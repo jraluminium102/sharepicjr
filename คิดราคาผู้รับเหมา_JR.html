@@ -231,11 +231,11 @@
       <div class="row2">
         <div class="field">
           <label>กว้าง (ม.)</label>
-          <input type="number" id="w" min="0" step="0.1" placeholder="0.00" oninput="calc()">
+          <input type="number" id="w" min="0" step="0.1" placeholder="0.00" oninput="autoCalcPile()">
         </div>
         <div class="field">
           <label>ยาว (ม.)</label>
-          <input type="number" id="l" min="0" step="0.1" placeholder="0.00" oninput="calc()">
+          <input type="number" id="l" min="0" step="0.1" placeholder="0.00" oninput="autoCalcPile()">
         </div>
       </div>
       <div id="area-display" class="info" style="display:none;margin-bottom:0;"></div>
@@ -244,9 +244,39 @@
     <!-- เสาเข็ม -->
     <div class="card">
       <h2>เสาเข็ม <span class="badge badge-green">🟢 ช่างพะเยา</span></h2>
+
+      <!-- ── ผู้ช่วยคำนวณอัตโนมัติ ── -->
+      <div style="background:#F1F5F9;border-radius:8px;padding:12px 12px 8px;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:var(--red-dark);margin-bottom:8px;">คำนวณจำนวนเข็ม/คานอัตโนมัติ <span style="font-weight:400;color:var(--muted);">(กฎช่าง · เช็คซ้ำ)</span></div>
+        <div class="row3">
+          <div class="field">
+            <label>จำนวนชั้น <span style="font-size:10.5px;color:var(--muted);">1ชั้น→I18, 2ชั้น→I22</span></label>
+            <select id="storey" onchange="onStoreyChange()">
+              <option value="1">1 ชั้น</option>
+              <option value="2">2 ชั้น</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>ระยะยื่นด้านกว้าง (ม.)</label>
+            <input type="number" id="overhang" min="0" step="0.1" value="0" oninput="autoCalcPile()">
+          </div>
+          <div class="field">
+            <label>เข็มด้านกว้าง</label>
+            <select id="width-mode" onchange="autoCalcPile()">
+              <option value="auto">อัตโนมัติ (ตามระยะยื่น)</option>
+              <option value="1">เดี่ยว (1)</option>
+              <option value="2">คู่ (2)</option>
+            </select>
+          </div>
+        </div>
+        <div id="auto-pile-summary" style="display:none;font-size:12.5px;color:#374151;margin-top:4px;padding:6px 8px;background:#fff;border-radius:6px;border:1px solid var(--line);"></div>
+        <div id="overhang-warn" style="display:none;margin-top:6px;"></div>
+      </div>
+
+      <!-- ── ช่องกรอกเอง (auto-fill แต่แก้ได้) ── -->
       <div class="row2">
         <div class="field">
-          <label>ชนิดเข็ม</label>
+          <label>ชนิดเข็ม <span style="font-size:10.5px;color:var(--muted);">(เปลี่ยนเองได้)</span></label>
           <select id="pile-type" onchange="calc()">
             <option value="0">— ไม่มี —</option>
             <option value="11000">ไมโครไพล์ I18 (11,000/ต้น)</option>
@@ -257,7 +287,7 @@
           </select>
         </div>
         <div class="field">
-          <label>จำนวนเข็ม (ต้น)</label>
+          <label>จำนวนเข็ม (ต้น) <span style="font-size:10.5px;color:var(--muted);">(แก้ได้)</span></label>
           <input type="number" id="pile-count" min="0" step="1" value="0" oninput="calc()">
         </div>
       </div>
@@ -1047,16 +1077,93 @@ function togglePaint() {
 }
 
 // ============================================================
+// AUTO CALC PILE (จำนวนชั้น / ระยะยื่น / mode)
+// ============================================================
+
+// เรียกเมื่อ storey เปลี่ยน: set pile-type อัตโนมัติ (ผู้ใช้เปลี่ยนเองได้ทีหลัง) แล้ว recompute
+function onStoreyChange() {
+  const storey = parseInt(el('storey').value) || 1;
+  if (storey === 1) {
+    el('pile-type').value = '11000'; // I18
+  } else {
+    el('pile-type').value = '12000'; // I22
+  }
+  autoCalcPile();
+}
+
+// คำนวณ pileCount/beamH/beamV จาก w, l, overhang, width-mode แล้วเรียก calc()
+function autoCalcPile() {
+  const l        = parseFloat(el('l').value) || 0;
+  const w        = parseFloat(el('w').value) || 0;
+  const overhang = parseFloat(el('overhang').value) || 0;
+  const mode     = el('width-mode').value;
+
+  // ---- คำนวณ widthFactor ----
+  let widthFactor;
+  if (mode === '1') {
+    widthFactor = 1;
+  } else if (mode === '2') {
+    widthFactor = 2;
+  } else {
+    // auto: ยื่น ≤ 1 ม. = เดี่ยว, > 1 ม. = คู่
+    widthFactor = (overhang <= 1) ? 1 : 2;
+  }
+
+  // ---- คำนวณ nL (แถวเข็มด้านยาว) ----
+  const nL = (l > 0) ? Math.ceil(l / 4) + 1 : 0;
+
+  // ---- เติมค่าลงช่อง ----
+  const pileCount = nL * widthFactor;
+  const beamH     = widthFactor;
+  const beamV     = nL;
+
+  el('pile-count').value = pileCount;
+  el('beam-h').value     = beamH;
+  el('beam-v').value     = beamV;
+
+  // ---- แสดงสรุปเล็ก ----
+  const factorLabel = widthFactor === 1 ? 'เดี่ยว' : 'คู่';
+  const modeLabel   = mode === 'auto'
+    ? `auto (ยื่น ${overhang} ม. → ${factorLabel})`
+    : factorLabel;
+  if (pileCount > 0) {
+    el('auto-pile-summary').style.display = 'block';
+    el('auto-pile-summary').innerHTML =
+      `<b>คำนวณ:</b> เข็ม <b>${pileCount}</b> ต้น ` +
+      `(${nL} แถว × ${widthFactor} ${modeLabel}) ` +
+      `&nbsp;·&nbsp; คานนอน <b>${beamH}</b> &nbsp;·&nbsp; คานตั้ง <b>${beamV}</b> ` +
+      `&nbsp;<span style="color:var(--muted);font-size:11px;">กฎช่าง (เช็คซ้ำ)</span>`;
+  } else {
+    el('auto-pile-summary').style.display = 'none';
+  }
+
+  // ---- เตือน overhang ----
+  const warnEl = el('overhang-warn');
+  if (overhang > 1.5) {
+    warnEl.style.display = 'block';
+    warnEl.innerHTML =
+      `<div class="warn">คานยื่น ${overhang} ม. &gt; 1.5 ม. เกินกฎ SPEC — ต้องวิศวกร กว. อนุมัติ</div>`;
+  } else if (overhang > 1.0) {
+    warnEl.style.display = 'block';
+    warnEl.innerHTML =
+      `<div class="info">ยื่น &gt;1 ม. ใช้เข็มคู่ (กฎช่าง · เช็คซ้ำ)</div>`;
+  } else {
+    warnEl.style.display = 'none';
+  }
+
+  // อัปเดตราคา
+  calc();
+}
+
+// ============================================================
 // LOAD SAMPLE
 // ============================================================
 function loadSample() {
+  // ① ขนาดพื้นที่
   el('w').value = 1.8;
   el('l').value = 3.5;
-  el('pile-type').value = '11000';
-  el('pile-count').value = 4;
-  el('beam-h').value = 2;
-  el('beam-v').value = 2;
 
+  // ② ราคา sand/tile ก่อน — ต้อง set state ก่อนที่ calc() จะอ่าน
   el('sand-val').value = 7000;
   state.sandVal = 7000;
   el('sand-label').textContent = '7,000 บ.';
@@ -1065,18 +1172,25 @@ function loadSample() {
   state.tileRate = 800;
   el('tile-label').textContent = '800 บ./ตร.ม.';
 
+  // ③ ผนัง/checkbox อื่น
   el('has-wall').checked = true;
   state.hasWall = true;
   el('wall-area-wrap').style.display = 'block';
-  // will be set by calc() to area
 
-  // uncheck others
   el('has-ceil').checked = false; state.hasCeil = false; el('ceil-wrap').style.display = 'none';
   el('has-elec').checked = false; state.hasElec = false; el('elec-wrap').style.display = 'none';
   el('has-demo').checked = false; state.hasDemo = false; el('demo-wrap').style.display = 'none';
   el('has-paint').checked = false; state.hasPaint = false; el('paint-wrap').style.display = 'none';
 
-  calc();
+  // ④ เสาเข็ม — ตั้ง storey=1, overhang=1.2, width-mode=auto ก่อน แล้ว autoCalcPile()
+  // autoCalcPile() คำนวณ: nL=ceil(3.5/4)+1=2, widthFactor=2 (ยื่น 1.2>1)
+  // → pile-count=4, beam-h=2, beam-v=2  แล้วเรียก calc() ให้ราคาออก 108,930 (ไม่มีผนัง)
+  el('storey').value     = '1';
+  el('pile-type').value  = '11000'; // storey=1 → I18 (11,000)
+  el('overhang').value   = 1.2;
+  el('width-mode').value = 'auto';
+  autoCalcPile(); // เติม pile-count=4, beam-h=2, beam-v=2 และเรียก calc() ภายใน
+  // calc() ท้ายนี้จะให้ผลรวม (มีผนัง) = 115,230 ถูกต้อง
 }
 
 // ============================================================
@@ -1408,16 +1522,41 @@ function updateStructPanel() {
   if (!state.area && !state.pileCount && !beamLen) {
     html = '<p style="color:var(--muted);font-size:13px;">กรอกข้อมูลที่แท็บ "คิดเร็ว" ก่อน</p>';
   } else {
+    // หมายเหตุ กว. บังคับ
+    html += `<div class="info" style="margin-bottom:10px;font-size:12px;">
+      ค่าด้านล่างเป็นประมาณการจากแท็บคิดเร็ว — <b>ต้องให้วิศวกร กว. ตรวจสอบก่อนก่อสร้างจริง</b>
+    </div>`;
+
     html += `<div class="item-row"><div class="item-name">พื้นที่</div><div class="item-price">${fmtDec(state.area,2)} ตร.ม.</div></div>`;
+
     if (state.pileCount > 0) {
       const pileOpt = el('pile-type').options[el('pile-type').selectedIndex].text.split(' (')[0];
+      // คำนวณ breakdown nL / widthFactor จาก state ปัจจุบัน
+      const overhang    = parseFloat(el('overhang').value) || 0;
+      const widthMode   = el('width-mode').value;
+      const storey      = parseInt(el('storey').value) || 1;
+      const nL          = (state.l > 0) ? Math.ceil(state.l / 4) + 1 : 0;
+      let widthFactor;
+      if (widthMode === '1')       widthFactor = 1;
+      else if (widthMode === '2')  widthFactor = 2;
+      else                         widthFactor = (overhang <= 1) ? 1 : 2;
+      const factorLabel = widthFactor === 1 ? 'เดี่ยว' : 'คู่';
+
       html += `<div class="item-row"><div class="item-name">เสาเข็ม</div><div class="item-price">${pileOpt} × ${fmt(state.pileCount)} ต้น</div></div>`;
+      // breakdown
+      if (nL > 0) {
+        html += `<div style="font-size:12px;color:var(--muted);padding:2px 0 6px;">
+          การวางเข็ม: ${nL} แถว (ยาว) × ${widthFactor} (${factorLabel}) = ${nL * widthFactor} ต้น
+          &nbsp;<span style="color:#6366F1;font-size:11px;">กฎช่าง (เช็คซ้ำ)</span>
+          &nbsp;|&nbsp; ${storey} ชั้น → ${storey === 1 ? 'I18' : 'I22'}
+        </div>`;
+      }
       html += `<div class="item-row"><div class="item-name">จำนวนหลุมขุด</div><div class="item-price">${fmt(state.pileCount)} หลุม</div></div>`;
       html += `<div class="item-row"><div class="item-name">จำนวนฟุตติ้ง</div><div class="item-price">${fmt(state.pileCount)} ต้น</div></div>`;
     }
     if (beamLen > 0) {
       html += `<div class="item-row"><div class="item-name">ความยาวคานรวม</div><div class="item-price">${fmtDec(beamLen,2)} ม.</div></div>`;
-      html += `<div style="font-size:12px;color:var(--muted);padding:4px 0 8px;">= (${fmtDec(state.l,1)} × ${state.beamH}) + (${fmtDec(state.w,1)} × ${state.beamV})</div>`;
+      html += `<div style="font-size:12px;color:var(--muted);padding:4px 0 8px;">= (${fmtDec(state.l,1)} × ${state.beamH} คานนอน) + (${fmtDec(state.w,1)} × ${state.beamV} คานตั้ง)</div>`;
     }
     if (state.area > 0) {
       html += `<div class="item-row"><div class="item-name">พื้นที่เทพื้น/ทราย/กระเบื้อง</div><div class="item-price">${fmtDec(state.area,2)} ตร.ม.</div></div>`;
