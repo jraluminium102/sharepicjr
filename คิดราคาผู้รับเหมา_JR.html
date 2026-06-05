@@ -329,16 +329,16 @@
       <div class="field" style="margin-top:8px;">
         <label>ทราย (เหมา) — 6,500–9,000 บาท</label>
         <div class="slider-wrap">
-          <input type="range" id="sand-val" min="6500" max="9000" step="500" value="9000" style="flex:1;" oninput="onSandSlide(this.value)">
-          <span class="slider-val" id="sand-label">9,000 บ.</span>
+          <input type="range" id="sand-val" min="6500" max="9000" step="500" value="7500" style="flex:1;" oninput="onSandSlide(this.value)">
+          <span class="slider-val" id="sand-label">7,500 บ.</span>
         </div>
       </div>
 
       <div class="field" style="margin-top:8px;">
         <label>กระเบื้อง — 500–800 บาท/ตร.ม.</label>
         <div class="slider-wrap">
-          <input type="range" id="tile-rate" min="500" max="800" step="50" value="800" style="flex:1;" oninput="onTileSlide(this.value)">
-          <span class="slider-val" id="tile-label">800 บ./ตร.ม.</span>
+          <input type="range" id="tile-rate" min="500" max="800" step="50" value="650" style="flex:1;" oninput="onTileSlide(this.value)">
+          <span class="slider-val" id="tile-label">650 บ./ตร.ม.</span>
         </div>
       </div>
     </div>
@@ -375,8 +375,8 @@
             <label>ราคา/ตร.ม.</label>
             <select id="ceil-rate" onchange="calc()">
               <option value="1500">1,500 (ฝ้าธรรมดา)</option>
-              <option value="2000">2,000 (กลาง)</option>
-              <option value="2500" selected>2,500 (ฉนวนหนา)</option>
+              <option value="2000" selected>2,000 (กลาง)</option>
+              <option value="2500">2,500 (ฉนวนหนา)</option>
             </select>
           </div>
         </div>
@@ -402,8 +402,8 @@
         <div class="field">
           <label>ราคาเดินไฟ (500–1,500 บ./ตร.ม.)</label>
           <div class="slider-wrap">
-            <input type="range" id="elec-rate" min="500" max="1500" step="100" value="1500" style="flex:1;" oninput="onElecSlide(this.value)">
-            <span class="slider-val" id="elec-label">1,500 บ./ตร.ม.</span>
+            <input type="range" id="elec-rate" min="500" max="1500" step="100" value="1000" style="flex:1;" oninput="onElecSlide(this.value)">
+            <span class="slider-val" id="elec-label">1,000 บ./ตร.ม.</span>
           </div>
         </div>
       </div>
@@ -992,10 +992,10 @@ let state = {
   w: 0, l: 0, area: 0,
   pileType: 0, pileCount: 0,
   beamH: 0, beamV: 0,
-  sandVal: 9000, tileRate: 800,
+  sandVal: 7500, tileRate: 650,
   hasWall: false, wallArea: 0,
-  hasCeil: false, ceilArea: 0, ceilRate: 2500,
-  hasElec: false, plug: 0, sw: 0, elecArea: 0, elecRate: 1500,
+  hasCeil: false, ceilArea: 0, ceilRate: 2000,
+  hasElec: false, plug: 0, sw: 0, elecArea: 0, elecRate: 1000,
   hasDemo: false, demoSize: 16000,
   hasPaint: false, paintVal: 15000,
 };
