@@ -1092,61 +1092,74 @@ function onStoreyChange() {
 }
 
 // คำนวณ pileCount/beamH/beamV จาก w, l, overhang, width-mode แล้วเรียก calc()
+// โมเดลใหม่: กริด n_w × n_l โดย -1.0 = คานยื่นปลาย 0.5ม. หัว+ท้าย
 function autoCalcPile() {
   const l        = parseFloat(el('l').value) || 0;
   const w        = parseFloat(el('w').value) || 0;
   const overhang = parseFloat(el('overhang').value) || 0;
   const mode     = el('width-mode').value;
 
-  // ---- คำนวณ widthFactor ----
-  let widthFactor;
-  if (mode === '1') {
-    widthFactor = 1;
-  } else if (mode === '2') {
-    widthFactor = 2;
-  } else {
-    // auto: ยื่น ≤ 1 ม. = เดี่ยว, > 1 ม. = คู่
-    widthFactor = (overhang <= 1) ? 1 : 2;
+  if (l <= 0 || w <= 0) {
+    el('auto-pile-summary').style.display = 'none';
+    el('overhang-warn').style.display = 'none';
+    calc();
+    return;
   }
 
-  // ---- คำนวณ nL (แถวเข็มด้านยาว) ----
-  const nL = (l > 0) ? Math.ceil(l / 4) + 1 : 0;
+  // ---- กริดเข็มหลัก (ทั้ง 2 ด้าน) ----
+  // -1.0 = คานยื่นปลาย 0.5ม. หัว+ท้าย วางเข็มเข้าด้านใน
+  const n_w = Math.max(1, Math.ceil((w - 1.0) / 4) + 1);
+  const n_l = Math.max(1, Math.ceil((l - 1.0) / 4) + 1);
+  const gridPiles = n_w * n_l;
 
-  // ---- เติมค่าลงช่อง ----
-  const pileCount = nL * widthFactor;
-  const beamH     = widthFactor;
-  const beamV     = nL;
+  // ---- ตัดสินใจเข็มคู่ (ด้านยื่น) ----
+  // mode บังคับ หรือ auto ตัดที่ threshold 1.0 ม.
+  let doubleRow = false;
+  if (mode === '2') {
+    doubleRow = true;
+  } else if (mode === '1') {
+    doubleRow = false;
+  } else {
+    // auto: ยื่น ≤ 1.0 ม. = เดี่ยว, > 1.0 ม. (และ ≤ 1.5) = คู่
+    doubleRow = (overhang > 1.0 && overhang <= 1.5);
+  }
+
+  // ---- จำนวนเข็มและคาน ----
+  // เข็มคู่ = เพิ่ม backspan 1 แถว (n_l ต้น) + คานนอนเพิ่ม 1 เส้น
+  const extraPiles = doubleRow ? n_l : 0;
+  const pileCount  = gridPiles + extraPiles;
+  const beamH      = n_w + (doubleRow ? 1 : 0);  // คานนอน (วิ่งตามแนวยาว)
+  const beamV      = n_l;                          // คานตั้ง (วิ่งตามแนวกว้าง)
 
   el('pile-count').value = pileCount;
   el('beam-h').value     = beamH;
   el('beam-v').value     = beamV;
 
-  // ---- แสดงสรุปเล็ก ----
-  const factorLabel = widthFactor === 1 ? 'เดี่ยว' : 'คู่';
-  const modeLabel   = mode === 'auto'
-    ? `auto (ยื่น ${overhang} ม. → ${factorLabel})`
-    : factorLabel;
-  if (pileCount > 0) {
-    el('auto-pile-summary').style.display = 'block';
-    el('auto-pile-summary').innerHTML =
-      `<b>คำนวณ:</b> เข็ม <b>${pileCount}</b> ต้น ` +
-      `(${nL} แถว × ${widthFactor} ${modeLabel}) ` +
-      `&nbsp;·&nbsp; คานนอน <b>${beamH}</b> &nbsp;·&nbsp; คานตั้ง <b>${beamV}</b> ` +
-      `&nbsp;<span style="color:var(--muted);font-size:11px;">กฎช่าง (เช็คซ้ำ)</span>`;
-  } else {
-    el('auto-pile-summary').style.display = 'none';
+  // ---- แสดงสรุปเล็ก (auto-pile-summary) ----
+  const spacing_w = n_w > 1 ? fmtDec((w - 1) / (n_w - 1), 2) : '—';
+  const spacing_l = n_l > 1 ? fmtDec((l - 1) / (n_l - 1), 2) : '—';
+  let summaryExtra = '';
+  if (doubleRow) {
+    summaryExtra = ` + เข็มคู่ backspan ${n_l} ต้น`;
   }
+  el('auto-pile-summary').style.display = 'block';
+  el('auto-pile-summary').innerHTML =
+    `<b>คำนวณ:</b> เข็ม <b>${pileCount}</b> ต้น = กว้าง ${n_w} × ยาว ${n_l} (ยื่นปลาย 0.5ม. หัวท้าย)` +
+    `${summaryExtra}` +
+    ` &nbsp;·&nbsp; คานนอน <b>${beamH}</b> &nbsp;·&nbsp; คานตั้ง <b>${beamV}</b>` +
+    ` &nbsp;·&nbsp; ระยะเข็ม กว. ${spacing_w}ม. / ยาว ${spacing_l}ม.` +
+    ` &nbsp;<span style="color:var(--muted);font-size:11px;">กฎช่าง (เช็คซ้ำ)</span>`;
 
   // ---- เตือน overhang ----
   const warnEl = el('overhang-warn');
   if (overhang > 1.5) {
     warnEl.style.display = 'block';
     warnEl.innerHTML =
-      `<div class="warn">คานยื่น ${overhang} ม. &gt; 1.5 ม. เกินกฎ SPEC — ต้องวิศวกร กว. อนุมัติ</div>`;
+      `<div class="warn">ยื่น ${overhang} ม. &gt; 1.5 ม. เกินสเปกคานยื่น — ต้องเพิ่มเสารับปลาย/ให้ กว. ออกแบบ</div>`;
   } else if (overhang > 1.0) {
     warnEl.style.display = 'block';
     warnEl.innerHTML =
-      `<div class="info">ยื่น &gt;1 ม. ใช้เข็มคู่ (กฎช่าง · เช็คซ้ำ)</div>`;
+      `<div class="info">เข็มคู่ — ต้องมี backspan ≥ 3 เท่า (≥${fmtDec(3 * overhang, 2)} ม.) + เข็มถ่วงรับแรงดึงขึ้น (uplift) · กฎช่าง เช็คซ้ำ</div>`;
   } else {
     warnEl.style.display = 'none';
   }
@@ -1182,15 +1195,14 @@ function loadSample() {
   el('has-demo').checked = false; state.hasDemo = false; el('demo-wrap').style.display = 'none';
   el('has-paint').checked = false; state.hasPaint = false; el('paint-wrap').style.display = 'none';
 
-  // ④ เสาเข็ม — ตั้ง storey=1, overhang=1.2, width-mode=auto ก่อน แล้ว autoCalcPile()
-  // autoCalcPile() คำนวณ: nL=ceil(3.5/4)+1=2, widthFactor=2 (ยื่น 1.2>1)
-  // → pile-count=4, beam-h=2, beam-v=2  แล้วเรียก calc() ให้ราคาออก 108,930 (ไม่มีผนัง)
+  // ④ เสาเข็ม — storey=1, overhang=0, width-mode=auto
+  // โมเดลใหม่: n_w=ceil((1.8-1)/4)+1=2, n_l=ceil((3.5-1)/4)+1=2 → gridPiles=4, ไม่มีเข็มคู่
+  // beamH=2, beamV=2, beamLen=(3.5×2)+(1.8×2)=10.6 → ราคา 108,930 (ไม่ผนัง)/115,230 (ผนัง)
   el('storey').value     = '1';
   el('pile-type').value  = '11000'; // storey=1 → I18 (11,000)
-  el('overhang').value   = 1.2;
+  el('overhang').value   = 0;
   el('width-mode').value = 'auto';
   autoCalcPile(); // เติม pile-count=4, beam-h=2, beam-v=2 และเรียก calc() ภายใน
-  // calc() ท้ายนี้จะให้ผลรวม (มีผนัง) = 115,230 ถูกต้อง
 }
 
 // ============================================================
@@ -1267,16 +1279,17 @@ function calc() {
       src: 'green',
     });
 
-    // pile warn — ประมาณระยะเข็ม (SPEC 13.2)
-    // สูตรหยาบ: ระยะประมาณ = max(กว้าง,ยาว) ÷ (จำนวนเข็ม−1)
-    // ใช้ได้เมื่อมีพื้นที่ และเข็ม ≥ 2
+    // pile warn — ระยะเข็มจริงจากกริด n_w × n_l (โมเดลใหม่)
     if (state.pileCount >= 2 && state.area > 0) {
-      const longestSide = Math.max(state.w, state.l);
-      const approxSpacing = longestSide / (state.pileCount - 1);
-      if (approxSpacing > 4) {
+      const nwChk = (state.w > 0) ? Math.max(1, Math.ceil((state.w - 1.0) / 4) + 1) : 1;
+      const nlChk = (state.l > 0) ? Math.max(1, Math.ceil((state.l - 1.0) / 4) + 1) : 1;
+      const sp_w  = nwChk > 1 ? (state.w - 1) / (nwChk - 1) : 0;
+      const sp_l  = nlChk > 1 ? (state.l - 1) / (nlChk - 1) : 0;
+      const maxSp = Math.max(sp_w, sp_l);
+      if (maxSp > 4) {
         el('pile-warn').style.display = 'block';
         el('pile-warn').textContent =
-          `⚠️ ระยะเข็มประมาณ ${fmtDec(approxSpacing, 1)} ม. เกิน 4 ม. (กฎ) — ตรวจผังจริง (ค่าประมาณหยาบ)`;
+          `⚠️ ระยะเข็มสูงสุด ${fmtDec(maxSp, 2)} ม. เกิน 4 ม. (กฎ) — ตรวจผังจริง`;
       } else {
         el('pile-warn').style.display = 'none';
       }
@@ -1530,23 +1543,25 @@ function updateStructPanel() {
     html += `<div class="item-row"><div class="item-name">พื้นที่</div><div class="item-price">${fmtDec(state.area,2)} ตร.ม.</div></div>`;
 
     if (state.pileCount > 0) {
-      const pileOpt = el('pile-type').options[el('pile-type').selectedIndex].text.split(' (')[0];
-      // คำนวณ breakdown nL / widthFactor จาก state ปัจจุบัน
-      const overhang    = parseFloat(el('overhang').value) || 0;
-      const widthMode   = el('width-mode').value;
-      const storey      = parseInt(el('storey').value) || 1;
-      const nL          = (state.l > 0) ? Math.ceil(state.l / 4) + 1 : 0;
-      let widthFactor;
-      if (widthMode === '1')       widthFactor = 1;
-      else if (widthMode === '2')  widthFactor = 2;
-      else                         widthFactor = (overhang <= 1) ? 1 : 2;
-      const factorLabel = widthFactor === 1 ? 'เดี่ยว' : 'คู่';
+      const pileOpt  = el('pile-type').options[el('pile-type').selectedIndex].text.split(' (')[0];
+      // breakdown โมเดลใหม่ n_w × n_l + ยื่นปลาย 0.5ม. + เดี่ยว/คู่
+      const overhang = parseFloat(el('overhang').value) || 0;
+      const widthMode= el('width-mode').value;
+      const storey   = parseInt(el('storey').value) || 1;
+      const n_w_sp   = (state.w > 0) ? Math.max(1, Math.ceil((state.w - 1.0) / 4) + 1) : 0;
+      const n_l_sp   = (state.l > 0) ? Math.max(1, Math.ceil((state.l - 1.0) / 4) + 1) : 0;
+      const gridSp   = n_w_sp * n_l_sp;
+      let doubleRowSp = false;
+      if (widthMode === '2') doubleRowSp = true;
+      else if (widthMode === '1') doubleRowSp = false;
+      else doubleRowSp = (overhang > 1.0 && overhang <= 1.5);
+      const extraSp   = doubleRowSp ? n_l_sp : 0;
+      const doubleLabel = doubleRowSp ? ` + เข็มคู่ backspan ${n_l_sp} ต้น` : '';
 
       html += `<div class="item-row"><div class="item-name">เสาเข็ม</div><div class="item-price">${pileOpt} × ${fmt(state.pileCount)} ต้น</div></div>`;
-      // breakdown
-      if (nL > 0) {
+      if (n_w_sp > 0 && n_l_sp > 0) {
         html += `<div style="font-size:12px;color:var(--muted);padding:2px 0 6px;">
-          การวางเข็ม: ${nL} แถว (ยาว) × ${widthFactor} (${factorLabel}) = ${nL * widthFactor} ต้น
+          กริด ${n_w_sp} × ${n_l_sp} = ${gridSp} ต้น (ยื่นปลาย 0.5ม. หัวท้าย)${doubleLabel}
           &nbsp;<span style="color:#6366F1;font-size:11px;">กฎช่าง (เช็คซ้ำ)</span>
           &nbsp;|&nbsp; ${storey} ชั้น → ${storey === 1 ? 'I18' : 'I22'}
         </div>`;
