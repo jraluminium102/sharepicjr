@@ -2613,7 +2613,7 @@ function genQuote(keepNo){
     const isSplit = window.qSplit || !!window.qSplitGroups[gn];
     const items = groups[gn];
     let gTotal=0;
-    const _gl=(items[0]&&items[0].groupLabel&&items[0].groupLabel.trim())||(items[0]?itemDetail(items[0]).prodName:'ชุด');
+    const _gl=(items[0]&&items[0].groupLabel&&items[0].groupLabel.trim())||(items.some(it=>it.position&&it.position.trim())?'กั้นห้องกระจก':(items[0]?itemDetail(items[0]).prodName:'ชุด'));
     items.forEach(it => { gTotal += it.r.sell*it.qty; });
     // รวบรวมบรรทัดรายละเอียด (det) ของทุกบาน แล้วตัดซ้ำ (dedupe) คงลำดับเดิม
     // — บรรทัด OPTION / หมายเหตุ ห้าม dedupe/ห้ามรวม ให้คงไว้ตามเดิม
@@ -2633,14 +2633,21 @@ function genQuote(keepNo){
       if(matLines.length){ content += '<div style="margin-top:6px;font-weight:600;color:#1F2937;">รายละเอียดงาน</div>';
         matLines.forEach(t => { content += '<div style="margin:1px 0 0 8px;color:#1F2937;font-size:13px;">- '+t+'</div>'; }); }
     } else {
-      // กั้นห้อง/งานหลายด้าน: ทุกส่วนมีตำแหน่ง → ขึ้นบรรทัดแยก "- {ตำแหน่ง} {ชื่อบาน}" (ตามใบจริง spec ข้อ 6)
-      const allPos = items.length>1 && items.every(it => it.position && it.position.trim());
-      if(allPos){
-        items.forEach(it => { const d=itemDetail(it); const pos=it.position.trim();
-          const an=(it.r.addonLines||[]).map(function(a){return a.n;});
-          // ถ้าชื่อบานขึ้นต้นด้วยตำแหน่งอยู่แล้ว (เช่น "หลังคา...") ไม่ใส่ตำแหน่งซ้ำ
-          const nm = d.prodName.startsWith(pos) ? d.prodName : (pos+' '+d.prodName);
-          content += '<div style="margin:2px 0 0 8px;color:#1F2937;font-size:13px;">- '+nm.replace(/\n/g,'<br>&nbsp;&nbsp;')+(an.length?' (มี'+an.join(', ')+')':'')+'</div>'; });
+      // กั้นห้อง/งานหลายด้าน: จัดกลุ่มตาม "ด้าน" → หัวด้านขึ้นก่อน บานเรียงใต้ (ตัด "พร้อม" ซ้ำ)
+      const hasPos = items.some(it => it.position && it.position.trim());
+      if(hasPos){
+        const order=[]; const byPos={}; let lastKey='';
+        items.forEach(it => {
+          let key=(it.position&&it.position.trim())||lastKey||'อื่นๆ'; lastKey=key;  // ชิ้นไม่ระบุด้าน (เช่นช่องแสงติดตาย) → แนบด้านก่อนหน้า
+          if(!byPos[key]){ byPos[key]=[]; order.push(key); }
+          byPos[key].push(it);
+        });
+        order.forEach(key => {
+          content += '<div style="margin:6px 0 1px 8px;font-weight:700;color:#B3151D;font-size:13px;">'+key+'</div>';
+          byPos[key].forEach(it => { const d=itemDetail(it); const an=(it.r.addonLines||[]).map(function(a){return a.n;});
+            let nm=d.prodName; if(nm.indexOf(key)===0) nm=nm.slice(key.length).trim();  // ตัดชื่อด้านซ้ำ (เช่น หลังคา)
+            content += '<div style="margin:1px 0 0 22px;color:#1F2937;font-size:13px;">• '+nm.replace(/\n/g,'<br>&nbsp;&nbsp;&nbsp;')+(an.length?' (มี'+an.join(', ')+')':'')+'</div>'; });
+        });
       } else {
         const names = items.map(it => { const d=itemDetail(it); const pos=it.position?(' '+it.position):''; const an=(it.r.addonLines||[]).map(function(a){return a.n;}); return d.prodName+pos+(an.length?' (มี'+an.join(', ')+')':''); });
         content += '<div style="margin:4px 0 0 8px;color:#1F2937;">- '+names.join(' พร้อม ')+'</div>';
