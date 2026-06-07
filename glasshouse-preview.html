@@ -1519,7 +1519,7 @@ function refreshSet(box){
 
   // ---- [2] ปุ่มระดับชุด: เปลี่ยนข้อความ + ซ่อน/โชว์ ----
   box.querySelectorAll('.set-addpart').forEach(function(btn, idx){
-    btn.textContent = hasGH ? '+ เพิ่มด้าน' : '+ เพิ่มส่วน';
+    btn.textContent = hasGH ? '+ เพิ่มบาน' : '+ เพิ่มส่วน';
     btn.style.display = (hasGH && idx>0) ? 'none' : '';  // กั้นห้อง: เหลือปุ่ม "เพิ่มด้าน" อันเดียว
   });
   box.querySelectorAll('.set-addfixed').forEach(function(btn){
