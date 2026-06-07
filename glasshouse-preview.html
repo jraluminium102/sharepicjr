@@ -1503,7 +1503,7 @@ let setSeq=0;
 // จัดหมวด option ในกั้นห้อง (post-process .opt flat → ใส่หัวข้อหมวด) — keyword-based
 function groupGHOpts(ch){
   var box=ch&&ch.querySelector('.i-opts'); if(!box || !box.children.length) return;
-  if(box.querySelector('.gh-opt-cat')) return; // จัดแล้ว (buildItemOpts จะ rebuild flat ใหม่เองเมื่อเปลี่ยน product)
+  if(box.querySelector('.gh-opt-cat-det')) return; // จัดแล้ว (buildItemOpts จะ rebuild flat ใหม่เองเมื่อเปลี่ยน product)
   var CATS=[
     {key:'🚪 ชนิด / การเปิด', kw:['ชนิดการเปิด','combo บาน']},
     {key:'🔧 มือจับ / ล็อค', kw:['มือจับ','Cmech','โช๊ค','[Up','ชุดล็อค','กุญแจ','เลือกมือจับ']},
@@ -1515,7 +1515,7 @@ function groupGHOpts(ch){
   var buckets=CATS.map(function(){return [];});
   kids.forEach(function(k){ var t=k.textContent||''; var ci=CATS.length-1; for(var i=0;i<CATS.length-1;i++){ if(CATS[i].kw.some(function(w){return t.indexOf(w)>=0;})){ ci=i; break; } } buckets[ci].push(k); });
   box.innerHTML='';
-  CATS.forEach(function(c,i){ if(!buckets[i].length) return; var h=document.createElement('div'); h.className='gh-opt-cat'; h.style.cssText='font-weight:700;color:#B3151D;font-size:12px;margin:9px 0 3px;border-bottom:1px dashed #e0c0c0;padding-bottom:2px;'; h.textContent=c.key; box.appendChild(h); buckets[i].forEach(function(k){ box.appendChild(k); }); });
+  CATS.forEach(function(c,i){ if(!buckets[i].length) return; var det=document.createElement('details'); det.className='gh-opt-cat-det'; det.style.cssText='margin:5px 0;border:1px solid #eedede;border-radius:6px;padding:0 8px;background:#fffafa;'; var sm=document.createElement('summary'); sm.style.cssText='font-weight:700;color:#B3151D;font-size:12px;cursor:pointer;padding:6px 2px;'; sm.textContent=c.key+' ('+buckets[i].length+')'; det.appendChild(sm); buckets[i].forEach(function(k){ det.appendChild(k); }); box.appendChild(det); });
 }
 function refreshSet(box){
   if(!box) return;
