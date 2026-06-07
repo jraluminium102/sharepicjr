@@ -1518,8 +1518,9 @@ function refreshSet(box){
   });
 
   // ---- [2] ปุ่มระดับชุด: เปลี่ยนข้อความ + ซ่อน/โชว์ ----
-  box.querySelectorAll('.set-addpart').forEach(function(btn){
+  box.querySelectorAll('.set-addpart').forEach(function(btn, idx){
     btn.textContent = hasGH ? '+ เพิ่มด้าน' : '+ เพิ่มส่วน';
+    btn.style.display = (hasGH && idx>0) ? 'none' : '';  // กั้นห้อง: เหลือปุ่ม "เพิ่มด้าน" อันเดียว
   });
   box.querySelectorAll('.set-addfixed').forEach(function(btn){
     // ซ่อนปุ่ม "+ ช่องแสงติดตาย" ระดับชุดเมื่อมีกลุ่ม 6 (ย้ายไปเป็น "+ เพิ่มบานในด้าน")
@@ -1578,9 +1579,11 @@ function refreshSet(box){
       var btn = c.querySelector('.sub-addbtn');
       if(!btn) return;
       if(isGH){
-        btn.textContent = '+ เพิ่มบานในด้านนี้';
-        btn.dataset.ghMode = '1';
+        // ตัดปุ่ม "เพิ่มบานในด้านนี้" — เหลือ "+ เพิ่มด้าน" ปุ่มเดียวพอ (เพิ่มด้านแล้วแก้ชื่อด้านให้ซ้ำได้ = บานในด้านเดิม)
+        btn.style.display = 'none';
+        btn.dataset.ghMode = '0';
       } else {
+        btn.style.display = '';
         btn.textContent = '＋ เพิ่มบานย่อยในชุดนี้';
         btn.dataset.ghMode = '0';
       }
@@ -1595,7 +1598,7 @@ function refreshSet(box){
       if(cw && cw.dataset.ghHidden){ delete cw.dataset.ghHidden; cw.style.display = ''; }
       if(gw && gw.dataset.ghHidden){ delete gw.dataset.ghHidden; gw.style.display = ''; }
       var btn = c.querySelector('.sub-addbtn');
-      if(btn){ btn.textContent = '＋ เพิ่มบานย่อยในชุดนี้'; btn.dataset.ghMode = '0'; }
+      if(btn){ btn.style.display=''; btn.textContent = '＋ เพิ่มบานย่อยในชุดนี้'; btn.dataset.ghMode = '0'; }
     });
   }
 }
