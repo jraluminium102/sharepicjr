@@ -1,0 +1,153 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ภาพร่าง flow — เช็คลิสต์ + ใบปะหน้า อยู่หน้าไหน ใช้ยังไง</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:#eceef1;color:#1a1a1a;padding:22px 14px;font-size:14px}
+.wrap{max-width:720px;margin:0 auto}
+h1{font-size:19px;color:#7d0f15;margin-bottom:4px}
+.lead{color:#667;font-size:13px;margin-bottom:20px}
+.step{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:8px}
+.stepnum{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#b3151d;color:#fff;font-weight:700;font-size:14px;margin-right:8px}
+.sthead{display:flex;align-items:center;margin-bottom:12px}
+.sttitle{font-weight:700;font-size:15px;color:#7d0f15}
+.arrow{text-align:center;color:#b3151d;font-size:26px;line-height:1;margin:2px 0}
+/* mini mockup */
+.mock{border:1.5px solid #d6d9de;border-radius:10px;overflow:hidden;background:#fafbfc}
+.bar{background:#7d0f15;color:#fff;padding:7px 11px;font-size:12px;display:flex;align-items:center;gap:8px}
+.bar .dot{width:8px;height:8px;border-radius:50%;background:#ffffff66}
+.body{padding:11px 13px}
+.btnrow{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}
+.btn{border-radius:8px;padding:6px 11px;font-size:12px;font-weight:600;border:1px solid #ccc;background:#fff;color:#444}
+.btn.bChk{background:#e7f0fb;border-color:#9cc1ee;color:#1e60c0}
+.btn.bCov{background:#fdeaea;border-color:#e6a3a3;color:#b3151d}
+.btn.bP{color:#666}
+.hl{outline:2px dashed #b3151d;outline-offset:2px;border-radius:8px}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:5px;margin-left:6px;vertical-align:middle}
+.tag.chk{background:#dbeafe;color:#1e60c0}
+.tag.cov{background:#fde2e2;color:#b3151d}
+.row{height:9px;background:#e9ebee;border-radius:3px;margin:6px 0}
+.row.s{width:60%}.row.m{width:80%}
+.chkitem{display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px solid #eee}
+.box{width:15px;height:15px;border:1.5px solid #9aa;border-radius:3px;flex-shrink:0}
+.box.on{background:#22c55e;border-color:#22c55e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px}
+.thru{text-decoration:line-through;color:#9a9}
+table.mini{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:4px}
+table.mini th,table.mini td{border:1px solid #999;padding:3px 5px;vertical-align:top}
+table.mini th{text-decoration:underline;text-align:center;font-size:10px}
+.red{color:#c00}
+.note{font-size:12.5px;color:#555;margin-top:10px;background:#fff8e1;border:1px solid #f1d98a;border-radius:8px;padding:8px 11px}
+.cap{font-size:12px;color:#778;margin-top:8px}
+.side{display:flex;gap:10px}
+.sidebar{width:130px;flex-shrink:0;background:#2a2f37;border-radius:8px;padding:9px;color:#fff;font-size:11px}
+.sidebar .m{padding:5px 6px;border-radius:5px;margin-bottom:2px;opacity:.7}
+.sidebar .m.act{background:#ffffff22;opacity:1}
+</style></head><body>
+<div class="wrap">
+<h1>ภาพร่าง: เช็คลิสต์ + ใบปะหน้า อยู่หน้าไหน ใช้ยังไง</h1>
+<div class="lead">ทั้งคู่เข้าจาก "หน้าใบสั่งผลิต" — ตามรอยทีละขั้น 👇</div>
+
+<!-- STEP 1 -->
+<div class="step">
+  <div class="sthead"><span class="stepnum">1</span><span class="sttitle">เปิดงานจากเมนู "ใบสั่งผลิต"</span></div>
+  <div class="mock">
+    <div class="bar"><span class="dot"></span> JR · ระบบออฟฟิศ</div>
+    <div class="body">
+      <div style="font-size:12px;color:#667;margin-bottom:6px">รายการใบสั่งผลิต</div>
+      <div class="hl" style="padding:8px;background:#fff">PO2568060012 · คุณณัฐวดี &nbsp;<span style="color:#b3151d">▶ กดเปิด</span></div>
+      <div class="row m" style="margin-top:8px"></div><div class="row s"></div>
+    </div>
+  </div>
+</div>
+<div class="arrow">↓ กดเปิดงาน</div>
+
+<!-- STEP 2 -->
+<div class="step">
+  <div class="sthead"><span class="stepnum">2</span><span class="sttitle">หน้างาน — ปุ่มอยู่แถบบน (เลือกได้ 2 อย่าง)</span></div>
+  <div class="mock">
+    <div class="bar"><span class="dot"></span> PO2568060012 · คุณณัฐวดี</div>
+    <div class="body">
+      <div class="btnrow">
+        <span class="btn bChk hl">✓ เช็คลิสต์</span>
+        <span class="btn bCov hl">▤ ใบปะหน้า</span>
+        <span class="btn bP">🖶 พิมพ์/PDF</span>
+      </div>
+      <div class="row m"></div><div class="row s"></div>
+      <div style="font-size:11px;color:#889;margin-top:6px">↑ รายการสินค้าในงาน</div>
+    </div>
+  </div>
+  <div class="note">ปุ่ม <b class="red">ใบปะหน้า</b> กับ <b style="color:#1e60c0">เช็คลิสต์</b> อยู่ตรงนี้ — เปิดงานแล้วเห็นเลย เลือกกดได้</div>
+</div>
+
+<div class="side" style="margin:14px 0">
+  <div style="flex:1">
+    <div class="arrow">↙ กด "เช็คลิสต์"</div>
+  </div>
+  <div style="flex:1">
+    <div class="arrow">กด "ใบปะหน้า" ↘</div>
+  </div>
+</div>
+
+<!-- STEP 3A : checklist -->
+<div class="step">
+  <div class="sthead"><span class="stepnum">3</span><span class="sttitle">ทาง A — เช็คลิสต์ <span class="tag chk">ติ๊กเอง</span></span></div>
+  <div class="mock">
+    <div class="bar" style="background:#1e60c0"><span class="dot"></span> เช็คลิสต์งาน · คุณณัฐวดี</div>
+    <div class="body">
+      <div style="font-weight:700;color:#1e60c0;font-size:13px;margin-bottom:4px">เซลล์ปิดงาน <span style="font-size:11px;color:#889">2/6 รายการ</span></div>
+      <div class="chkitem"><span class="box on">✓</span><span class="thru">ยืนยันสีอลูมิเนียม — <i>สีอบขาว</i></span></div>
+      <div class="chkitem"><span class="box on">✓</span><span class="thru">ยืนยันชนิดกระจก — <i>เขียว 6มม.</i></span></div>
+      <div class="chkitem"><span class="box"></span><span>ยืนยันทิศเปิด-ปิดบาน</span></div>
+      <div class="chkitem"><span class="box"></span><span>ลายเซ็นลูกค้า <span class="tag chk">ต้องเซ็น</span></span></div>
+      <div style="text-align:right;margin-top:8px"><span class="btn bChk">บันทึก</span></div>
+    </div>
+  </div>
+  <div class="cap">ใช้ตอน: คุยกับลูกค้า/เตรียมงาน — <b>ติ๊ก</b>ทีละข้อ + <b>ใส่หมายเหตุ</b> + กด <b>บันทึก</b> · แต่ละบทบาทเห็นเฉพาะชุดของตัวเอง</div>
+</div>
+
+<!-- STEP 3B : cover -->
+<div class="step">
+  <div class="sthead"><span class="stepnum">3</span><span class="sttitle">ทาง B — ใบปะหน้า <span class="tag cov">พิมพ์/แก้</span></span></div>
+  <div class="mock">
+    <div class="bar"><span class="dot"></span> ใบปะหน้างาน · คุณณัฐวดี</div>
+    <div class="body">
+      <div style="text-align:center;font-weight:700;font-size:12px;border-bottom:1px solid #999;padding-bottom:3px;margin-bottom:6px"><span style="font-weight:400;color:#888;font-size:11px">ชื่อลูกค้า</span> คุณณัฐวดี (มด)</div>
+      <table class="mini">
+        <thead><tr><th>สั่งของเตรียมผลิต</th><th>แจ้งช่างติดตั้ง</th><th>แจ้งลูกค้าเตรียมของ</th></tr></thead>
+        <tbody><tr>
+          <td>- อลูมิเนียม สีอบขาว<br>- กระจกเขียว 6มม.<br>- มุ้งจีบ ผ้าไฟเบอร์ดำ</td>
+          <td class="red">- เสริมกล่อง (A)<br>- ดรอปพื้น (B)<br>- รื้อระแนง (C)</td>
+          <td class="red">- สีทาเก็บงาน</td>
+        </tr></tbody>
+      </table>
+      <div class="btnrow" style="justify-content:flex-end;margin-top:8px">
+        <span class="btn bCov">บันทึก</span><span class="btn bP">🖶 พิมพ์/PDF</span>
+      </div>
+    </div>
+  </div>
+  <div class="cap">ใช้ตอน: เตรียมผลิต/ไปหน้างาน — คอลัมน์ ① <b>ระบบดึงให้เอง</b> · ②③ <b class="red">พิมพ์เพิ่ม/แก้</b>ได้ · กด <b>พิมพ์</b>แนบไปกับเอกสารสั่งผลิต</div>
+</div>
+
+<!-- STEP 4 : admin -->
+<div class="step" style="background:#f7f8fa">
+  <div class="sthead"><span class="stepnum">＋</span><span class="sttitle">เฉพาะแอดมิน — ตั้ง/แก้ "ชุดเช็คลิสต์"</span></div>
+  <div class="side">
+    <div class="sidebar">
+      <div class="m">หน้าหลัก</div>
+      <div class="m">ใบสั่งผลิต</div>
+      <div class="m">คลังภาพสินค้า</div>
+      <div class="m act">✓ จัดการเช็คลิสต์</div>
+    </div>
+    <div style="flex:1;font-size:12.5px;color:#555;padding-top:4px">
+      เมนูซ้าย → <b>"จัดการเช็คลิสต์"</b> (เห็นเฉพาะแอดมิน)<br><br>
+      ใช้เพิ่ม/แก้รายการในชุดเช็ค เช่น เพิ่มข้อ "เช็คมุ้ง" · ตั้งว่าชุดไหนให้บทบาทไหนเห็น
+    </div>
+  </div>
+</div>
+
+<div class="note" style="margin-top:16px">
+<b>สรุปสั้น:</b> เปิดงานในใบสั่งผลิต → เห็นปุ่ม <b style="color:#1e60c0">เช็คลิสต์</b> (ติ๊กเตือนงาน) กับ <b class="red">ใบปะหน้า</b> (สรุปของ+พิมพ์) ข้างกัน · ส่วนการตั้งชุดเช็คอยู่เมนูซ้ายของแอดมิน
+</div>
+</div>
+</body></html>
