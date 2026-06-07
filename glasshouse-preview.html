@@ -1500,6 +1500,23 @@ function calcQuickAll(){
 /* ---- QUOTE: line items ---- */
 let itemSeq=0;
 let setSeq=0;
+// จัดหมวด option ในกั้นห้อง (post-process .opt flat → ใส่หัวข้อหมวด) — keyword-based
+function groupGHOpts(ch){
+  var box=ch&&ch.querySelector('.i-opts'); if(!box || !box.children.length) return;
+  if(box.querySelector('.gh-opt-cat')) return; // จัดแล้ว (buildItemOpts จะ rebuild flat ใหม่เองเมื่อเปลี่ยน product)
+  var CATS=[
+    {key:'🚪 ชนิด / การเปิด', kw:['ชนิดการเปิด','combo บาน']},
+    {key:'🔧 มือจับ / ล็อค', kw:['มือจับ','Cmech','โช๊ค','[Up','ชุดล็อค','กุญแจ','เลือกมือจับ']},
+    {key:'🪟 มุ้ง', kw:['มุ้ง','🪟','ผ้ามุ้ง']},
+    {key:'📐 คาดตาราง', kw:['คาดตาราง']},
+    {key:'➕ อื่นๆ (ครอบวงกบ / ดรอปพื้น / หมายเหตุ)', kw:[]}
+  ];
+  var kids=[].slice.call(box.children);
+  var buckets=CATS.map(function(){return [];});
+  kids.forEach(function(k){ var t=k.textContent||''; var ci=CATS.length-1; for(var i=0;i<CATS.length-1;i++){ if(CATS[i].kw.some(function(w){return t.indexOf(w)>=0;})){ ci=i; break; } } buckets[ci].push(k); });
+  box.innerHTML='';
+  CATS.forEach(function(c,i){ if(!buckets[i].length) return; var h=document.createElement('div'); h.className='gh-opt-cat'; h.style.cssText='font-weight:700;color:#B3151D;font-size:12px;margin:9px 0 3px;border-bottom:1px dashed #e0c0c0;padding-bottom:2px;'; h.textContent=c.key; box.appendChild(h); buckets[i].forEach(function(k){ box.appendChild(k); }); });
+}
 function refreshSet(box){
   if(!box) return;
   const parts = box.querySelectorAll('.ch');
@@ -1601,6 +1618,7 @@ function refreshSet(box){
       var _ship=c.querySelector('.i-ship'); if(_ship){ var _sl=_ship.closest('label'); if(_sl){ _sl.dataset.ghH2='1'; _sl.style.display='none'; } }
       var _oe=c.querySelector('.i-opts'); var _det=_oe?_oe.closest('details'):null;
       if(_det){ _det.open=false; var _sm=_det.querySelector('summary'); if(_sm && !_sm.dataset.ghSm){ _sm.dataset.ghSm='1'; _sm.textContent='⚙ ตัวเลือกเพิ่มเติม (มือจับ/ล็อค/มุ้ง/ครอบวงกบ — กดถ้าต้องใช้)'; } }
+      if(isGH) groupGHOpts(c);  // จัด option เป็นหมวด
     });
     // ---- [5] ปุ่ม ".sub-addbtn" ในแต่ละ ch: เปลี่ยนข้อความตาม group ----
     parts.forEach(function(c){
@@ -1656,7 +1674,7 @@ function addSet(){
         const pos = newCh.querySelector('.i-position');
         const labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         const idx = chs.length - 1;
-        if(pos && !pos.value.trim()){ pos.value='ด้าน '+(labels[idx]||String(idx+1)); pos.dispatchEvent(new Event('input',{bubbles:true})); }
+        if(pos && !pos.value.trim()){ pos.value='ด้าน A'; pos.dispatchEvent(new Event('input',{bubbles:true})); }
         // sync สี/กระจก จาก gh-set-color-row
         const ghColorRow = box.querySelector('.gh-set-color-row');
         if(ghColorRow){
@@ -1804,7 +1822,7 @@ function addItem(container){
       if(pos){
         const sb=d.closest('.setbox'); const chs=sb?[...sb.querySelectorAll('.ch')]:[d]; const idx=Math.max(0,chs.indexOf(d));
         const labels='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        if(!pos.value.trim()){ pos.value='ด้าน '+(labels[idx]||String(idx+1)); pos.dispatchEvent(new Event('input',{bubbles:true})); }
+        if(!pos.value.trim()){ pos.value='ด้าน A'; pos.dispatchEvent(new Event('input',{bubbles:true})); }
         const lblWrap=pos.closest('.full'); const lbl=lblWrap?lblWrap.querySelector('label'):null;
         if(lbl) lbl.innerHTML='<b style="color:#B3151D;">ด้านของห้องนี้</b> (ด้าน A, B, C... แก้/พิมพ์เองได้)';
         if(sb) refreshSet(sb);
