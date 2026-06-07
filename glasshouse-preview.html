@@ -1500,7 +1500,7 @@ function calcQuickAll(){
 /* ---- QUOTE: line items ---- */
 let itemSeq=0;
 let setSeq=0;
-function refreshSet(box){ if(!box)return; const parts=box.querySelectorAll('.ch'); const multi=parts.length>1; parts.forEach(function(c){ const pos=c.querySelector('.i-position'); if(pos){ const w=pos.closest('.full')||pos.parentElement; if(w) w.style.display=multi?'':'none'; } }); }
+function refreshSet(box){ if(!box)return; const parts=box.querySelectorAll('.ch'); const multi=parts.length>1; parts.forEach(function(c){ const pos=c.querySelector('.i-position'); if(pos){ const isGH=(c.querySelector('.i-group')||{}).value==='6'; const w=pos.closest('.full')||pos.parentElement; if(w) w.style.display=(multi||isGH)?'':'none'; } }); }
 function addSet(){
   setSeq++;
   const sid='S'+setSeq+'_'+Math.random().toString(36).slice(2,7);
@@ -1685,7 +1685,20 @@ function addItem(container){
    `<div class="chmsg i-msg"></div>`;
   (container||document.getElementById('items')).appendChild(d);
   d.querySelector('.i-prod').addEventListener('change',()=>{ buildItemOpts(d); refreshColorByProduct(d); refreshItype(d); calcQuote(); });
-  d.querySelector('.i-group').addEventListener('change',()=>{ d.querySelector('.i-prod').innerHTML=prodOptionsG6(d.querySelector('.i-group').value); buildItemOpts(d); refreshItype(d); calcQuote(); });
+  d.querySelector('.i-group').addEventListener('change',()=>{ d.querySelector('.i-prod').innerHTML=prodOptionsG6(d.querySelector('.i-group').value); buildItemOpts(d); refreshItype(d);
+    // กั้นห้องกระจก: เลือกกลุ่มงาน 6 → โชว์ช่องด้านทันที + เติม "ด้าน A/B/..." ให้ถ้ายังว่าง
+    if(d.querySelector('.i-group').value==='6'){
+      const pos=d.querySelector('.i-position');
+      if(pos){
+        const sb=d.closest('.setbox'); const chs=sb?[...sb.querySelectorAll('.ch')]:[d]; const idx=Math.max(0,chs.indexOf(d));
+        const labels='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        if(!pos.value.trim()){ pos.value='ด้าน '+(labels[idx]||String(idx+1)); pos.dispatchEvent(new Event('input',{bubbles:true})); }
+        const lblWrap=pos.closest('.full'); const lbl=lblWrap?lblWrap.querySelector('label'):null;
+        if(lbl) lbl.innerHTML='<b style="color:#B3151D;">🔴 ด้านของห้องนี้</b> (ด้าน A, B, C… แก้/พิมพ์เองได้)';
+        if(sb) refreshSet(sb);
+      }
+    }
+    calcQuote(); });
   d.querySelector('.i-type').addEventListener('change',()=>{ refreshItype(d); calcQuote(); });
   d.querySelector('.del').addEventListener('click',()=>{ const _pb=d.closest('.setbox'); d.remove(); if(_pb)refreshSet(_pb); calcQuote(); });
   d.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',calcQuote));
