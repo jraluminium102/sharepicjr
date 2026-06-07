@@ -1500,7 +1500,105 @@ function calcQuickAll(){
 /* ---- QUOTE: line items ---- */
 let itemSeq=0;
 let setSeq=0;
-function refreshSet(box){ if(!box)return; const parts=box.querySelectorAll('.ch'); const multi=parts.length>1; parts.forEach(function(c){ const pos=c.querySelector('.i-position'); if(pos){ const isGH=(c.querySelector('.i-group')||{}).value==='6'; const w=pos.closest('.full')||pos.parentElement; if(w) w.style.display=(multi||isGH)?'':'none'; } }); }
+function refreshSet(box){
+  if(!box) return;
+  const parts = box.querySelectorAll('.ch');
+  const multi = parts.length > 1;
+  // ตรวจว่าชุดนี้มีส่วนกลุ่ม 6 อย่างน้อย 1 ชิ้นไหม
+  const hasGH = Array.from(parts).some(function(c){ return (c.querySelector('.i-group')||{}).value==='6'; });
+
+  // ---- [1] โชว์/ซ่อนช่อง position + ปรับ label ----
+  parts.forEach(function(c){
+    const pos = c.querySelector('.i-position');
+    if(pos){
+      const isGH = (c.querySelector('.i-group')||{}).value==='6';
+      const w = pos.closest('.full') || pos.parentElement;
+      if(w) w.style.display = (multi || isGH) ? '' : 'none';
+    }
+  });
+
+  // ---- [2] ปุ่มระดับชุด: เปลี่ยนข้อความ + ซ่อน/โชว์ ----
+  box.querySelectorAll('.set-addpart').forEach(function(btn){
+    btn.textContent = hasGH ? '+ เพิ่มด้าน' : '+ เพิ่มส่วน';
+  });
+  box.querySelectorAll('.set-addfixed').forEach(function(btn){
+    // ซ่อนปุ่ม "+ ช่องแสงติดตาย" ระดับชุดเมื่อมีกลุ่ม 6 (ย้ายไปเป็น "+ เพิ่มบานในด้าน")
+    btn.style.display = hasGH ? 'none' : '';
+  });
+
+  // ---- [3] สีหัวชุด: inject/sync row ----
+  var ghColorRow = box.querySelector('.gh-set-color-row');
+  if(hasGH){
+    if(!ghColorRow){
+      // สร้างแถวสีระดับชุด
+      ghColorRow = document.createElement('div');
+      ghColorRow.className = 'gh-set-color-row';
+      ghColorRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;background:#FFF7E6;border:1px solid #F0C040;border-radius:8px;padding:8px 10px;margin:6px 0;';
+      ghColorRow.innerHTML =
+        '<div style="flex:1;min-width:140px;"><label style="font-size:12px;color:#92400e;font-weight:700;display:block;margin-bottom:4px;">สีอลู (ทั้งห้อง)</label><select class="gh-color-sel" style="width:100%;height:36px;border:1px solid #F0C040;border-radius:7px;font-size:14px;background:#fff;">'+colorOpts()+'</select></div>'+
+        '<div style="flex:1;min-width:140px;"><label style="font-size:12px;color:#92400e;font-weight:700;display:block;margin-bottom:4px;">กระจก (ทั้งห้อง)</label><select class="gh-glass-sel" style="width:100%;height:36px;border:1px solid #F0C040;border-radius:7px;font-size:14px;background:#fff;">'+glassOpts()+'</select></div>';
+      // ใส่ก่อน set-btns-top
+      var topBtns = box.querySelector('.set-btns-top');
+      if(topBtns) box.insertBefore(ghColorRow, topBtns);
+      else box.querySelector('.set-parts') && box.insertBefore(ghColorRow, box.querySelector('.set-parts'));
+
+      // sync เมื่อเปลี่ยน
+      var syncGHColor = function(){
+        var colorVal = ghColorRow.querySelector('.gh-color-sel').value;
+        var glassVal = ghColorRow.querySelector('.gh-glass-sel').value;
+        box.querySelectorAll('.set-parts .ch').forEach(function(c){
+          if((c.querySelector('.i-group')||{}).value !== '6') return;
+          var ci = c.querySelector('.i-color'); if(ci){ ci.value = colorVal; ci.dispatchEvent(new Event('change',{bubbles:true})); }
+          var gi = c.querySelector('.i-glass'); if(gi){ gi.value = glassVal; gi.dispatchEvent(new Event('change',{bubbles:true})); }
+        });
+        calcQuote();
+      };
+      ghColorRow.querySelector('.gh-color-sel').addEventListener('change', syncGHColor);
+      ghColorRow.querySelector('.gh-glass-sel').addEventListener('change', syncGHColor);
+    }
+    // ---- [4] ซ่อนช่องสี/กระจกในแต่ละ ch กลุ่ม 6 + sync ค่า ----
+    var masterColor = ghColorRow.querySelector('.gh-color-sel').value;
+    var masterGlass = ghColorRow.querySelector('.gh-glass-sel').value;
+    parts.forEach(function(c){
+      var isGH = (c.querySelector('.i-group')||{}).value === '6';
+      var cw = c.querySelector('.i-color-wrap');
+      var gw = c.querySelector('.i-glass-wrap');
+      if(isGH){
+        if(cw){ cw.dataset.ghHidden='1'; cw.style.display = 'none'; }
+        if(gw){ gw.dataset.ghHidden='1'; gw.style.display = 'none'; }
+        // sync ค่าจาก master
+        var ci = c.querySelector('.i-color'); if(ci && ci.value !== masterColor){ ci.value = masterColor; ci.dispatchEvent(new Event('change',{bubbles:true})); }
+        var gi = c.querySelector('.i-glass'); if(gi && gi.value !== masterGlass){ gi.value = masterGlass; gi.dispatchEvent(new Event('change',{bubbles:true})); }
+      }
+      // ch กลุ่มอื่น — ไม่แตะ display ให้ buildItemOpts/refreshColorByProduct ควบคุม
+    });
+    // ---- [5] ปุ่ม ".sub-addbtn" ในแต่ละ ch: เปลี่ยนข้อความตาม group ----
+    parts.forEach(function(c){
+      var isGH = (c.querySelector('.i-group')||{}).value === '6';
+      var btn = c.querySelector('.sub-addbtn');
+      if(!btn) return;
+      if(isGH){
+        btn.textContent = '+ เพิ่มบานในด้านนี้';
+        btn.dataset.ghMode = '1';
+      } else {
+        btn.textContent = '＋ เพิ่มบานย่อยในชุดนี้';
+        btn.dataset.ghMode = '0';
+      }
+    });
+  } else {
+    // ไม่มีกลุ่ม 6 — ลบแถวสีหัวชุด (ถ้ามี) + คืน ch ที่ GH ซ่อนไว้
+    if(ghColorRow) ghColorRow.remove();
+    parts.forEach(function(c){
+      var cw = c.querySelector('.i-color-wrap');
+      var gw = c.querySelector('.i-glass-wrap');
+      // คืนเฉพาะที่ GH ซ่อน (data-gh-hidden='1') ให้ buildItemOpts ควบคุมต่อ
+      if(cw && cw.dataset.ghHidden){ delete cw.dataset.ghHidden; cw.style.display = ''; }
+      if(gw && gw.dataset.ghHidden){ delete gw.dataset.ghHidden; gw.style.display = ''; }
+      var btn = c.querySelector('.sub-addbtn');
+      if(btn){ btn.textContent = '＋ เพิ่มบานย่อยในชุดนี้'; btn.dataset.ghMode = '0'; }
+    });
+  }
+}
 function addSet(){
   setSeq++;
   const sid='S'+setSeq+'_'+Math.random().toString(36).slice(2,7);
@@ -1508,7 +1606,31 @@ function addSet(){
   box.innerHTML='<div class="set-head"><span class="set-badge">ชุด</span><input class="set-name" placeholder="ชื่อชุด/ตำแหน่ง (เว้นว่าง=ชุดเดี่ยว)"><button type="button" class="set-del">ลบชุด ✕</button></div><div class="set-opt" style="margin:0 0 8px;"><select class="set-optpreset" onchange="addSetOptPreset(this)" style="width:100%;height:32px;margin-bottom:6px;border:1px solid var(--line);border-radius:6px;font-size:13px;color:var(--red);">'+setOptPresetOptions()+'</select><div style="display:flex;gap:6px;"><input class="set-opttext" placeholder="OPTION ทางเลือกลูกค้า เช่น เปลี่ยนเป็นเทมเปอร์ (ว่าง=ไม่มี)" style="flex:1;height:32px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-size:13px;"><input type="number" class="set-optdelta" placeholder="±บาท" style="width:100px;height:32px;border:1px solid var(--line);border-radius:6px;padding:0 8px;"></div></div><div class="set-btns set-btns-top"><button type="button" class="set-addpart">+ เพิ่มส่วน</button><button type="button" class="set-addfixed">+ ช่องแสงติดตาย</button></div><div class="set-parts"></div><div class="set-btns set-btns-bot"><button type="button" class="set-addpart">+ เพิ่มส่วน</button><button type="button" class="set-addfixed">+ ช่องแสงติดตาย</button></div>';
   document.getElementById('items').appendChild(box);
   box.querySelector('.set-del').addEventListener('click',function(){ box.remove(); calcQuote(); });
-  box.querySelectorAll('.set-addpart').forEach(function(b){ b.addEventListener('click',function(){ addItem(box.querySelector('.set-parts')); refreshSet(box); calcQuote(); }); });
+  box.querySelectorAll('.set-addpart').forEach(function(b){ b.addEventListener('click',function(){
+    const parts = box.querySelector('.set-parts');
+    const hasGH = Array.from(box.querySelectorAll('.ch')).some(function(c){ return (c.querySelector('.i-group')||{}).value==='6'; });
+    addItem(parts);
+    if(hasGH){
+      // auto: กลุ่ม 6 + ด้าน B/C/D... ตามลำดับ
+      const chs = parts.querySelectorAll('.ch');
+      const newCh = chs[chs.length-1];
+      if(newCh){
+        const grp = newCh.querySelector('.i-group');
+        if(grp && grp.value !== '6'){ grp.value='6'; grp.dispatchEvent(new Event('change',{bubbles:true})); }
+        const pos = newCh.querySelector('.i-position');
+        const labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const idx = chs.length - 1;
+        if(pos && !pos.value.trim()){ pos.value='ด้าน '+(labels[idx]||String(idx+1)); pos.dispatchEvent(new Event('input',{bubbles:true})); }
+        // sync สี/กระจก จาก gh-set-color-row
+        const ghColorRow = box.querySelector('.gh-set-color-row');
+        if(ghColorRow){
+          const ci = newCh.querySelector('.i-color'); if(ci){ ci.value=ghColorRow.querySelector('.gh-color-sel').value; ci.dispatchEvent(new Event('change',{bubbles:true})); }
+          const gi = newCh.querySelector('.i-glass'); if(gi){ gi.value=ghColorRow.querySelector('.gh-glass-sel').value; gi.dispatchEvent(new Event('change',{bubbles:true})); }
+        }
+      }
+    }
+    refreshSet(box); calcQuote();
+  }); });
   box.querySelectorAll('.set-addfixed').forEach(function(b){ b.addEventListener('click',function(){ addFixedToSet(box); }); });
   box.querySelector('.set-name').addEventListener('input',calcQuote);
   addItem(box.querySelector('.set-parts'));
@@ -1525,46 +1647,22 @@ function addGlasshouseSet(){
   // ตั้งชื่อชุด default
   const nameEl = box.querySelector('.set-name');
   if(nameEl){ nameEl.value='กั้นห้องกระจก (ห้อง...)'; nameEl.dispatchEvent(new Event('input',{bubbles:true})); }
-  // ส่วนที่ 1 ที่ถูก addSet() สร้างให้แล้ว → set position = "ด้าน A"
+  // ส่วนที่ 1 ที่ถูก addSet() สร้างให้แล้ว → set group 6 + position = "ด้าน A"
   const firstPart = box.querySelector('.set-parts .ch');
   if(firstPart){
-    const pos = firstPart.querySelector('.i-position');
-    if(pos){ pos.value='ด้าน A'; pos.dispatchEvent(new Event('input',{bubbles:true})); }
-    // auto-set group 1 (บานกระจก) — เป็น default อยู่แล้ว แต่ set ให้ชัด
     const grp = firstPart.querySelector('.i-group');
-    if(grp && grp.value !== '1'){ grp.value='1'; grp.dispatchEvent(new Event('change',{bubbles:true})); }
+    if(grp && grp.value !== '6'){ grp.value='6'; grp.dispatchEvent(new Event('change',{bubbles:true})); }
+    const pos = firstPart.querySelector('.i-position');
+    if(pos && !pos.value.trim()){ pos.value='ด้าน A'; pos.dispatchEvent(new Event('input',{bubbles:true})); }
   }
-  // เปลี่ยนปุ่ม "+ เพิ่มส่วน" ให้ auto-label ด้าน B/C/D...
-  box.querySelectorAll('.set-addpart').forEach(function(btn){
-    // remove เดิมก่อน แล้วใส่ listener ใหม่
-    const newBtn = btn.cloneNode(true);
-    newBtn.textContent = '+ เพิ่มด้าน';
-    btn.parentNode.replaceChild(newBtn, btn);
-    newBtn.addEventListener('click', function(){
-      const parts = box.querySelector('.set-parts');
-      addItem(parts);
-      // หาจำนวนส่วนที่มีแล้ว → label ด้าน B/C/.../Z
-      const chs = parts.querySelectorAll('.ch');
-      const sideLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      const newCh = chs[chs.length - 1];
-      if(newCh){
-        const pos = newCh.querySelector('.i-position');
-        const idx = chs.length - 1;  // ส่วนที่ 2=B, 3=C ...
-        if(pos) pos.value = 'ด้าน ' + (sideLabels[idx] || String(idx+1));
-        // set group 1 ให้ชัด
-        const grp = newCh.querySelector('.i-group');
-        if(grp && grp.value !== '1'){ grp.value='1'; grp.dispatchEvent(new Event('change',{bubbles:true})); }
-      }
-      refreshSet(box); calcQuote();
-    });
-  });
+  // refreshSet จะจัดการปุ่มให้อัตโนมัติ — ไม่ต้อง clone/replace ปุ่มแยก
   // เพิ่มปุ่ม "+ เพิ่มหลังคา" ใน set-btns-bot
   const botBtns = box.querySelector('.set-btns-bot');
   if(botBtns){
     const roofBtn = document.createElement('button');
-    roofBtn.type='button'; roofBtn.className='set-addfixed';
+    roofBtn.type='button'; roofBtn.className='set-addroof';
     roofBtn.textContent='+ เพิ่มหลังคา';
-    roofBtn.style.cssText='border-color:#16A34A;color:#15803D;';
+    roofBtn.style.cssText='flex:1;height:38px;border-radius:8px;cursor:pointer;font-size:14px;border:1.5px solid #16A34A;background:#fff;color:#15803D;';
     roofBtn.addEventListener('click', function(){
       const parts = box.querySelector('.set-parts');
       addItem(parts);
@@ -1694,9 +1792,13 @@ function addItem(container){
         const labels='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         if(!pos.value.trim()){ pos.value='ด้าน '+(labels[idx]||String(idx+1)); pos.dispatchEvent(new Event('input',{bubbles:true})); }
         const lblWrap=pos.closest('.full'); const lbl=lblWrap?lblWrap.querySelector('label'):null;
-        if(lbl) lbl.innerHTML='<b style="color:#B3151D;">🔴 ด้านของห้องนี้</b> (ด้าน A, B, C… แก้/พิมพ์เองได้)';
+        if(lbl) lbl.innerHTML='<b style="color:#B3151D;">ด้านของห้องนี้</b> (ด้าน A, B, C... แก้/พิมพ์เองได้)';
         if(sb) refreshSet(sb);
       }
+    } else {
+      // เปลี่ยนกลับจากกลุ่ม 6 → re-evaluate ชุด
+      const sb=d.closest('.setbox');
+      if(sb) refreshSet(sb);
     }
     calcQuote(); });
   d.querySelector('.i-type').addEventListener('change',()=>{ refreshItype(d); calcQuote(); });
@@ -1722,17 +1824,47 @@ var SUBITEM_TYPES=[
   {v:'กระจกติดตายอื่นๆ',l:'กระจกติดตายอื่นๆ'},
 ];
 function addSubItem(btn){
-  const ch=btn.closest('.ch'); if(!ch) return;
-  const list=ch.querySelector('.subitem-list');
-  const row=document.createElement('div'); row.className='subitem-row';
-  const typeOpts=SUBITEM_TYPES.map(function(t){return '<option value="'+t.v+'">'+t.l+'</option>';}).join('');
-  row.innerHTML='<span class="s-tag">บานย่อย</span>'
-    +'<select class="s-type">'+typeOpts+'</select>'
-    +'<input class="s-w" type="number" step="0.1" min="0" value="1.0" title="กว้าง (ม.)" placeholder="กว้าง">'
-    +'<span style="font-size:12px;color:#6b7280;flex:none;">×</span>'
-    +'<input class="s-h" type="number" step="0.1" min="0" value="0.5" title="สูง (ม.)" placeholder="สูง">'
-    +'<span style="font-size:12px;color:#6b7280;flex:none;">ม.</span>'
-    +'<button type="button" class="s-del" title="ลบบานย่อย">&times;</button>';
+  const ch = btn.closest('.ch'); if(!ch) return;
+  // GH mode: ปุ่มนี้อยู่ใน ch กลุ่ม 6 → เพิ่ม .ch ใหม่ในชุด (ตำแหน่งเดียวกัน) แทน subitem
+  const isGHMode = btn.dataset.ghMode === '1' || (ch.querySelector('.i-group')||{}).value === '6';
+  if(isGHMode){
+    const box = ch.closest('.setbox'); if(!box) return;
+    const parts = box.querySelector('.set-parts'); if(!parts) return;
+    // ดึง position ของ ch ที่กด
+    const thisPos = (ch.querySelector('.i-position')||{}).value || '';
+    // ดึงค่าสี/กระจก master จาก gh-set-color-row (หรือจาก ch นั้นถ้าไม่มี master)
+    const ghColorRow = box.querySelector('.gh-set-color-row');
+    const masterColor = ghColorRow ? ghColorRow.querySelector('.gh-color-sel').value : (ch.querySelector('.i-color')||{}).value || '0';
+    const masterGlass = ghColorRow ? ghColorRow.querySelector('.gh-glass-sel').value : (ch.querySelector('.i-glass')||{}).value || '0';
+    // เพิ่ม .ch ใหม่
+    addItem(parts);
+    const chs = parts.querySelectorAll('.ch');
+    const newCh = chs[chs.length - 1];
+    if(newCh){
+      // ตั้ง group 6
+      const grp = newCh.querySelector('.i-group');
+      if(grp && grp.value !== '6'){ grp.value = '6'; grp.dispatchEvent(new Event('change',{bubbles:true})); }
+      // ตั้ง position เดียวกับด้านที่กด
+      const pos = newCh.querySelector('.i-position');
+      if(pos){ pos.value = thisPos; pos.dispatchEvent(new Event('input',{bubbles:true})); }
+      // sync สี/กระจก
+      const ci = newCh.querySelector('.i-color'); if(ci){ ci.value = masterColor; ci.dispatchEvent(new Event('change',{bubbles:true})); }
+      const gi = newCh.querySelector('.i-glass'); if(gi){ gi.value = masterGlass; gi.dispatchEvent(new Event('change',{bubbles:true})); }
+    }
+    refreshSet(box); calcQuote();
+    return;
+  }
+  // พฤติกรรมเดิม: เพิ่ม subitem row
+  const list = ch.querySelector('.subitem-list');
+  const row = document.createElement('div'); row.className = 'subitem-row';
+  const typeOpts = SUBITEM_TYPES.map(function(t){ return '<option value="'+t.v+'">'+t.l+'</option>'; }).join('');
+  row.innerHTML = '<span class="s-tag">บานย่อย</span>'
+    + '<select class="s-type">'+typeOpts+'</select>'
+    + '<input class="s-w" type="number" step="0.1" min="0" value="1.0" title="กว้าง (ม.)" placeholder="กว้าง">'
+    + '<span style="font-size:12px;color:#6b7280;flex:none;">×</span>'
+    + '<input class="s-h" type="number" step="0.1" min="0" value="0.5" title="สูง (ม.)" placeholder="สูง">'
+    + '<span style="font-size:12px;color:#6b7280;flex:none;">ม.</span>'
+    + '<button type="button" class="s-del" title="ลบบานย่อย">&times;</button>';
   row.querySelector('.s-del').addEventListener('click',function(){ row.remove(); calcQuote(); });
   row.querySelectorAll('input,select').forEach(function(e){ e.addEventListener('input',calcQuote); e.addEventListener('change',calcQuote); });
   list.appendChild(row);
