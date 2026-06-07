@@ -1526,6 +1526,31 @@ function refreshSet(box){
     // ซ่อนปุ่ม "+ ช่องแสงติดตาย" ระดับชุดเมื่อมีกลุ่ม 6 (ย้ายไปเป็น "+ เพิ่มบานในด้าน")
     btn.style.display = hasGH ? 'none' : '';
   });
+  // ---- [2.5] ปุ่ม "+ เพิ่มหลังคา" — โผล่ทุกชุดกั้นห้อง (inject ครั้งเดียว ข้าง "เพิ่มด้าน") ----
+  if(hasGH){
+    if(!box.querySelector('.set-addroof')){
+      var topRow = box.querySelector('.set-btns-top') || box.querySelector('.set-btns');
+      if(topRow){
+        var roofBtn = document.createElement('button');
+        roofBtn.type='button'; roofBtn.className='set-addroof';
+        roofBtn.textContent='+ เพิ่มหลังคา';
+        roofBtn.style.cssText='flex:1;height:38px;border-radius:8px;cursor:pointer;font-size:14px;border:1.5px solid #16A34A;background:#fff;color:#15803D;';
+        roofBtn.addEventListener('click', function(){
+          var parts = box.querySelector('.set-parts');
+          addItem(parts);
+          var chs = parts.querySelectorAll('.ch'); var newCh = chs[chs.length-1];
+          if(newCh){
+            var pos = newCh.querySelector('.i-position'); if(pos) pos.value='หลังคา';
+            var grp = newCh.querySelector('.i-group'); if(grp){ grp.value='3'; grp.dispatchEvent(new Event('change',{bubbles:true})); }
+          }
+          refreshSet(box); calcQuote();
+        });
+        topRow.appendChild(roofBtn);
+      }
+    }
+  } else {
+    var rbOld = box.querySelector('.set-addroof'); if(rbOld) rbOld.remove();
+  }
 
   // ---- [3] สีหัวชุด: inject/sync row ----
   var ghColorRow = box.querySelector('.gh-set-color-row');
@@ -1658,29 +1683,7 @@ function addGlasshouseSet(){
     const pos = firstPart.querySelector('.i-position');
     if(pos && !pos.value.trim()){ pos.value='ด้าน A'; pos.dispatchEvent(new Event('input',{bubbles:true})); }
   }
-  // refreshSet จะจัดการปุ่มให้อัตโนมัติ — ไม่ต้อง clone/replace ปุ่มแยก
-  // เพิ่มปุ่ม "+ เพิ่มหลังคา" ใน set-btns-bot
-  const botBtns = box.querySelector('.set-btns-bot');
-  if(botBtns){
-    const roofBtn = document.createElement('button');
-    roofBtn.type='button'; roofBtn.className='set-addroof';
-    roofBtn.textContent='+ เพิ่มหลังคา';
-    roofBtn.style.cssText='flex:1;height:38px;border-radius:8px;cursor:pointer;font-size:14px;border:1.5px solid #16A34A;background:#fff;color:#15803D;';
-    roofBtn.addEventListener('click', function(){
-      const parts = box.querySelector('.set-parts');
-      addItem(parts);
-      const chs = parts.querySelectorAll('.ch');
-      const newCh = chs[chs.length-1];
-      if(newCh){
-        const pos = newCh.querySelector('.i-position');
-        if(pos) pos.value='หลังคา';
-        const grp = newCh.querySelector('.i-group');
-        if(grp){ grp.value='3'; grp.dispatchEvent(new Event('change',{bubbles:true})); }
-      }
-      refreshSet(box); calcQuote();
-    });
-    botBtns.appendChild(roofBtn);
-  }
+  // ปุ่ม "+ เพิ่มด้าน" + "+ เพิ่มหลังคา" จัดการโดย refreshSet (โผล่ทุกชุดกั้นห้อง ไม่ว่าสร้างทางไหน)
   refreshSet(box); calcQuote();
   return box;
 }
