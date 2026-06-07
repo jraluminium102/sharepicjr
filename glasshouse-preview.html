@@ -1596,7 +1596,11 @@ function refreshSet(box){
         var ci = c.querySelector('.i-color'); if(ci && ci.value !== masterColor){ ci.value = masterColor; ci.dispatchEvent(new Event('change',{bubbles:true})); }
         var gi = c.querySelector('.i-glass'); if(gi && gi.value !== masterGlass){ gi.value = masterGlass; gi.dispatchEvent(new Event('change',{bubbles:true})); }
       }
-      // ch กลุ่มอื่น — ไม่แตะ display ให้ buildItemOpts/refreshColorByProduct ควบคุม
+      // ---- ลดความรก: ซ่อน field พื้นฐานที่ไม่ใช้ในกั้นห้อง + ยุบ option เข้าพับ (ทุกบาน/หลังคาในชุด) ----
+      ['.i-group','.i-type','.i-qty','.i-override','.i-note'].forEach(function(s){ var el=c.querySelector(s); if(el){ var w=el.closest('.full')||el.parentElement; if(w){ w.dataset.ghH2='1'; w.style.display='none'; } } });
+      var _ship=c.querySelector('.i-ship'); if(_ship){ var _sl=_ship.closest('label'); if(_sl){ _sl.dataset.ghH2='1'; _sl.style.display='none'; } }
+      var _oe=c.querySelector('.i-opts'); var _det=_oe?_oe.closest('details'):null;
+      if(_det){ _det.open=false; var _sm=_det.querySelector('summary'); if(_sm && !_sm.dataset.ghSm){ _sm.dataset.ghSm='1'; _sm.textContent='⚙ ตัวเลือกเพิ่มเติม (มือจับ/ล็อค/มุ้ง/ครอบวงกบ — กดถ้าต้องใช้)'; } }
     });
     // ---- [5] ปุ่ม ".sub-addbtn" ในแต่ละ ch: เปลี่ยนข้อความตาม group ----
     parts.forEach(function(c){
@@ -1622,6 +1626,10 @@ function refreshSet(box){
       // คืนเฉพาะที่ GH ซ่อน (data-gh-hidden='1') ให้ buildItemOpts ควบคุมต่อ
       if(cw && cw.dataset.ghHidden){ delete cw.dataset.ghHidden; cw.style.display = ''; }
       if(gw && gw.dataset.ghHidden){ delete gw.dataset.ghHidden; gw.style.display = ''; }
+      // คืน field พื้นฐานที่ซ่อน + summary เดิม
+      c.querySelectorAll('[data-gh-h2="1"]').forEach(function(w){ delete w.dataset.ghH2; w.style.display=''; });
+      var _oe2=c.querySelector('.i-opts'); var _det2=_oe2?_oe2.closest('details'):null;
+      if(_det2){ var _sm2=_det2.querySelector('summary'); if(_sm2 && _sm2.dataset.ghSm){ delete _sm2.dataset.ghSm; _sm2.textContent='อุปกรณ์เสริม / ออปชั่น'; } }
       var btn = c.querySelector('.sub-addbtn');
       if(btn){ btn.style.display=''; btn.textContent = '＋ เพิ่มบานย่อยในชุดนี้'; btn.dataset.ghMode = '0'; }
     });
@@ -1788,7 +1796,7 @@ function addItem(container){
    `<div class="chfoot"><span class="i-area">—</span><span class="price i-price">฿0</span></div>`+
    `<div class="chmsg i-msg"></div>`;
   (container||document.getElementById('items')).appendChild(d);
-  d.querySelector('.i-prod').addEventListener('change',()=>{ buildItemOpts(d); refreshColorByProduct(d); refreshItype(d); calcQuote(); });
+  d.querySelector('.i-prod').addEventListener('change',()=>{ buildItemOpts(d); refreshColorByProduct(d); refreshItype(d); calcQuote(); const _sb=d.closest('.setbox'); if(_sb) refreshSet(_sb); });
   d.querySelector('.i-group').addEventListener('change',()=>{ d.querySelector('.i-prod').innerHTML=prodOptionsG6(d.querySelector('.i-group').value); buildItemOpts(d); refreshItype(d);
     // กั้นห้องกระจก: เลือกกลุ่มงาน 6 → โชว์ช่องด้านทันที + เติม "ด้าน A/B/..." ให้ถ้ายังว่าง
     if(d.querySelector('.i-group').value==='6'){
