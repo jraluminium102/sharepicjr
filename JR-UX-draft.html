@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JR ดราฟ UX ปรับปรุง — 6 หมวด (เดโมกรอกเล่น)</title>
+<style>
+:root{--red:#B3151D;--ink:#1f2937;--bg:#f4f4f5;--line:#e5e7eb;--mut:#6b7280;}
+*{box-sizing:border-box;font-family:system-ui,"Segoe UI",Tahoma,sans-serif;}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5;}
+.wrap{max-width:860px;margin:0 auto;padding:14px;}
+header{background:var(--red);color:#fff;border-radius:12px;padding:16px 18px;margin-bottom:14px;}
+header h1{margin:0;font-size:19px;}
+header p{margin:6px 0 0;font-size:13px;opacity:.92;}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;}
+.card h2{margin:0 0 10px;font-size:15px;color:var(--red);}
+label{display:block;font-size:13px;color:var(--mut);margin:8px 0 3px;}
+select,input[type=text],input[type=number]{width:100%;height:38px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-size:15px;background:#fff;}
+.row{display:flex;gap:10px;flex-wrap:wrap;}
+.row>div{flex:1;min-width:130px;}
+.chk{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:14px;color:var(--ink);cursor:pointer;}
+.chk input{width:18px;height:18px;}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.tab{flex:1;min-width:92px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 6px;font-size:13px;text-align:center;cursor:pointer;font-weight:600;color:var(--mut);}
+.tab.on{background:var(--red);color:#fff;border-color:var(--red);}
+.opt-block{border:1px dashed var(--red);border-radius:10px;padding:10px;margin-top:10px;background:#fff8f8;}
+.opt-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:8px;border-bottom:1px dashed var(--line);padding-bottom:8px;}
+.opt-row>div{flex:1;min-width:120px;}
+.opt-row .del{flex:0 0 auto;}
+.btn{background:var(--red);color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;}
+.btn.ghost{background:#fff;color:var(--red);border:1.5px dashed var(--red);width:100%;}
+.btn.mini{padding:6px 10px;font-size:13px;background:#fff;color:var(--red);border:1px solid var(--red);}
+.preview{position:sticky;bottom:0;}
+.qline{border-left:4px solid var(--red);padding:4px 0 4px 12px;}
+.qline b{font-size:15px;}
+.det{margin:6px 0 0;font-size:13.5px;color:#374151;}
+.det div{padding:1px 0;}
+.opt-out{color:var(--red);font-size:13.5px;margin-top:5px;}
+.price{font-size:22px;font-weight:800;color:var(--red);text-align:right;margin-top:8px;}
+.muted{color:var(--mut);font-size:12px;}
+.badge{display:inline-block;background:#fee;color:var(--red);border-radius:6px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:6px;}
+.hide{display:none;}
+hr{border:none;border-top:1px solid var(--line);margin:12px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>JR เครื่องคิดราคา — ดราฟ UX ปรับปรุง <span class="badge">DRAFT</span></h1>
+  <p>เดโมกรอกเล่น 6 หมวดสินค้า · ราคาเป็นตัวอย่างประมาณ (ไม่ใช่ราคาจริง) · โชว์ออปชั่นใหม่ที่ปรับ: OPTION แบบเลือกหมวด→รายการ · มือจับ Cmech · ลูกฟูกล่าง · หลังคาแปคู่/ปล่อยไม่มีราง · สีซาฮาร่า</p>
+</header>
+
+<div class="card">
+  <h2>สีอลูมิเนียม + กระจก (ทั้งใบ)</h2>
+  <div class="row">
+    <div><label>สีอลูมิเนียม (ทั้งใบ)</label><select id="mColor"></select></div>
+    <div><label>กระจก (ทั้งใบ)</label><select id="mGlass"></select></div>
+  </div>
+  <p class="muted">เปลี่ยนที่นี่ = sync ทุกรายการ · แก้รายชิ้นได้ใน OPTION</p>
+</div>
+
+<div class="card">
+  <h2>เลือกหมวดสินค้า</h2>
+  <div class="tabs" id="tabs"></div>
+  <div id="form"></div>
+</div>
+
+<div class="card preview">
+  <h2>ตัวอย่างที่จะออกในใบ ▾</h2>
+  <div class="qline">
+    <b id="pvName">—</b>
+    <div class="det" id="pvDet"></div>
+    <div id="pvOpts"></div>
+  </div>
+  <div class="price" id="pvPrice">฿0</div>
+  <p class="muted">* ราคาเดโม คิดหยาบๆ เพื่อโชว์ UX · ของจริงใช้สูตร R3.9</p>
+</div>
+
+</div>
+
+<script>
+// ---------- ข้อมูล (เดโม) ----------
+const fmt = n => '฿' + Math.round(n).toLocaleString();
+// สี: up = ค่าเพิ่ม/ตร.ม. (เดโม) — สะกด "ซาฮาร่า" ตามที่แก้
+const COLORS = [
+  {n:'สีอบขาว',up:0},{n:'สีดำ',up:0},
+  {n:'สีเทาซาฮาร่า',up:200},{n:'สีดำซาฮาร่า',up:200},
+  {n:'สีลายไม้สต๊อก สักทอง',up:750},{n:'สีลายไม้ ไวท์โอ๊ค',up:750},
+  {n:'สีอบพิเศษ (ระบุรหัส)',up:1600},{n:'สีลายไม้อบพิเศษ',up:2200},
+];
+// กระจก: sell = ราคาขาย/ตร.ม. (เดโม) ใช้คิดส่วนต่าง OPTION · grp = หมวดย่อย (optgroup)
+const GLASS = [
+  {grp:'ใส/สี',n:'กระจกใส 6 มม.',sell:500},
+  {grp:'ใส/สี',n:'กระจกเขียว 6 มม.',sell:650},
+  {grp:'ใส/สี',n:'กระจกชาดำ 6 มม.',sell:700},
+  {grp:'ฝ้า/ลอน',n:'กระจกฝ้า 6 มม.',sell:600},
+  {grp:'ฝ้า/ลอน',n:'กระจกลอนแก้ว 5 มม.',sell:1300},
+  {grp:'เทมเปอร์',n:'กระจกเทมเปอร์ใส 6 มม.',sell:1400},
+  {grp:'เทมเปอร์',n:'กระจกเทมเปอร์ใส 10 มม.',sell:2400},
+  {grp:'เทมเปอร์',n:'กระจกเทมเปอร์ใส 12 มม.',sell:3200},
+  {grp:'ลามิเนต',n:'กระจกลามิเนต 4+4 ฟิล์มเขียว/ใส',sell:2200},
+  {grp:'ลามิเนต',n:'กระจกลามิเนต 4+4 กันเสียง',sell:5300},
+  {grp:'อินซูเลท',n:'กระจกอินซูเลท 5+8+5 (รอราคา)',sell:0},
+];
+const SCREENS = [
+  {n:'มุ้งจีบ ผ้าไฟเบอร์ดำ',add:3500},
+  {n:'มุ้งจีบ กันแมว/หมา',add:4500},
+  {n:'มุ้งจีบนิรภัย (สแตนเลส)',add:5000},
+  {n:'มุ้งม้วนเตะได้',add:7500},
+];
+// มือจับ Cmech (ราคาขายเพิ่ม/ชุด) — ตาราง 4A/4B
+const HANDLES = [
+  {n:'Cmech ฝัง — ประตู ธรรมดา',add:1050},{n:'Cmech ฝัง — ประตู พิเศษ',add:1470},
+  {n:'Cmech ฝัง — หน้าต่าง ธรรมดา',add:350},{n:'Cmech ฝัง — หน้าต่าง พิเศษ',add:490},
+  {n:'Cmech เมโทร — ประตู ธรรมดา',add:1000},{n:'Cmech เมโทร — ประตู พิเศษ',add:1400},
+  {n:'Cmech เมโทร — หน้าต่าง ธรรมดา',add:600},{n:'Cmech เมโทร — หน้าต่าง พิเศษ',add:840},
+  {n:'Cmech หลบมุ้ง (กระทุ้ง) ธรรมดา',add:600},{n:'Cmech หลบมุ้ง (กระทุ้ง) พิเศษ',add:840},
+  {n:'X-J / XO / XT (เฉพาะ SlimLux/X-series · ฟรี)',add:0},
+];
+// บาน: rate เดโม/ตร.ม.
+const DOORTYPES = [
+  {n:'บานเลื่อนสลับ',rate:4500},{n:'บานเลื่อนเปิดคู่กลาง',rate:4800},
+  {n:'บานเปิด',rate:5000},{n:'บานเฟี้ยม',rate:7000},
+  {n:'บานกระทุ้ง',rate:5500},{n:'กระจกติดตาย',rate:3000},
+];
+const RANAE = ['บังตาผนังระแนง 1"x1.6" โชว์ 1"','บังตาผนังระแนง 1x5 โชว์ 5','ระแนงเกล็ด Z','ประตูรั้วบานเลื่อน'];
+const ROOFS = [{n:'ไวนิล',rate:5500,colors:['สีขาว','สีเทา','สีน้ำตาล']},
+  {n:'โพลีตัน 3มม.',rate:4500,colors:['ใส','ขาวขุ่น','ชาใส','ออสเกรย์']},
+  {n:'ชินโคไลท์ 6มม.',rate:6000,colors:['Light Grey','Modern Grey']},
+  {n:'เมทัลชีท PU',rate:5000,colors:['ขาว','น้ำตาล']},
+  {n:'กระจกลามิเนต',rate:9000,colors:['ฟิล์มใส','ฟิล์มเขียว']}];
+const SCREENPROD = ['มุ้งเฟรมเล็ก','มุ้งเฟรมใหญ่','มุ้งจีบ','มุ้งม้วน','มุ้งจีบนิรภัย'];
+const SOLID = [{n:'แผ่นลูกฟูกล่าง (อลู)',rate:3500},{n:'แผ่นคอมโพสิทล่าง',rate:3300}];
+
+// ---------- state ----------
+let CAT='บาน';
+const S = {w:1.8,h:2.2,n:1,opts:[]};
+
+// ---------- helpers ----------
+const el = id => document.getElementById(id);
+const opt = (a,sel) => a.map((o,i)=>{const v=typeof o==='string'?o:o.n;return `<option ${i===sel?'selected':''}>${v}</option>`}).join('');
+function colorSel(id){return `<select id="${id}">`+COLORS.map((c,i)=>`<option ${i===0?'selected':''}>${c.n}</option>`).join('')+`</select>`;}
+function curColor(){return COLORS.find(c=>c.n===el('mColor').value)||COLORS[0];}
+function curGlass(){return GLASS.find(g=>g.n===el('mGlass').value)||GLASS[0];}
+
+// ---------- init master ----------
+el('mColor').innerHTML = COLORS.map((c,i)=>`<option ${i===0?'selected':''}>${c.n}</option>`).join('');
+el('mGlass').innerHTML = GLASS.filter(g=>g.sell>0).map((g,i)=>`<option ${i===0?'selected':''}>${g.n}</option>`).join('');
+el('mColor').onchange=el('mGlass').onchange=render;
+
+// ---------- tabs ----------
+const CATS=['บาน','ระแนง/รั้ว','หลังคา','มุ้ง','กั้นห้องกระจก','ม่านซิป'];
+el('tabs').innerHTML = CATS.map(c=>`<div class="tab ${c===CAT?'on':''}" data-c="${c}">${c}</div>`).join('');
+el('tabs').onclick = e => { const t=e.target.closest('.tab'); if(!t)return; CAT=t.dataset.c; S.opts=[]; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.c===CAT)); buildForm(); render(); };
+
+// ---------- form per category ----------
+function buildForm(){
+  let h='';
+  const sizeRow = `<div class="row"><div><label>กว้าง (ม.)</label><input type="number" id="fw" value="${S.w}" step="0.1"></div><div><label>สูง (ม.)</label><input type="number" id="fh" value="${S.h}" step="0.1"></div><div><label>จำนวน (ชุด)</label><input type="number" id="fn" value="${S.n}" step="1" min="1"></div></div>`;
+
+  if(CAT==='บาน'){
+    h+=`<label>ชนิดบาน</label><select id="dtype">${opt(DOORTYPES,0)}</select>`;
+    h+=`<label>ประตู/หน้าต่าง</label><select id="ditype"><option>ประตู</option><option>หน้าต่าง</option></select>`;
+    h+=sizeRow;
+    h+=`<label>จำนวนบาน (แบ่ง)</label><input type="number" id="dpanel" value="2" min="1">`;
+    h+=`<label class="chk"><input type="checkbox" id="dgrid"> มีคาดตาราง</label>`;
+    h+=`<label>มุ้ง (ในบาน)</label><select id="dscreen"><option value="">ไม่ใส่</option>${SCREENS.map(s=>`<option>${s.n}</option>`).join('')}</select>`;
+    h+=`<label>มือจับ Cmech</label><select id="dhandle"><option value="">ไม่ใส่</option>${HANDLES.map(s=>`<option>${s.n}</option>`).join('')}</select>`;
+    h+=`<label>แผ่นทึบล่าง <span class="muted">(กว้าง×สูง×เรต)</span></label><select id="dsolid"><option value="">ไม่ใส่</option>${SOLID.map(s=>`<option>${s.n}</option>`).join('')}</select>`;
+    h+=`<div class="row" id="dsolidwrap" style="display:none"><div><label>กว้างทึบ (ม.)</label><input type="number" id="dsw" value="1.8" step="0.1"></div><div><label>สูงทึบ (ม.)</label><input type="number" id="dsh" value="0.4" step="0.1"></div></div>`;
+  }
+  else if(CAT==='ระแนง/รั้ว'){
+    h+=`<label>ชนิดระแนง</label><select id="rtype">${opt(RANAE,0)}</select>`;
+    h+=sizeRow;
+    h+=`<label class="chk"><input type="checkbox" id="rwrap"> ครอบวงกบ</label>`;
+    h+=`<div id="rwrapn" style="display:none"><label>จำนวนด้าน</label><select id="rsides"><option>3 ด้าน</option><option>4 ด้าน</option></select></div>`;
+  }
+  else if(CAT==='หลังคา'){
+    h+=`<label>ชนิดหลังคา</label><select id="rfp">${opt(ROOFS,0)}</select>`;
+    h+=`<label>สีวัสดุมุง</label><select id="rfc"></select>`;
+    h+=sizeRow;
+    h+=`<label>แป</label><select id="rfb"><option selected>แปคู่ (default)</option><option>แปเดี่ยว</option></select>`;
+    h+=`<label>ปลายหลังคา</label><select id="rfe"><option selected>ปล่อย (ไม่มีรางน้ำ)</option><option>รางน้ำ (ท่อ)</option><option>รางน้ำ (โซ่ ลายทิวลิป)</option></select>`;
+    h+=`<div id="rfchainwrap" style="display:none"><label>โซ่รางน้ำ (3,000/เส้น) · จำนวนเส้น</label><input type="number" id="rfchain" value="0" min="0"></div>`;
+    h+=`<label class="chk"><input type="checkbox" id="rfplate"> เสริมเพลทเหล็กล่าง (ฟรี)</label>`;
+    h+=`<label class="chk"><input type="checkbox" id="rfpull"> เหล็กดึงด้านบน (ฟรี)</label>`;
+    h+=`<label>ซ่อนสโลป</label><select id="rfhs"><option value="">ไม่มี</option><option data-r="3500">คอมโพสิต 3มม. (3,500/ตร.ม.)</option><option data-r="4000">สมาร์ทบอร์ด 6มม. (4,000/ตร.ม.)</option></select>`;
+  }
+  else if(CAT==='มุ้ง'){
+    h+=`<label>ชนิดมุ้ง</label><select id="mtype">${opt(SCREENPROD,0)}</select>`;
+    h+=sizeRow;
+    h+=`<label>ผ้ามุ้ง</label><select id="mfab"><option>ไฟเบอร์ ดำ/เทา</option><option>กันแมว/หมา (+800/ตร.ม.)</option><option>สแตนเลส กันหนู (+1,200/ตร.ม.)</option></select>`;
+  }
+  else if(CAT==='กั้นห้องกระจก'){
+    h+=`<p class="muted">ชุดหลายด้าน — เพิ่มด้าน/หลังคาได้ (เดโมย่อ)</p>`;
+    h+=`<div id="sides"></div>`;
+    h+=`<button class="btn mini" id="addside" type="button">+ เพิ่มด้าน</button> <button class="btn mini" id="addroof" type="button">+ เพิ่มหลังคา</button>`;
+  }
+  else if(CAT==='ม่านซิป'){
+    h+=sizeRow;
+    h+=`<label>ผ้าโปร่ง</label><select id="zfab"><option>โปร่ง 5%</option><option>โปร่ง 3%</option><option>ทึบ 0%</option></select>`;
+  }
+
+  // ---- OPTION block (F2 redesign) ----
+  h+=`<hr><div><b style="color:var(--red)">OPTION ทางเลือกลูกค้า</b> <span class="muted">(เลือกหมวด→รายการ · auto ราคา (ใหม่−เดิม)×พื้นที่)</span></div>`;
+  h+=`<div id="optList"></div>`;
+  h+=`<button class="btn ghost" id="addOpt" type="button" style="margin-top:8px">+ OPTION</button>`;
+
+  el('form').innerHTML=h;
+  bindForm();
+}
+
+function bindForm(){
+  el('form').oninput = render;
+  el('form').onchange = render;
+  if(el('addOpt')) el('addOpt').onclick = addOpt;
+  // chain show/hide
+  if(el('dsolid')) el('dsolid').onchange = ()=>{el('dsolidwrap').style.display=el('dsolid').value?'flex':'none';render();};
+  if(el('rwrap')) el('rwrap').onchange = ()=>{el('rwrapn').style.display=el('rwrap').checked?'block':'none';render();};
+  if(el('rfp')){ const setC=()=>{const r=ROOFS.find(x=>x.n===el('rfp').value)||ROOFS[0];el('rfc').innerHTML=r.colors.map(c=>`<option>${c}</option>`).join('');}; setC(); el('rfp').addEventListener('change',()=>{setC();render();}); }
+  if(el('rfe')) el('rfe').onchange = ()=>{el('rfchainwrap').style.display=el('rfe').value.includes('โซ่')?'block':'none';render();};
+  if(el('addside')){ el('addside').onclick=()=>{addSide('ด้าน');}; el('addroof').onclick=()=>{addSide('หลังคา');}; if(!el('sides').children.length){addSide('ด้าน A');addSide('ด้าน B');} }
+}
+
+// กั้นห้อง: ด้าน
+let sideIdx=0;
+function addSide(kind){
+  sideIdx++;
+  const id='side'+sideIdx;
+  const d=document.createElement('div'); d.className='opt-row';
+  const label = kind==='หลังคา'?'หลังคา':('ด้าน '+String.fromCharCode(64+el('sides').children.length+1));
+  d.innerHTML=`<div><label>${kind==='หลังคา'?'หลังคา':'ตำแหน่ง'}</label><input type="text" value="${kind==='ด้าน'?label:kind}"></div>
+   <div><label>ชนิด</label><select>${kind==='หลังคา'?ROOFS.map(r=>`<option>${r.n}</option>`).join(''):DOORTYPES.map(t=>`<option>${t.n}</option>`).join('')}</select></div>
+   <div><label>กว้าง</label><input type="number" value="2" step="0.1"></div>
+   <div><label>สูง</label><input type="number" value="2.4" step="0.1"></div>
+   <div class="del"><label>&nbsp;</label><button class="btn mini" type="button">ลบ</button></div>`;
+  d.querySelector('button').onclick=()=>{d.remove();render();};
+  d.oninput=render; d.onchange=render;
+  el('sides').appendChild(d); render();
+}
+
+// ---- OPTION cascade ----
+const OPTCATS = {
+  'เปลี่ยนกระจก': GLASS,
+  'เปลี่ยนผ้ามุ้ง': SCREENS,
+  'เปลี่ยนสีอลู': COLORS,
+  'เปลี่ยนมือจับ': HANDLES,
+  'เปลี่ยนหลังคา': ROOFS,
+  'อื่นๆ (พิมพ์เอง)': null,
+};
+function addOpt(){
+  const i = S.opts.length; S.opts.push({cat:'เปลี่ยนกระจก',item:'',text:'',price:0});
+  renderOptRows(); render();
+}
+function renderOptRows(){
+  el('optList').innerHTML = S.opts.map((o,i)=>{
+    const cats = Object.keys(OPTCATS);
+    let listHtml='';
+    const data = OPTCATS[o.cat];
+    if(data){
+      if(o.cat==='เปลี่ยนกระจก'){
+        const grps=[...new Set(GLASS.map(g=>g.grp))];
+        listHtml = grps.map(gr=>`<optgroup label="${gr}">`+GLASS.filter(g=>g.grp===gr).map(g=>`<option ${g.n===o.item?'selected':''}>${g.n}</option>`).join('')+`</optgroup>`).join('');
+      } else {
+        listHtml = data.map(d=>{const v=d.n||d;return `<option ${v===o.item?'selected':''}>${v}</option>`}).join('');
+      }
+    }
+    return `<div class="opt-row" data-i="${i}">
+      <div><label>หมวด</label><select class="oc">${cats.map(c=>`<option ${c===o.cat?'selected':''}>${c}</option>`).join('')}</select></div>
+      ${data?`<div><label>รายการ</label><select class="oi">${listHtml}</select></div>`:`<div><label>ข้อความ</label><input type="text" class="ot" value="${o.text}" placeholder="พิมพ์ออปชั่น"></div>`}
+      <div style="flex:0 0 110px"><label>±บาท</label><input type="number" class="op" value="${o.price}" step="100"></div>
+      <div class="del"><label>&nbsp;</label><button class="btn mini ox" type="button">ลบ</button></div>
+    </div>`;
+  }).join('');
+  // bind
+  el('optList').querySelectorAll('.opt-row').forEach(row=>{
+    const i=+row.dataset.i;
+    const oc=row.querySelector('.oc'), oi=row.querySelector('.oi'), ot=row.querySelector('.ot'), op=row.querySelector('.op');
+    if(oc) oc.onchange=()=>{S.opts[i].cat=oc.value;S.opts[i].item='';S.opts[i].text='';S.opts[i].price=0;renderOptRows();render();};
+    if(oi) oi.onchange=()=>{S.opts[i].item=oi.value;autoOpt(i);renderOptRows();render();};
+    if(ot) ot.oninput=()=>{S.opts[i].text=ot.value;render();};
+    if(op) op.oninput=()=>{S.opts[i].price=+op.value||0;render();};
+    row.querySelector('.ox').onclick=()=>{S.opts.splice(i,1);renderOptRows();render();};
+  });
+}
+// auto ข้อความ + ราคา (ใหม่−เดิม)×พื้นที่
+function autoOpt(i){
+  const o=S.opts[i], area=(+ (el('fw')?el('fw').value:S.w)||1.8)*(+(el('fh')?el('fh').value:S.h)||2.2);
+  o.text = 'เปลี่ยนเป็น '+o.item;
+  if(o.cat==='เปลี่ยนกระจก'){ const ng=GLASS.find(g=>g.n===o.item), cur=curGlass(); o.price = ng&&ng.sell&&cur.sell?Math.round((ng.sell-cur.sell)*area):0; }
+  else if(o.cat==='เปลี่ยนสีอลู'){ const nc=COLORS.find(c=>c.n===o.item), cur=curColor(); o.price=Math.round(((nc?nc.up:0)-cur.up)*area); }
+  else if(o.cat==='เปลี่ยนผ้ามุ้ง'){ const s=SCREENS.find(x=>x.n===o.item); o.price=s?Math.round(s.add):0; }
+  else if(o.cat==='เปลี่ยนมือจับ'){ const hh=HANDLES.find(x=>x.n===o.item); o.price=hh?hh.add:0; }
+  else o.price=0;
+}
+
+// ---------- render preview ----------
+function render(){
+  const w=+(el('fw')?el('fw').value:S.w)||0, h=+(el('fh')?el('fh').value:S.h)||0, n=+(el('fn')?el('fn').value:1)||1;
+  const area=w*h; const col=curColor(), gl=curGlass();
+  let name='', det=[], price=0;
+
+  if(CAT==='บาน'){
+    const t=DOORTYPES.find(x=>x.n===el('dtype').value)||DOORTYPES[0];
+    const itype=el('ditype').value, panel=el('dpanel').value;
+    name=`${itype==='ประตู'?'ประตู':'หน้าต่าง'}${t.n} (${w}×${h} ม.)${(+panel>1)?` แบ่ง ${panel} บาน`:''}`;
+    price=Math.max(t.rate*area,3000)+col.up*area;
+    det.push('อลูมิเนียม '+col.n); det.push(gl.n);
+    if(el('dgrid').checked) det.push('มีคาดตาราง');
+    if(el('dscreen').value){ const s=SCREENS.find(x=>x.n===el('dscreen').value); name=name.replace(/\)/,') พร้อม'+el('dscreen').value.split(' ')[0]); det.push(el('dscreen').value); price+=s?s.add:0; }
+    if(el('dhandle').value){ const hh=HANDLES.find(x=>x.n===el('dhandle').value); det.push(el('dhandle').value); price+=hh?hh.add:0; }
+    if(el('dsolid') && el('dsolid').value){ const sd=SOLID.find(x=>x.n===el('dsolid').value); const sw=+el('dsw').value||0, sh=+el('dsh').value||0; const a2=sw*sh; det.push(el('dsolid').value+` (${sw}×${sh}=${a2.toFixed(2)} ตร.ม.)`); price+=sd?sd.rate*a2:0; }
+  }
+  else if(CAT==='ระแนง/รั้ว'){
+    const t=el('rtype').value; name=`${t} (${w}×${h} ม.)`;
+    price=Math.max(3300*area,5000)+col.up*area; det.push('อลูมิเนียม '+col.n);
+    if(el('rwrap').checked){ const sides=el('rsides').value; det.push('ครอบวงกบอลู '+sides); price+= (sides.startsWith('4')?4:3)*Math.max(w,h)*700; }
+  }
+  else if(CAT==='หลังคา'){
+    const r=ROOFS.find(x=>x.n===el('rfp').value)||ROOFS[0];
+    name=`หลังคา ${r.n} (${w}×${h} ม.)`;
+    price=Math.max(r.rate*area,30000)+col.up*area;
+    det.push('โครงอลูมิเนียม '+col.n+(el('rfb').value.startsWith('แปคู่')?' (แปคู่)':' (แปเดี่ยว)'));
+    det.push('หลังคา'+r.n+' '+el('rfc').value);
+    const end=el('rfe').value;
+    if(end.includes('โซ่')){ const c=+el('rfchain').value||0; det.push('รางน้ำ (โซ่ ลายทิวลิป)'); if(c>0){det.push('โซ่รางน้ำ '+c+' เส้น');price+=c*3000;} }
+    else if(end.includes('ท่อ')){ det.push('รางน้ำอลูมิเนียม + ตะแกรงกันใบไม้ + ท่อ PVC'); }
+    // ปล่อย = ไม่เขียนรางน้ำ (F3)
+    if(el('rfplate').checked) det.push('เสริมเพลทเหล็กล่าง (รับล่าง)');
+    if(el('rfpull').checked) det.push('เหล็กดึงด้านบน');
+    const hs=el('rfhs').selectedOptions[0]; if(hs && hs.dataset.r){ det.push('ซ่อนสโลป '+hs.text.split(' (')[0]); price+= (+hs.dataset.r)*area*0.5; }
+  }
+  else if(CAT==='มุ้ง'){
+    const t=el('mtype').value; name=`${t} (${w}×${h} ม.)`; price=Math.max(2500*area,3500);
+    det.push(el('mfab').value);
+    if(el('mfab').value.includes('กันแมว')) price+=800*area; if(el('mfab').value.includes('สแตนเลส')) price+=1200*area;
+  }
+  else if(CAT==='กั้นห้องกระจก'){
+    name='กั้นห้องกระจก (ชุด)'; det.push('อลูมิเนียม '+col.n); det.push(gl.n);
+    [...el('sides').children].forEach(row=>{
+      const inp=row.querySelectorAll('input,select'); const pos=inp[0].value, ty=inp[1].value, ww=+inp[2].value||0, hh=+inp[3].value||0;
+      det.push('• '+pos+' : '+ty+` (${ww}×${hh})`);
+      const isRoof = ROOFS.some(r=>r.n===ty);
+      price += isRoof? Math.max((ROOFS.find(r=>r.n===ty).rate)*ww*hh,30000) : Math.max(4500*ww*hh,3000);
+    });
+    price+=col.up*5;
+    n; // ชุด
+  }
+  else if(CAT==='ม่านซิป'){
+    name=`ม่านซิป (${w}×${h} ม.)`; det.push('ผ้า'+el('zfab').value); price=Math.max(2600*area,8000);
+  }
+
+  // OPTION lines
+  let optHtml='';
+  S.opts.forEach(o=>{ const txt=o.text||(o.item?('เปลี่ยนเป็น '+o.item):''); if(txt){ optHtml+=`<div class="opt-out">OPTION : ${txt}${o.price?` (ราคา ${o.price>0?'+':'−'}${Math.abs(o.price).toLocaleString()})`:''}</div>`; price+=o.price; } });
+
+  // per-unit × qty
+  const total=price*n;
+  el('pvName').textContent = name||'—';
+  el('pvDet').innerHTML = det.map(d=>`<div>- ${d}</div>`).join('');
+  el('pvOpts').innerHTML = optHtml;
+  el('pvPrice').innerHTML = `${n>1?`${n} ชุด × ${fmt(price)} = `:''}${fmt(total)}`;
+}
+
+buildForm(); render();
+</script>
+</body>
+</html>
