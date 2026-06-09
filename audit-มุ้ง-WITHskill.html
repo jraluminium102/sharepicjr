@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตรวจออปชั่นหมวด "มุ้ง" — เทียบเครื่องคิดราคา JR กับใบเสนอราคาจริง</title>
+<style>
+  :root{ --jr:#B3151D; --jr-dark:#7e0e14; --jr-soft:#fbeaeb; --ink:#1a1a1a; --muted:#6b6b6b; --line:#e3d5d6; }
+  *{box-sizing:border-box;}
+  body{ font-family:"Segoe UI","Sarabun","Tahoma",sans-serif; color:var(--ink); margin:0; background:#f6f3f3; line-height:1.55; }
+  .wrap{ max-width:1080px; margin:0 auto; padding:28px 22px 60px; }
+  header{ background:linear-gradient(135deg,var(--jr),var(--jr-dark)); color:#fff; border-radius:14px; padding:26px 30px; box-shadow:0 6px 18px rgba(179,21,29,.25); }
+  header h1{ margin:0 0 6px; font-size:23px; }
+  header .sub{ font-size:13.5px; opacity:.92; }
+  header .meta{ margin-top:12px; font-size:12px; opacity:.85; border-top:1px solid rgba(255,255,255,.25); padding-top:10px; }
+  h2{ color:var(--jr); border-left:5px solid var(--jr); padding-left:11px; margin:34px 0 14px; font-size:18px; }
+  h3{ color:var(--jr-dark); margin:22px 0 8px; font-size:15px; }
+  .cards{ display:flex; gap:14px; flex-wrap:wrap; margin:20px 0 6px; }
+  .card{ flex:1; min-width:150px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 18px; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,.04); }
+  .card .n{ font-size:30px; font-weight:800; line-height:1; }
+  .card .l{ font-size:12.5px; color:var(--muted); margin-top:6px; }
+  .card.red .n{ color:var(--jr); } .card.yellow .n{ color:#c98a00; } .card.green .n{ color:#1e7a34; } .card.tot .n{ color:#333; }
+  table{ width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.05); font-size:13px; margin:10px 0 8px; }
+  th,td{ border:1px solid var(--line); padding:9px 11px; vertical-align:top; text-align:left; }
+  th{ background:var(--jr); color:#fff; font-weight:600; font-size:12.5px; }
+  tbody tr:nth-child(even){ background:#fcf8f8; }
+  .pill{ display:inline-block; padding:2px 9px; border-radius:11px; font-size:11.5px; font-weight:700; white-space:nowrap; }
+  .p-red{ background:#fbe1e2; color:var(--jr); } .p-yellow{ background:#fdf2d6; color:#9a6a00; } .p-green{ background:#dcefe1; color:#1e7a34; }
+  code{ background:#f0e8e8; padding:1px 5px; border-radius:4px; font-size:12px; }
+  .note{ background:var(--jr-soft); border:1px solid var(--line); border-left:4px solid var(--jr); border-radius:8px; padding:12px 15px; font-size:13px; margin:14px 0; }
+  ul{ margin:6px 0 6px; padding-left:22px; } li{ margin:3px 0; }
+  .prio{ font-weight:700; border-radius:6px; padding:1px 8px; font-size:12px; color:#fff; }
+  .P1{ background:var(--jr); } .P2{ background:#c98a00; } .P3{ background:#5a7d8c; }
+  .src{ font-size:11.5px; color:var(--muted); }
+  footer{ margin-top:40px; font-size:11.5px; color:var(--muted); text-align:center; border-top:1px solid var(--line); padding-top:14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>ตรวจออปชั่นหมวด “มุ้ง” — เครื่องคิดราคา JR เทียบใบเสนอราคาจริง</h1>
+  <div class="sub">เช็คว่าออปชั่น/ชนิดมุ้ง/รายละเอียดที่ระบบออก ตรงกับใบจริงของบริษัทไหม · หาที่ขาด/ผิด + root cause</div>
+  <div class="meta">
+    ขอบเขต: หมวดเดียว (มุ้ง) · READ-ONLY ไม่แก้ <code>public/calculator/index.html</code> ·
+    วันที่ 2026-06-09 · ระบบ: <code>public/calculator/index.html</code> + harness <code>gen-quotes-full.mjs</code> (render จริง) ·
+    ใบจริงที่อ่าน: บุญญารัตน์, ชวลิต, ปีเตอร์, สุจินต์ + เอกสาร QC คุณอิงควัชร์ (คลังคำศัพท์)
+  </div>
+</header>
+
+<div class="cards">
+  <div class="card red"><div class="n">3</div><div class="l">🔴 ขาด/ผิดแน่</div></div>
+  <div class="card yellow"><div class="n">5</div><div class="l">🟡 น่าสงสัย/ไม่ครบ</div></div>
+  <div class="card green"><div class="n">6</div><div class="l">🟢 มีครบ/ตรง</div></div>
+  <div class="card tot"><div class="n">14</div><div class="l">รวมที่ตรวจ</div></div>
+</div>
+
+<h2>1. สรุปผล (อ่านอันเดียวจบ)</h2>
+<div class="note">
+ระบบ <b>ครอบคลุมชนิดมุ้ง “ราคาแยกชุด” ได้ดีมาก</b> (มุ้งจีบ, มุ้งจีบนิรภัยสแตน, มุ้งม้วน/เตะได้, มุ้งแม่เหล็ก, มุ้งกันแมว/หนู, blackout/ทูเวย์, เฟรมเล็ก/ใหญ่/ติดตาย) ทั้งแบบสินค้าเดี่ยว (หมวดมุ้ง) และแบบ add-on ในบาน (<code>o-mosq</code>)
+<br><br>
+แต่มี <b>ช่องว่างสำคัญ 3 จุด (🔴)</b> ที่ทำให้ออกใบไม่ตรงใบจริง:
+<br>① <b>“มุ้งนิรภัย” (เฟรมตัน ผ้าสแตน) ไม่มีเป็นสินค้า/ออปชั่น</b> ทั้งที่เป็นมุ้งที่ใบจริงใช้บ่อยที่สุด — ระบบมีแต่ “มุ้งจีบนิรภัย” (คนละตัว)
+<br>② <b>“เส้นคาดมุ้ง” ไม่มีช่องเลือก + ไม่ออกลงใบ</b> ทั้งที่ QC ระบุเป็นสเปกบังคับของเฟรมเล็ก/ใหญ่/นิรภัย
+<br>③ <b>add-on มุ้งในบาน ออกข้อความลงใบไม่ครบ</b> (ไม่โชว์สีกรอบมุ้ง/เส้นคาด/แบบยัด-เสริมวงกบ ในบรรทัดรายละเอียด)
+</div>
+
+<h2>2. คลังคำศัพท์ “มุ้ง” ที่เจอในใบจริง (เกณฑ์เทียบ)</h2>
+<table>
+<thead><tr><th style="width:24%">ชนิดมุ้ง (ใบจริงเขียน)</th><th style="width:40%">รายละเอียด/ออปชั่นที่ใบจริงระบุ</th><th>พบในใบ</th></tr></thead>
+<tbody>
+<tr><td><b>มุ้งนิรภัย</b> (เฟรมตัน)</td><td>เฟรมลายไม้สีไวท์โอ๊ค / เฟรมสีเทาซาฮาร่า · บางใบเขียน “ประตูมุ้งนิรภัย”</td><td>บุญญารัตน์ (ข้อ 2,5-7,17-18), ชวลิต, ปีเตอร์</td></tr>
+<tr><td><b>มุ้งเฟรมเล็ก</b></td><td>ผ้าไฟเบอร์เทา/ดำ · เฟรมสีเทาซาฮาร่า · มีเส้นคาดมุ้ง</td><td>บุญญารัตน์, สุจินต์</td></tr>
+<tr><td><b>มุ้งเฟรมใหญ่</b></td><td>ผ้าไฟเบอร์ดำ</td><td>ปีเตอร์ (ทุกข้อ)</td></tr>
+<tr><td><b>มุ้งจีบ</b></td><td>เฟรมลายไม้ไวท์แบมบู / เฟรมสีเทาซาฮาร่า · ผ้าไฟเบอร์ดำ</td><td>ชวลิต, สุจินต์</td></tr>
+<tr><td><b>มุ้งจีบนิรภัย</b></td><td>เปิดได้ 1 ทาง · รางล่าง 2.5 ซม.</td><td>QC อิงควัชร์</td></tr>
+<tr><td><b>มุ้งม้วน</b></td><td>กำหนดขนาดตามรูป · ขั้นต่ำ 2 ตร.ม./ชุด แยกกลาง</td><td>QC อิงควัชร์</td></tr>
+<tr><td><b>เส้นคาดมุ้ง</b> (ออปชั่นร่วม)</td><td>เฟรมเล็กเปิด=1เส้น · เลื่อนทั่วไป=คู่ · SMS เสาโหนก=0/1 · เฟรมใหญ่เลื่อน=ไม่ใส่ · นิรภัยสูง&gt;2ม.=คาด 0.90ม.</td><td>QC อิงควัชร์ (ละเอียดสุด)</td></tr>
+<tr><td>ออปชั่นติดตั้ง</td><td>ยัดในวงกบ / นอกวงกบ · เสริมวงกบ · กว้าง&gt;1.5ม. เสริมเส้นซอย</td><td>QC อิงควัชร์</td></tr>
+</tbody>
+</table>
+
+<h2>3. ตารางเทียบ (ใบจริง ↔ ระบบ)</h2>
+<table>
+<thead><tr>
+  <th style="width:20%">รายการ (ใบจริง)</th>
+  <th style="width:24%">ใบจริงเขียนอะไร</th>
+  <th style="width:30%">ระบบมี option + ออกครบไหม</th>
+  <th style="width:18%">ขาด/ผิด/ต้องแก้ + root cause</th>
+  <th style="width:8%">สถานะ</th>
+</tr></thead>
+<tbody>
+
+<tr>
+  <td><b>มุ้งนิรภัย</b> (เฟรมตัน ผ้าสแตน)</td>
+  <td>“+ มุ้งนิรภัย (เฟรมลายไม้สีไวท์โอ๊ค)” — มุ้งยอดฮิตในใบจริง</td>
+  <td>❌ ไม่มีสินค้า/ออปชั่นชื่อนี้เลย · ระบบมีแต่ “มุ้งจีบนิรภัย” (สแตน 0.8 จีบได้ คนละแบบ) · มีตารางราคา <code>IMP24-27</code> (2,500/2,900/3,000/3,500) แต่ <b>ไม่มี product ผูกใช้</b> (orphan)</td>
+  <td>🔴 จัดทำสินค้า/addon “มุ้งนิรภัย” ใหม่ ผูก IMP24-27 · root: product ขาด (ตารางราคามีแล้วแต่ลืมต่อ product)</td>
+  <td><span class="pill p-red">🔴 ขาด</span></td>
+</tr>
+
+<tr>
+  <td><b>เส้นคาดมุ้ง</b></td>
+  <td>QC บังคับระบุ: เฟรมเล็กเปิด 1 เส้น / เลื่อนคู่ / นิรภัยสูง&gt;2ม. คาด 0.90ม. ฯลฯ</td>
+  <td>❌ ไม่มีช่องเลือกเส้นคาดมุ้งใน <code>o-mosq</code> / สินค้าหมวดมุ้ง · genQuote ไม่ออกข้อความเส้นคาด (det = name+ผ้า+สีกรอบ เท่านั้น) · มีแค่ checklist เตือนข้อความ (line 1575)</td>
+  <td>🔴 เพิ่ม dropdown เส้นคาด (ไม่ใส่/1เส้น/คู่/0.90ม.) + ออกลงใบ · root: option ขาด + genQuote ไม่ดึงลงใบ</td>
+  <td><span class="pill p-red">🔴 ขาด</span></td>
+</tr>
+
+<tr>
+  <td><b>add-on มุ้งในบาน — ข้อความลงใบ</b></td>
+  <td>ใบจริงเขียนใต้บาน เช่น “- มุ้งจีบ (เฟรมสีเทาซาฮาร่า/ผ้าไฟเบอร์ดำ)”</td>
+  <td>⚠ ระบบบวกราคา + ออกบรรทัดได้ แต่ det = <code>name + ผ้า + สีกรอบ</code> เท่านั้น · <b>ไม่โชว์สีกรอบเป็นวงเล็บแบบใบจริง</b> และไม่มีเส้นคาด/แบบยัด-เสริมวงกบ</td>
+  <td>🔴 ปรับ genQuote ให้ออกฟอร์แมต “(เฟรม.../ผ้า...)” ตรงใบจริง · root: genQuote ออกข้อความไม่ครบ</td>
+  <td><span class="pill p-red">🔴 ผิดรูป</span></td>
+</tr>
+
+<tr>
+  <td>ผ้ามุ้ง default (เทา vs ดำ)</td>
+  <td>ใบจริงส่วนใหญ่ใช้ <b>ผ้าไฟเบอร์ดำ</b> (ปีเตอร์/ชวลิต/สุจินต์ ทุกข้อ)</td>
+  <td>⚠ ระบบ default = <code>fiber_gray</code> (ไฟเบอร์เทา) — สวนทางการใช้จริง</td>
+  <td>🟡 พิจารณาตั้ง default เป็นไฟเบอร์ดำ (เช็คซ้ำกับพี่นัท ว่าค่าตั้งต้นควรเป็นอะไร)</td>
+  <td><span class="pill p-yellow">🟡 ตั้งต้น</span></td>
+</tr>
+
+<tr>
+  <td>สีกรอบมุ้ง (ลายไม้)</td>
+  <td>ใบจริงมี “เฟรมลายไม้สีไวท์โอ๊ค”, “ไวท์แบมบู” (สีลายไม้เฉพาะ)</td>
+  <td>⚠ <code>o-mosqcolor</code> มี: ขาว/ดำ, ซาฮาร่า, เคแอลอบพิเศษ, เคแอลลายไม้ · มี “ลายไม้” แต่ <b>ไม่มีเฉดไวท์โอ๊ค/ไวท์แบมบู</b> ระบุชื่อ</td>
+  <td>🟡 ตรวจว่า “เคแอลลายไม้” ครอบคลุมเฉดที่ใบจริงใช้ไหม (เช็คซ้ำ)</td>
+  <td><span class="pill p-yellow">🟡 เช็คซ้ำ</span></td>
+</tr>
+
+<tr>
+  <td>แบบติดตั้ง ยัด/เสริมวงกบ</td>
+  <td>QC ระบุ “ยัดในวงกบ/นอกวงกบ”, “เสริมวงกบ”</td>
+  <td>⚠ มีเฉพาะ “เสริมวงกบ” ใน 2 สินค้า (imp32, mj_kick ติดล้นนอกวงกบ) · add-on มุ้งในบาน ไม่มีช่องเลือกยัด/เสริม</td>
+  <td>🟡 เพิ่มช่องเลือกแบบติดตั้งใน addon (เช็คซ้ำว่าจำเป็นออกใบไหม)</td>
+  <td><span class="pill p-yellow">🟡 ไม่ครบ</span></td>
+</tr>
+
+<tr>
+  <td>ประตูมุ้งนิรภัย (บานรอง)</td>
+  <td>บุญญารัตน์: “บานรอง: ประตูมุ้งนิรภัย”</td>
+  <td>⚠ เป็นกรณีของ มุ้งนิรภัย ที่ทำเป็นบานประตู — ผูกกับ 🔴 ข้อ 1 (ไม่มีมุ้งนิรภัย)</td>
+  <td>🟡 ครอบคลุมเมื่อแก้ข้อ 1 (มุ้งนิรภัยเป็น product/addon บานประตูได้)</td>
+  <td><span class="pill p-yellow">🟡 พ่วงข้อ1</span></td>
+</tr>
+
+<tr>
+  <td>เสริมเส้นซอยกลาง (กว้าง&gt;1.5ม.)</td>
+  <td>QC: บานกว้างเกิน 1.5 ม. ต้องเสริมเส้นซอยกลาง</td>
+  <td>⚠ ไม่มีออปชั่น/ออโต้คิดเส้นซอย · มีแต่ checklist เตือน</td>
+  <td>🟡 เพิ่มเตือน/คิดราคาเส้นซอยอัตโนมัติ (เช็คซ้ำว่าคิดเงินเพิ่มไหม)</td>
+  <td><span class="pill p-yellow">🟡 ไม่ครบ</span></td>
+</tr>
+
+<tr><td><b>มุ้งจีบ</b></td><td>ผ้าไฟเบอร์ดำ · เฟรมซาฮาร่า/ลายไม้</td><td>✅ มีครบ: addon (mj_sd_basic) + สินค้าเดี่ยว · render ออกใบได้ (FULL-B row 4-19,34-42)</td><td>—</td><td><span class="pill p-green">🟢 ตรง</span></td></tr>
+<tr><td><b>มุ้งเฟรมเล็ก / ติดตาย</b></td><td>ผ้าไฟเบอร์ · เฟรมซาฮาร่า</td><td>✅ imp21/imp22 มีทั้ง addon + สินค้าเดี่ยว (FULL-B row 75-76)</td><td>—</td><td><span class="pill p-green">🟢 ตรง</span></td></tr>
+<tr><td><b>มุ้งเฟรมใหญ่</b></td><td>ผ้าไฟเบอร์ดำ</td><td>✅ imp23 มี (FULL-B row 77)</td><td>—</td><td><span class="pill p-green">🟢 ตรง</span></td></tr>
+<tr><td><b>มุ้งจีบนิรภัย (สแตน 0.8)</b></td><td>เปิด 1 ทาง · รางเตี้ย</td><td>✅ imp31/imp32 + mj_screen_safety (FULL-B row 81-82,93)</td><td>—</td><td><span class="pill p-green">🟢 ตรง</span></td></tr>
+<tr><td><b>มุ้งม้วน / เตะได้</b></td><td>ตามขนาด · ขั้นต่ำ/ชุด</td><td>✅ imp29 + mj_kick_150/300/600 (FULL-B row 79,89-91)</td><td>—</td><td><span class="pill p-green">🟢 ตรง</span></td></tr>
+<tr><td>มุ้งแม่เหล็ก / กันแมว / กันหนู / blackout / ทูเวย์</td><td>ชนิดเสริม</td><td>✅ imp30/33/35, mj_blackout, mj_sd_twoway, mj_keep_* (FULL-B row 80,83-88,92)</td><td>—</td><td><span class="pill p-green">🟢 ตรง</span></td></tr>
+
+</tbody>
+</table>
+
+<h2>4. รายการ “ต้องเพิ่ม/แก้” จัดตามความสำคัญ</h2>
+<ul>
+<li><span class="prio P1">P1</span> <b>เพิ่ม “มุ้งนิรภัย” (เฟรมตัน ผ้าสแตน)</b> เป็นสินค้า/addon — ผูกตารางราคา <code>IMP24-27</code> ที่มีอยู่แล้วแต่ยังลอย (orphan). เป็นมุ้งที่ใบจริงใช้บ่อยสุด ขาดไป = ออกใบไม่ได้</li>
+<li><span class="prio P1">P1</span> <b>เพิ่ม “เส้นคาดมุ้ง”</b> เป็น dropdown (ไม่ใส่/1เส้น/คู่/คาด 0.90ม.) ทั้งใน addon บาน และสินค้าหมวดมุ้ง + ให้ <code>genQuote</code> ออกข้อความลงใบ (ตอนนี้มีแค่ checklist เตือน)</li>
+<li><span class="prio P1">P1</span> <b>แก้ genQuote บรรทัด addon มุ้ง</b> ให้ออกฟอร์แมตตรงใบจริง: “มุ้งจีบ (เฟรมสีเทาซาฮาร่า/ผ้าไฟเบอร์ดำ)” — ปัจจุบันต่อ string เฉยๆ ไม่จัดเป็นวงเล็บ</li>
+<li><span class="prio P2">P2</span> ทบทวน <b>default ผ้ามุ้ง</b> (ปัจจุบัน=ไฟเบอร์เทา · ใบจริงใช้ดำเป็นหลัก)</li>
+<li><span class="prio P2">P2</span> เพิ่มช่อง <b>แบบติดตั้ง ยัด/เสริมวงกบ</b> ใน addon มุ้งในบาน</li>
+<li><span class="prio P3">P3</span> ตรวจเฉดสีกรอบลายไม้ (ไวท์โอ๊ค/ไวท์แบมบู) ว่าครอบใน “เคแอลลายไม้” พอไหม</li>
+<li><span class="prio P3">P3</span> ออโต้คิด/เตือน “เส้นซอยกลาง” เมื่อบานกว้าง &gt; 1.5 ม.</li>
+</ul>
+
+<div class="note">
+<b>หมายเหตุผู้ตรวจ:</b> รายงานนี้ READ-ONLY — ไม่ได้แก้ <code>public/calculator/index.html</code>.
+ตัวเลขราคา IMP24-27 และโครงสร้าง option อ้างอิงจาก index.html (เลขบรรทัด 478-481, 674-693, 810-822, 1480-1560, 2350-2353, 1575).
+รายการ 🔴 ยืนยันด้วยทั้งโค้ดและผล render (FULL-B). รายการ 🟡 ที่ติด “เช็คซ้ำ” ยังไม่ฟันธง.
+</div>
+
+<footer>
+ตรวจออปชั่นหมวดมุ้ง · เครื่องคิดราคา JR · 2026-06-09 · ผู้ตรวจเอกสาร JR (quote-option-audit skill)
+</footer>
+</div>
+</body>
+</html>

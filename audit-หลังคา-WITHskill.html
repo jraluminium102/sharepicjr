@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit ออปชั่นหมวดหลังคา — เทียบใบเสนอราคาจริง</title>
+<style>
+  :root{ --jr:#B3151D; --jr-dark:#7d0f15; --bg:#fff; --ink:#222; --muted:#666;
+         --green:#1b7e3c; --amber:#b8860b; --red:#c0392b; }
+  *{ box-sizing:border-box; }
+  body{ font-family:"Sarabun","TH Sarabun New","Tahoma",sans-serif; color:var(--ink);
+        margin:0; background:#f4f4f4; line-height:1.55; }
+  .page{ max-width:1000px; margin:0 auto; background:var(--bg); padding:34px 40px 60px; }
+  header.hd{ border-bottom:4px solid var(--jr); padding-bottom:14px; margin-bottom:22px; }
+  header.hd .tag{ color:var(--jr); font-weight:700; letter-spacing:.5px; font-size:13px; }
+  header.hd h1{ margin:6px 0 2px; font-size:25px; color:var(--jr-dark); }
+  header.hd .sub{ color:var(--muted); font-size:13px; }
+  h2{ color:var(--jr); font-size:18px; margin:30px 0 10px; padding-left:10px;
+      border-left:5px solid var(--jr); }
+  h3{ font-size:15px; margin:18px 0 6px; color:var(--jr-dark); }
+  p,li{ font-size:13.5px; }
+  .cards{ display:flex; gap:12px; flex-wrap:wrap; margin:14px 0 4px; }
+  .card{ flex:1; min-width:120px; border:1px solid #e3e3e3; border-radius:10px;
+         padding:12px 14px; text-align:center; background:#fafafa; }
+  .card .n{ font-size:30px; font-weight:800; line-height:1; }
+  .card .l{ font-size:12px; color:var(--muted); margin-top:5px; }
+  .card.ok .n{ color:var(--green); } .card.warn .n{ color:var(--amber); }
+  .card.bad .n{ color:var(--red); } .card.tot .n{ color:var(--jr); }
+  table{ width:100%; border-collapse:collapse; margin:10px 0 6px; font-size:12.5px; }
+  th,td{ border:1px solid #ddd; padding:7px 9px; vertical-align:top; text-align:left; }
+  th{ background:var(--jr); color:#fff; font-weight:600; font-size:12.5px; }
+  tbody tr:nth-child(even){ background:#fbf3f3; }
+  .pill{ display:inline-block; padding:1px 8px; border-radius:11px; font-size:11px;
+         font-weight:700; white-space:nowrap; color:#fff; }
+  .p-ok{ background:var(--green); } .p-warn{ background:var(--amber); } .p-bad{ background:var(--red); }
+  code,.mono{ font-family:Consolas,monospace; font-size:11.5px; background:#f0f0f0;
+        padding:1px 4px; border-radius:3px; }
+  .note{ background:#fff7e6; border-left:4px solid var(--amber); padding:9px 12px;
+         font-size:12.5px; margin:10px 0; border-radius:0 6px 6px 0; }
+  .root{ background:#fdeceb; border-left:4px solid var(--jr); padding:9px 12px;
+         font-size:12.5px; margin:10px 0; border-radius:0 6px 6px 0; }
+  .pri{ font-weight:700; padding:1px 7px; border-radius:5px; font-size:11px; color:#fff; }
+  .P1{ background:var(--red); } .P2{ background:var(--amber); } .P3{ background:#777; }
+  ul{ margin:6px 0 6px 4px; padding-left:20px; }
+  .small{ font-size:11.5px; color:var(--muted); }
+  footer{ margin-top:34px; border-top:1px solid #ddd; padding-top:10px;
+          font-size:11px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hd">
+  <div class="tag">JR · QUOTE OPTION AUDIT · TEST REPORT</div>
+  <h1>ระบบออกรายละเอียด “หลังคา” ตรงใบเสนอราคาจริงไหม</h1>
+  <div class="sub">หมวดเดียว (หลังคา) · เทียบ <code>public/calculator/index.html</code> (render จริงผ่าน jsdom) กับใบเสนอราคาจริง
+   · 2026-06-09 · READ-ONLY (ไม่แก้ index.html)</div>
+</header>
+
+<h2>สรุปผล (นับ pill จริงในตารางเทียบด้านล่าง)</h2>
+<div class="cards">
+  <div class="card ok"><div class="n">4</div><div class="l">✅ ออกครบ (ตรงใบจริง)</div></div>
+  <div class="card warn"><div class="n">2</div><div class="l">🟡 ออกบางส่วน / คำไม่ตรง / แยกหมวด</div></div>
+  <div class="card bad"><div class="n">8</div><div class="l">🔴 คิดเงินแต่ไม่ขึ้นใบ / ขาด</div></div>
+  <div class="card tot"><div class="n">14</div><div class="l">รายการที่เทียบ</div></div>
+</div>
+<p class="small">เกณฑ์เทียบ: ใบจริง QT2024080066 (คุณหญิง) — มีงานหลังคา 3 จุด (ไวนิล+ลามิเนต / โพลีตัน+ระแนง / กันสาด)
+  · เสริมด้วยคลัง “เช็คลิสต์ Glass House/หลังคา” จากเอกสาร QC คุณอิงควัชร์ (หน้า 3)
+  · ตรวจ ปีเตอร์/ขวัญ/บุญญารัตน์ แล้ว ไม่มีงานหลังคา จึงไม่ใช้เป็นเกณฑ์.</p>
+
+<div class="root"><b>หัวใจของปัญหา (root cause เดียว ครอบเกือบทุกข้อแดง):</b>
+ตัวคิดเงินหมวดหลังคา (<code>calc</code> บรรทัด ~1401) บวกราคา “ของเสริมหลังคา” ครบทุกตัว
+(<span class="mono">rfgut/rfbeam/rfchain/rfpvc/rfhs/rfpole/rfeave/rfgc/rfbc</span>) แต่ตัวเขียนข้อความลงใบ
+(<code>genQuote</code> หมวดหลังคา บรรทัด ~3197–3231) <b>เขียนลงรายละเอียดงานแค่:</b> ชนิด+สีหลังคา / โครง+แป / บรรทัดรางน้ำ (เฉพาะถ้าเลือก “ปลายหลังคา=รางน้ำ”) / เพลทเหล็กล่าง / เหล็กดึง
+— ของเสริมที่เหลือ <b>ถูกคิดเงินแต่ไม่โผล่ในใบ</b> → ลูกค้าจ่ายของที่มองไม่เห็นในเอกสาร.</div>
+
+<h2>ตารางเทียบ (รายการใบจริง ↔ ระบบ)</h2>
+<table>
+<thead><tr>
+  <th style="width:17%;">รายการ (ใบจริง)</th>
+  <th style="width:25%;">ใบจริงเขียนอะไร</th>
+  <th style="width:13%;">ระบบมี option?</th>
+  <th style="width:13%;">ออกลงใบครบ?</th>
+  <th style="width:32%;">ขาด/ผิด + root cause</th>
+</tr></thead>
+<tbody>
+
+<tr>
+  <td>ชนิดหลังคา + สีวัสดุมุง</td>
+  <td>“หลังคาไวนิล สีขาว” / “หลังคาโพลีตัน หนา 3 มม. สีไอซ์ (603S Ice)”</td>
+  <td>มี (ไวนิล/ดีไลท์/โพลีตัน/ลามิเนต + dropdown สี)</td>
+  <td><span class="pill p-ok">ครบ</span></td>
+  <td>ออก “หลังคาไวนิล สีเทา” ได้ถูก. <span class="pill p-warn">เช็คซ้ำ</span> สีโพลีตันในระบบไม่มี “ไอซ์ 603S” (มี Clear/Opal/Bronze/Green/Grey/Silver…) — รายการสีอาจยังไม่ครบของจริง.</td>
+</tr>
+
+<tr>
+  <td>แป (เดี่ยว/คู่)</td>
+  <td>“( แปคู่ )”</td>
+  <td>มี (o-roofbatten: แปเดี่ยว/แปคู่)</td>
+  <td><span class="pill p-ok">ครบ</span></td>
+  <td>ออก “(แปคู่)” ต่อท้ายบรรทัดโครง ตรงใบจริง.</td>
+</tr>
+
+<tr>
+  <td>โครงสร้าง</td>
+  <td>“โครงอลูมิเนียม”</td>
+  <td>มี (o-roofframe: อลู / เหล็กชุบซิงค์)</td>
+  <td><span class="pill p-ok">ครบ</span></td>
+  <td>ออก “โครงอลูมิเนียม สี…” / “โครงเหล็กชุบซิงค์” ตรง.</td>
+</tr>
+
+<tr>
+  <td>รางน้ำอลูมิเนียม + ความยาว</td>
+  <td>“พร้อมรางน้ำอลูมิเนียม … ปล่อยปลาย” + ใน รายละเอียด: “รางน้ำอลูมิเนียม”</td>
+  <td>มี (o-rfgut: อลู S / สแตน M / สแตน L + ยาว(ม.))</td>
+  <td><span class="pill p-bad">ไม่ขึ้นใบ</span></td>
+  <td><b>คิดเงิน(rfgut×len) แต่ไม่เขียนลงใบ.</b> บรรทัด “รางน้ำ (ท่อ สีขาว)” ที่ระบบออก เป็นแค่ป้าย “ระบบรางน้ำ” (cosmetic) ของช่อง <code>rfend=รางน้ำ</code> ไม่ใช่รางน้ำที่คิดเงินจาก o-rfgut. root: genQuote ไม่ดึง rfgut/len.</td>
+</tr>
+
+<tr>
+  <td>ตะแกรงกันใบไม้</td>
+  <td>“+ ตะแกรงกันใบไม้” / “ตะแกรงพลาสติกกันใบไม้ สีดำ”</td>
+  <td><span class="pill p-bad">ไม่มี</span></td>
+  <td><span class="pill p-bad">ขาด</span></td>
+  <td>ไม่มี option “ตะแกรงกันใบไม้” เลย (ทั้ง UI/calc/genQuote). root: ไม่มี product/option. ใบจริงระบุทุกงานที่มีรางน้ำ.</td>
+</tr>
+
+<tr>
+  <td>ท่อน้ำทิ้ง PVC + ขนาด/สี</td>
+  <td>“มีท่อน้ำทิ้ง PVC ปล่อยปลาย” / “ท่อน้ำทิ้ง PVC 2.5 นิ้ว สีขาว”</td>
+  <td>มี (o-rfpvc “ครอบท่อ PVC” ยาว(ม.))</td>
+  <td><span class="pill p-bad">ไม่ขึ้นใบ + คำไม่ตรง</span></td>
+  <td><b>คิดเงิน(ครอบ PVC) แต่ไม่เขียนลงใบ.</b> อีกทั้งใบจริงเป็น “ท่อน้ำทิ้ง PVC 2.5 นิ้ว” (ตัวท่อ) ส่วนระบบเรียก “ครอบท่อ PVC” (งานครอบ) — คนละสิ่ง อาจสับสน. root: genQuote ไม่ดึง + ไม่มีช่องขนาดท่อ/สี.</td>
+</tr>
+
+<tr>
+  <td>วัสดุปิดรอยต่อแผ่นหลังคา</td>
+  <td>“วัสดุปิดรอยต่อแผ่นหลังคา สีขาว”</td>
+  <td><span class="pill p-bad">ไม่มี</span></td>
+  <td><span class="pill p-bad">ขาด</span></td>
+  <td>ไม่มี option. root: ไม่มี. ใบจริงระบุในรายละเอียดงานหลังคาแทบทุกใบ.</td>
+</tr>
+
+<tr>
+  <td>ต่อปลายหลังคา (วัสดุผสม)</td>
+  <td>“หลังคาไวนิล (แปคู่) <b>ต่อปลายหลังคากระจกลามิเนต</b>” + “หลังคากระจกลามิเนตใส ฟิล์มเขียว 4+4 มม.”</td>
+  <td><span class="pill p-bad">ไม่มี</span> (1 จุด = 1 ชนิดเท่านั้น)</td>
+  <td><span class="pill p-bad">ขาด</span></td>
+  <td>ระบบทำหลังคาผสม 2 วัสดุในจุดเดียวไม่ได้. root: โครงสร้าง product 1 ชนิด/รายการ. ใบจริงผสมไวนิล+ลามิเนตในชุดเดียว.</td>
+</tr>
+
+<tr>
+  <td>เสริมเพลทเหล็กล่าง (รับล่าง)</td>
+  <td>“เสริมเพลทเหล็กรับด้านล่าง”</td>
+  <td>มี (o-rfplate checkbox)</td>
+  <td><span class="pill p-ok">ครบ</span></td>
+  <td>ออก “เสริมเพลทเหล็กล่าง (รับล่าง)” ลงใบได้ (เป็น 1 ใน 2 ของเสริมที่ genQuote เขียน). <span class="small">ยืนยันจาก render ตรง.</span></td>
+</tr>
+
+<tr>
+  <td>โซ่รางน้ำ (สี+ลาย)</td>
+  <td>QC: “เพิ่มโซ่รางน้ำมั้ย ระบุสี+ลายโซ่” (ออปชั่นมาตรฐาน)</td>
+  <td>มี 2 ทาง: ป้าย rfend=รางน้ำ→โซ่(ลาย/สี) <i>ไม่คิดเงิน</i> · o-rfchain (3,000/เส้น) <i>คิดเงิน</i></td>
+  <td><span class="pill p-warn">บางส่วน</span></td>
+  <td>บรรทัด “รางน้ำ (โซ่ลาย… สี…)” ออกได้ <b>เฉพาะ</b>เมื่อเลือก rfend=รางน้ำ+ระบบ=โซ่ (cosmetic). แต่ o-rfchain ที่ <b>คิดเงินจริง</b> ไม่ขึ้นใบ. ของซ้อนกัน 2 ที่ ชวนสับสน. root: 2 กลไกแยกกัน.</td>
+</tr>
+
+<tr>
+  <td>ปล่อยปลายยื่น / ปิดปลายกันน้ำ</td>
+  <td>“ปล่อยปลาย” (ใบจริง) · QC: “ไม่มีรางน้ำ 1.ปล่อยปลายยื่น 10ซม. 2.โครงปิดปลายกันน้ำ”</td>
+  <td>มี (rfend=ปล่อย/รางน้ำ · o-rfeave “ปิดปลายกันน้ำ” 1,000/ม.)</td>
+  <td><span class="pill p-bad">ไม่ขึ้นใบ</span></td>
+  <td>rfend=ปล่อย → genQuote ไม่เขียนบรรทัดอะไรเลย (ใบจริงเขียน “ปล่อยปลาย” ชัดเจน). o-rfeave คิดเงินแต่ไม่ขึ้นใบ. root: genQuote ข้ามกรณีปล่อย + ไม่ดึง rfeave.</td>
+</tr>
+
+<tr>
+  <td>ซ่อนสโลปหลังคาเดิม</td>
+  <td>QC: “งานปิดซ่อนสโลปหลังคาเดิม สมาร์ทบอร์ดทาสี 6มม. / คอมโพสิต 3มม.”</td>
+  <td>มี (o-rfhs: comp 3,500 / smart 4,000 + สูง/ยาว/ด้าน)</td>
+  <td><span class="pill p-bad">ไม่ขึ้นใบ</span></td>
+  <td>คิดเงินครบ (สูตรพื้นที่) แต่ไม่เขียนลงใบ. root: genQuote ไม่ดึง rfhs.</td>
+</tr>
+
+<tr>
+  <td>คานเหล็กถัก / เสาแผง / เสา 4"x8" / ครอบคาน / ปิดซ่อนราง</td>
+  <td>QC + ใบจริงระบุเสริมโครง/เสา/ครอบในงานกันสาด-หลังคา</td>
+  <td>มี (o-rfbeam / o-rfpolep / o-rfpole4 / o-rfbcw,bcl / o-rfgcw,gch,gcl)</td>
+  <td><span class="pill p-bad">ไม่ขึ้นใบ</span></td>
+  <td>ทั้งกลุ่มคิดเงินครบ แต่ genQuote ไม่เขียนตัวไหนลงใบเลย. root: เดียวกัน — genQuote เขียนแค่ rfplate/rfpull.</td>
+</tr>
+
+<tr>
+  <td>ระแนงใต้หลังคา</td>
+  <td>QC: “เพิ่มระแนงใต้หลังคาไหม มี 2 แบบ 1x5 ซม. / 1"x1.6"”</td>
+  <td><span class="pill p-warn">แยกหมวด</span> (มี product ระแนง แต่ไม่ผูกในชุดหลังคา)</td>
+  <td><span class="pill p-warn">ต้องแยกรายการ</span></td>
+  <td>ทำได้แต่ต้องเพิ่มเป็นรายการระแนงต่างหาก ไม่รวมในรายละเอียดหลังคาจุดเดียว (ใบจริงคุณหญิงข้อ 2 ก็แยกระแนง+หลังคาในชุดเดียว). root: ระแนงไม่ใช่ option ของหลังคา. <span class="pill p-warn">เช็คซ้ำ</span></td>
+</tr>
+
+</tbody>
+</table>
+
+<h2>หลักฐาน render (ยืนยันด้วยผลจริง ไม่ใช่อ่านโค้ดเดา)</h2>
+<p>สร้างรายการหลังคา ไวนิล 4×3 ม. กรอก “ของเสริมหลังคา” <b>ครบทุกช่อง</b> (รางน้ำ+ยาว, คานเหล็กถัก+ยาว, เสาแผง 2, เสา 4x8 1, โซ่ 2, ปิดปลาย 4 ม., ครอบ PVC 3 ม., ซ่อนสโลป comp, ปิดซ่อนราง, ครอบคาน, ติ๊กเพลท+เหล็กดึง) แล้ว render ผ่าน jsdom:</p>
+<div class="note">
+<b>ราคาออกมา 150,000.- /จุด</b> (ฐานไวนิล 4×3 ≈ 28,000 min → ส่วนเกิน ≈ 122,000 = ของเสริมถูกคิดเงินจริง) แต่
+<b>รายละเอียดงานที่พิมพ์ลงใบมีแค่:</b><br>
+• หลังคาไวนิล สีเทา &nbsp;•&nbsp; โครงเหล็กชุบซิงค์ (แปคู่) &nbsp;•&nbsp; รางน้ำ (ท่อ สีขาว) &nbsp;•&nbsp; เสริมเพลทเหล็กล่าง (รับล่าง) &nbsp;•&nbsp; เหล็กดึงด้านบน<br>
+<span class="small">→ รางน้ำ(ยาว)/คานเหล็กถัก/เสาแผง/เสา 4x8/โซ่/ปิดปลาย/ครอบ PVC/ซ่อนสโลป/ปิดซ่อนราง/ครอบคาน — หายหมด ทั้งที่จ่ายเงินแล้ว.</span>
+</div>
+
+<h2>สิ่งที่ต้องเพิ่ม/แก้ (จัดลำดับความสำคัญ)</h2>
+<table>
+<thead><tr><th style="width:8%;">ระดับ</th><th style="width:40%;">เรื่อง</th><th>เหตุผล</th></tr></thead>
+<tbody>
+<tr><td><span class="pri P1">P1</span></td>
+  <td>genQuote หมวดหลังคา ต้องเขียน “ของเสริมที่คิดเงิน” ทุกตัวลงรายละเอียดงาน (รางน้ำ+ยาว, ท่อ/ครอบ PVC, ซ่อนสโลป, โซ่, คานเหล็กถัก, เสา, ปิดปลาย, ครอบคาน, ปิดซ่อนราง)</td>
+  <td><b>ลูกค้าจ่ายเงินแต่ของไม่ขึ้นเอกสาร</b> = เสี่ยงข้อพิพาท/ตกหล่นตอนผลิต. กระทบทุกใบที่มีงานหลังคา.</td></tr>
+<tr><td><span class="pri P1">P1</span></td>
+  <td>เพิ่ม option “ตะแกรงกันใบไม้” และ “วัสดุปิดรอยต่อแผ่นหลังคา (สี)”</td>
+  <td>ใบจริงระบุแทบทุกงานหลังคาที่มีรางน้ำ — ตอนนี้ไม่มีให้เลือกเลย.</td></tr>
+<tr><td><span class="pri P2">P2</span></td>
+  <td>กรณี rfend=ปล่อย ให้เขียน “ปล่อยปลายยื่น ~10 ซม.” ลงใบ (ตาม QC) แทนที่จะเว้นว่าง</td>
+  <td>ใบจริงเขียน “ปล่อยปลาย” ชัดเจน เป็นข้อมูลการติดตั้ง.</td></tr>
+<tr><td><span class="pri P2">P2</span></td>
+  <td>รวมกลไกโซ่/รางน้ำที่ซ้อนกัน 2 ที่ (ป้าย cosmetic rfend กับ o-rfgut/o-rfchain ที่คิดเงิน) ให้เหลือทางเดียว</td>
+  <td>ตอนนี้สับสน: เลือกโซ่ที่หนึ่งฟรี อีกที่คิดเงิน 3,000/เส้น.</td></tr>
+<tr><td><span class="pri P3">P3</span></td>
+  <td>รองรับหลังคาผสม 2 วัสดุในจุดเดียว (เช่น ไวนิล + ต่อปลายลามิเนต)</td>
+  <td>มีในใบจริง (คุณหญิง) แต่ไม่บ่อย — workaround แยกรายการได้ชั่วคราว.</td></tr>
+<tr><td><span class="pri P3">P3</span></td>
+  <td>ทบทวนรายการ “สีโพลีตัน” ให้มี “ไอซ์ 603S” / สีที่ขายจริง</td>
+  <td>ใบจริงใช้สีไอซ์ ระบบไม่มี. <span class="small">(เช็คซ้ำกับฝ่ายขาย)</span></td></tr>
+</tbody>
+</table>
+
+<footer>
+อ้างอิงโค้ด (READ-ONLY): <code>public/calculator/index.html</code> —
+buildItemOpts หลังคา L2303–2342 · calc ของเสริม L1401 · genQuote หมวดหลังคา L3197–3231 (เขียนลงใบแค่ rfplate/rfpull).<br>
+ใบจริง: QT2024080066 คุณหญิง (3 จุดหลังคา) · เอกสาร QC คุณอิงควัชร์ หน้า 3 “งาน Glass House หรือ หลังคา–กันสาด”.<br>
+วิธี: render ระบบจริงด้วย jsdom (กรอกของเสริมครบ) เทียบข้อความที่ลงใบ. ไม่มีการแก้ไข index.html.
+</footer>
+
+</div>
+</body>
+</html>
