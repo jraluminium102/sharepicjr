@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JR ดราฟ UX หลังคา/หลังคาเลื่อน (กรอกง่าย)</title>
+<style>
+:root{--red:#B3151D;--ink:#1f2937;--bg:#f4f4f5;--line:#e5e7eb;--mut:#6b7280;--blue:#1E5AA8;--blbg:#EAF3FF;}
+*{box-sizing:border-box;font-family:system-ui,"Segoe UI",Tahoma,sans-serif;}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55;}
+.wrap{max-width:760px;margin:0 auto;padding:14px;}
+header{background:var(--red);color:#fff;border-radius:12px;padding:15px 18px;margin-bottom:14px;}
+header h1{margin:0;font-size:18px;} header p{margin:6px 0 0;font-size:12.5px;opacity:.92;}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;}
+.card h2{margin:0 0 10px;font-size:15px;color:var(--red);}
+label{display:block;font-size:13px;color:var(--mut);margin:9px 0 3px;}
+select,input[type=text],input[type=number]{width:100%;min-height:44px;border:1px solid var(--line);border-radius:9px;padding:0 11px;font-size:16px;background:#fff;}
+.row{display:flex;gap:10px;flex-wrap:wrap;} .row>div{flex:1;min-width:120px;}
+details{border:1px solid var(--line);border-radius:10px;padding:0;margin:10px 0;overflow:hidden;}
+summary{cursor:pointer;padding:12px 14px;font-weight:600;color:var(--red);background:#fbfbfb;font-size:14px;list-style:none;}
+summary::-webkit-details-marker{display:none;} summary:before{content:"▸ ";} details[open] summary:before{content:"▾ ";}
+.dbody{padding:0 14px 12px;}
+.slidebox{background:var(--blbg);border:1.5px solid #9DBCE0;border-radius:11px;padding:13px;margin-top:6px;}
+.slidebox .t{color:var(--blue);font-weight:700;font-size:14px;margin-bottom:8px;}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0;}
+.chip{min-width:52px;min-height:48px;border:1.5px solid #9DBCE0;background:#fff;border-radius:10px;font-size:17px;font-weight:700;color:var(--blue);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.chip.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.stepper{display:inline-flex;align-items:center;gap:0;border:1.5px solid #9DBCE0;border-radius:10px;overflow:hidden;}
+.stepper button{width:48px;height:48px;border:none;background:#fff;color:var(--blue);font-size:24px;font-weight:700;cursor:pointer;}
+.stepper input{width:60px;min-height:48px;border:none;border-left:1px solid #cdddef;border-right:1px solid #cdddef;text-align:center;border-radius:0;font-size:18px;font-weight:700;}
+.chk{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:15px;cursor:pointer;font-weight:600;}
+.chk input{width:24px;height:24px;}
+.helper{background:#eef6ee;border:1px solid #bfe0bf;border-radius:8px;padding:8px 11px;font-size:13.5px;color:#15803d;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px;}
+.helper b{color:#0f5132;font-size:15px;}
+.linkbtn{background:none;border:none;color:var(--blue);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;}
+.muted{color:var(--mut);font-size:12px;}
+.preview{position:sticky;bottom:0;}
+.qline{border-left:4px solid var(--red);padding:4px 0 4px 12px;}
+.det{font-size:13.5px;color:#374151;margin-top:5px;} .det div{padding:1px 0;}
+.price{font-size:22px;font-weight:800;color:var(--red);text-align:right;margin-top:8px;}
+.hide{display:none;}
+.tag{display:inline-block;background:#fee;color:var(--red);border-radius:6px;padding:1px 8px;font-size:11px;font-weight:700;margin-left:6px;}
+</style></head>
+<body>
+<div class="wrap">
+<header>
+<h1>ดราฟ UX — หลังคา / หลังคาเลื่อน <span class="tag">กรอกง่าย</span></h1>
+<p>เดโม: ① ของเสริมพับเก็บ ② จำนวนบานเป็นชิป+stepper ③ ปุ่มใหญ่แตะง่าย ④ มอเตอร์ auto โชว์ชัด · ราคาเดโมประมาณ</p>
+</header>
+
+<div class="card">
+<h2>หลังคา</h2>
+<label>ชนิดหลังคา</label>
+<select id="rtype"><option data-r="5500">ไวนิล</option><option data-r="4500">โพลีตัน 3มม.</option><option data-r="6000">ชินโคไลท์ 6มม.</option><option data-r="9000">กระจกลามิเนต</option></select>
+<div class="row">
+<div><label>สีวัสดุมุง</label><select id="rcolor"><option>สีขาว</option><option>สีเทา</option><option>สีน้ำตาล</option></select></div>
+</div>
+<div class="row">
+<div><label>กว้าง (ม.)</label><input type="number" id="rw" value="4" step="0.1" oninput="calc()"></div>
+<div><label>สูง/ลึก (ม.)</label><input type="number" id="rh" value="3" step="0.1" oninput="calc()"></div>
+</div>
+<div class="row">
+<div><label>แป</label><select id="rbatten"><option selected>แปคู่ (default)</option><option>แปเดี่ยว</option></select></div>
+<div><label>ปลายหลังคา</label><select id="rend"><option selected>ปล่อย (ไม่มีราง)</option><option>รางน้ำ</option><option>ปิดปลาย</option></select></div>
+</div>
+
+<details>
+<summary>ของเสริมหลังคา (รางน้ำ / เสา / คาน / โซ่ / ซ่อนสโลป ...)</summary>
+<div class="dbody">
+<p class="muted">P1: ยุบเก็บ default — เคสปกติไม่ต้องเลื่อนผ่าน 10+ ช่อง · กดเปิดเมื่อต้องใช้</p>
+<label>รางน้ำเสริม</label><select><option>ไม่มี</option><option>อลู S 1,000/ม.</option><option>สแตน M 2,000/ม.</option></select>
+<label class="chk"><input type="checkbox"> เสริมเพลทเหล็กล่าง (ฟรี)</label>
+<label class="chk"><input type="checkbox"> เหล็กดึงด้านบน (ฟรี)</label>
+<label>ซ่อนสโลป</label><select><option>ไม่มี</option><option>คอมโพสิต 3มม. (3,500/ตร.ม.)</option><option>สมาร์ทบอร์ด 6มม. (4,000/ตร.ม.)</option></select>
+<label>โซ่รางน้ำ (3,000/เส้น) · จำนวนเส้น</label><input type="number" value="0" min="0">
+</div>
+</details>
+
+<label class="chk" style="background:var(--blbg);border:1.5px solid #9DBCE0;border-radius:10px;padding:11px 13px;"><input type="checkbox" id="doSlide" onchange="toggleSlide();calc()"> ทำเป็นหลังคาเลื่อน</label>
+
+<div id="slideWrap" class="hide">
+<div class="slidebox">
+<div class="t">🔀 หลังคาเลื่อน — กรอก 3 อย่าง</div>
+
+<label>จำนวนบานเลื่อน</label>
+<div class="chips" id="panelChips"></div>
+<div class="stepper" style="margin-top:4px;">
+  <button type="button" onclick="bump(-1)">−</button>
+  <input type="number" id="spanels" value="3" min="2" readonly>
+  <button type="button" onclick="bump(1)">+</button>
+</div>
+
+<label style="margin-top:12px;">พื้นที่เลื่อน (ตร.ม.)</label>
+<input type="number" id="sarea" placeholder="ว่าง = auto (กว้าง×สูง)" oninput="calc()">
+
+<label style="margin-top:12px;">มอเตอร์</label>
+<div class="helper">
+  <span>จำนวน</span>
+  <span class="stepper"><button type="button" onclick="mbump(-1)">−</button><input type="number" id="mqty" value="1" min="1" readonly><button type="button" onclick="mbump(1)">+</button></span>
+  <span>× <b id="mauto">฿28,000</b>/ตัว <span class="muted">(auto ตามพื้นที่)</span></span>
+  <button class="linkbtn" type="button" onclick="editPrice()">แก้ราคา</button>
+</div>
+<div id="mpriceWrap" class="hide" style="margin-top:6px;"><label>ราคา/ตัว (แก้เอง)</label><input type="number" id="mprice" oninput="calc()"></div>
+</div>
+</div>
+</div>
+
+<div class="card preview">
+<h2>ตัวอย่างออกใบ ▾</h2>
+<div class="qline"><b id="pvName">—</b><div class="det" id="pvDet"></div></div>
+<div class="price" id="pvPrice">฿0</div>
+<p class="muted">* ราคาเดโม โชว์ UX · ของจริงใช้สูตร R3.9</p>
+</div>
+</div>
+
+<script>
+const fmt=n=>'฿'+Math.round(n).toLocaleString();
+const $=id=>document.getElementById(id);
+let priceEdited=false;
+// chips จำนวนบาน
+const PCH=[2,3,4,6];
+$('panelChips').innerHTML=PCH.map(n=>`<div class="chip${n==3?' on':''}" data-n="${n}" onclick="pickPanel(${n})">${n}</div>`).join('')+`<div class="chip" data-n="other" onclick="pickPanel('other')" style="font-size:13px;min-width:64px;">อื่นๆ</div>`;
+function pickPanel(n){ if(n==='other'){ $('spanels').removeAttribute('readonly'); $('spanels').focus(); }else{ $('spanels').setAttribute('readonly',''); $('spanels').value=n; } markChip(); calc(); }
+function markChip(){ const v=$('spanels').value; document.querySelectorAll('#panelChips .chip').forEach(c=>c.classList.toggle('on', c.dataset.n==v)); }
+function bump(d){ $('spanels').removeAttribute('readonly'); let v=Math.max(2,(parseInt($('spanels').value)||2)+d); $('spanels').value=v; markChip(); calc(); }
+function mbump(d){ let v=Math.max(1,(parseInt($('mqty').value)||1)+d); $('mqty').value=v; calc(); }
+function toggleSlide(){ $('slideWrap').classList.toggle('hide',!$('doSlide').checked); }
+function editPrice(){ $('mpriceWrap').classList.remove('hide'); priceEdited=true; if(!$('mprice').value) $('mprice').value=autoMotor(); calc(); }
+function autoMotor(){ const a=slideArea(); const N=parseInt($('spanels').value)||3; const m=a*N/(N+1); return m<=3.5?18000:m<=14?28000:m<=40?36000:72000; }
+function slideArea(){ const sa=parseFloat($('sarea').value); if(sa>0)return sa; return (parseFloat($('rw').value)||0)*(parseFloat($('rh').value)||0); }
+function calc(){
+  const w=+$('rw').value||0,h=+$('rh').value||0,area=w*h;
+  const rt=$('rtype').selectedOptions[0], rate=+rt.dataset.r;
+  let price=Math.max(rate*area,30000), det=[];
+  det.push('โครงอลูมิเนียม'+($('rbatten').value.startsWith('แปคู่')?' (แปคู่)':' (แปเดี่ยว)'));
+  det.push('หลังคา'+rt.text+' '+$('rcolor').value);
+  if($('rend').value.startsWith('ปล่อย')){} else det.push('รางน้ำอลูมิเนียม + ตะแกรงกันใบไม้');
+  let name='หลังคา '+rt.text+` (${w}×${h} ม.)`;
+  if($('doSlide').checked){
+    const N=parseInt($('spanels').value)||3, mq=parseInt($('mqty').value)||1;
+    const mp=priceEdited&&$('mprice').value?+$('mprice').value:autoMotor();
+    $('mauto').textContent=fmt(autoMotor());
+    name='หลังคาเลื่อน '+rt.text+` (${w}×${h} ม.) แบ่ง ${N} บาน`;
+    det.push('หลังคาเลื่อน '+N+' บาน · มอเตอร์ '+mq+'×'+fmt(mp));
+    price+=mq*mp+(N-1)*6750;
+  }
+  $('pvName').textContent=name;
+  $('pvDet').innerHTML=det.map(d=>`<div>- ${d}</div>`).join('');
+  $('pvPrice').textContent=fmt(price);
+}
+calc();
+</script>
+</body></html>
