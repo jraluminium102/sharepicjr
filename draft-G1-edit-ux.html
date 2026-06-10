@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ดราฟ — ระบบแก้ไขรวม (แก้ข้อความ+ราคา+OPTION)</title>
+<style>
+:root{--red:#B3151D;--blue:#1E5AA8;--line:#e5e7eb;--mut:#6b7280;}
+*{font-family:"Leelawadee UI","Tahoma",system-ui,sans-serif;box-sizing:border-box;}
+body{margin:0;background:#ececed;color:#1f2937;font-size:14px;padding:14px;}
+.wrap{max-width:760px;margin:0 auto;}
+h1{color:var(--red);font-size:18px;}
+.tip{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:9px 12px;font-size:12.5px;margin-bottom:12px;}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.btn{background:var(--red);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:600;cursor:pointer;}
+.btn.off{background:#fff;color:var(--red);border:1.5px solid var(--red);}
+.btn.mini{padding:5px 10px;font-size:12px;background:#fff;color:var(--blue);border:1px solid #9DBCE0;}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px #0001;}
+table{border-collapse:collapse;width:100%;}
+thead th{background:var(--red);color:#fff;font-size:13px;padding:7px 10px;}
+thead th.l{text-align:left;}
+td{padding:9px 10px;vertical-align:top;font-size:13.5px;border-bottom:1px solid var(--line);}
+.qty{text-align:center;width:64px;} .price{text-align:right;width:96px;}
+.title{font-weight:700;}
+.det div{padding:1px 0;color:#374151;}
+.h{font-size:12px;color:var(--mut);font-weight:600;}
+/* edit mode */
+.editing [data-edit]{background:#fff70015;outline:1px dashed #f0c000;border-radius:4px;padding:1px 4px;}
+[contenteditable=true]{cursor:text;}
+.priceinp{width:90px;text-align:right;border:1px solid #f0c000;border-radius:5px;height:30px;padding:0 6px;font-size:14px;}
+.delx{color:var(--red);cursor:pointer;font-weight:700;margin-left:6px;display:none;}
+.editing .delx{display:inline;}
+.editing .addln{display:inline-block;}
+.addln{display:none;margin-top:4px;}
+.opt-block{border:1px dashed var(--red);border-radius:9px;padding:9px;margin:9px 0;background:#fff8f8;}
+.opt-row{display:flex;gap:7px;flex-wrap:wrap;align-items:flex-end;margin-bottom:7px;}
+.opt-row>div{flex:1;min-width:110px;}
+label{display:block;font-size:12px;color:var(--mut);margin:0 0 2px;}
+select,input[type=text],input[type=number]{width:100%;height:36px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-size:14px;}
+.optout{color:var(--red);font-size:13px;margin-top:4px;}
+.muted{color:var(--mut);font-size:12px;}
+.strike{text-decoration:line-through;color:#aaa;}
+</style></head><body><div class="wrap">
+<h1>ดราฟ — ระบบแก้ไขรวม (แก้เอง+ราคา+OPTION)</h1>
+<div class="tip">กด <b>✏️ โหมดแก้ไข</b> → แก้ข้อความได้ทุกจุด (ชื่อ/รายละเอียด/หมายเหตุ) + แก้ราคาตรงๆ · <b class="strike">เลิก checkbox "คิดราคาเหมา"</b> (ซ้ำซ้อน) · OPTION = เลือก preset หรือพิมพ์เอง + ใส่ราคาเอง</div>
+
+<div class="bar"><span class="muted">ตัวอย่าง 1 รายการ</span>
+<button class="btn off" id="editBtn" onclick="toggle()">✏️ โหมดแก้ไข : ปิด</button></div>
+
+<div class="card" id="sheet">
+<table><thead><tr><th>#</th><th class="l">รายละเอียด</th><th>จำนวน</th><th>ราคา/หน่วย</th><th>ยอดรวม</th></tr></thead>
+<tbody><tr>
+<td style="text-align:center;color:#6b7280">1</td>
+<td>
+  <div class="title" data-edit contenteditable="false">ประตูบานเลื่อน (ห้องนั่งเล่น)</div>
+  <div data-edit contenteditable="false">- ประตูบานเลื่อนรางล่าง (รุ่นกันน้ำ) แบ่ง 4 บาน เปิดคู่กลาง พร้อมมุ้งจีบ ขนาด 3.6×2.4 ม.</div>
+  <div class="det" style="margin-top:6px;padding-top:6px;border-top:1px dashed #e5e7eb">
+    <span class="h">รายละเอียดงาน</span>
+    <div id="detlist">
+      <div><span data-edit contenteditable="false">- อลูมิเนียม สีเทาซาฮาร่า</span><span class="delx" onclick="this.parentNode.remove()">✕</span></div>
+      <div><span data-edit contenteditable="false">- กระจกเทมเปอร์ใส หนา 6 มม.</span><span class="delx" onclick="this.parentNode.remove()">✕</span></div>
+      <div><span data-edit contenteditable="false">- มุ้งจีบ เฟรมสีเทาซาฮาร่า / ผ้าไฟเบอร์ดำ</span><span class="delx" onclick="this.parentNode.remove()">✕</span></div>
+    </div>
+    <button class="btn mini addln" onclick="addLine()">+ เพิ่มบรรทัดรายละเอียด</button>
+  </div>
+  <div id="optWrap"></div>
+  <button class="btn off addln" style="width:100%;margin-top:8px" onclick="addOpt()">+ OPTION ทางเลือกลูกค้า</button>
+</td>
+<td class="qty">1 ชุด</td>
+<td class="price"><span id="puView">95,000</span><input class="priceinp" id="puEdit" style="display:none" value="95000" oninput="sync()"></td>
+<td class="price" id="total">95,000</td>
+</tr></tbody></table>
+</div>
+
+<div class="tip" style="margin-top:12px;background:#f0f9ff;border-color:#bae6fd">
+<b>สรุปสิ่งที่เปลี่ยน:</b><br>
+① กดดินสอ → ทุกข้อความแก้ได้ (ชื่อ + ทุกบรรทัดรายละเอียด + เพิ่ม/ลบบรรทัด) · ราคาแก้ในช่องโดยตรง<br>
+② <b>ลบ checkbox "คิดราคาเหมา" + ช่องราคาเหมา</b> ทิ้ง — ไม่ต้องมี เพราะราคาแก้ได้ตรงๆ แล้ว<br>
+③ OPTION: เลือกหมวด → เลือกรายการ <b>หรือ "พิมพ์เอง"</b> + กรอก ±ราคาเอง → ขึ้น "OPTION : ..." ในใบ
+</div>
+</div>
+
+<script>
+let editing=false;
+function toggle(){
+  editing=!editing;
+  document.getElementById('sheet').classList.toggle('editing',editing);
+  document.querySelectorAll('[data-edit]').forEach(e=>e.contentEditable=editing);
+  document.getElementById('puView').style.display=editing?'none':'';
+  document.getElementById('puEdit').style.display=editing?'':'none';
+  const b=document.getElementById('editBtn');
+  b.textContent='✏️ โหมดแก้ไข : '+(editing?'เปิด':'ปิด'); b.classList.toggle('off',!editing);
+}
+function addLine(){
+  const d=document.createElement('div');
+  d.innerHTML='<span data-edit contenteditable="true">- พิมพ์รายละเอียด...</span><span class="delx" onclick="this.parentNode.remove()">✕</span>';
+  document.getElementById('detlist').appendChild(d);
+}
+const PRESET={
+ 'เปลี่ยนกระจก':['กระจกเทมเปอร์ใส 6 มม.','กระจกเขียว 6 มม.','กระจกลามิเนต 4+4','กระจกอินซูเลท 5+8+5'],
+ 'เปลี่ยนผ้ามุ้ง':['ไฟเบอร์ดำ','กันแมว/หมา','สแตนเลสกันหนู'],
+ 'เปลี่ยนสีอลู':['สีเทาซาฮาร่า','สีดำ','ลายไม้สักทอง'],
+ 'เปลี่ยนมือจับ':['Cmech ฝัง','Cmech เมโทร','HD182 สแตนเลส'],
+ 'เปลี่ยนหลังคา':['ไวนิล','ชินโคไลท์','กระจกลามิเนต'],
+ 'อื่นๆ (พิมพ์เอง)':null
+};
+let opts=[];
+function addOpt(){opts.push({cat:'เปลี่ยนกระจก',item:'',text:'',price:0});renderOpts();}
+function renderOpts(){
+  const w=document.getElementById('optWrap');
+  w.innerHTML=opts.map((o,i)=>{
+    const cats=Object.keys(PRESET);const list=PRESET[o.cat];
+    return `<div class="opt-block"><div class="opt-row">
+      <div><label>หมวด</label><select onchange="opts[${i}].cat=this.value;opts[${i}].item='';opts[${i}].text='';renderOpts()">${cats.map(c=>`<option ${c===o.cat?'selected':''}>${c}</option>`).join('')}</select></div>
+      ${list?`<div><label>รายการ</label><select onchange="opts[${i}].item=this.value;sync()"><option value="">— เลือก —</option>${list.map(x=>`<option ${x===o.item?'selected':''}>${x}</option>`).join('')}</select></div>`:''}
+      <div><label>หรือพิมพ์เอง</label><input type="text" value="${o.text}" placeholder="พิมพ์ออปชั่นเอง" oninput="opts[${i}].text=this.value;sync()"></div>
+      <div style="flex:0 0 90px"><label>±บาท</label><input type="number" value="${o.price}" step="100" oninput="opts[${i}].price=+this.value||0;sync()"></div>
+      <div style="flex:0 0 auto"><button class="btn mini" onclick="opts.splice(${i},1);renderOpts();sync()">ลบ</button></div>
+    </div></div>`;
+  }).join('');
+  sync();
+}
+function sync(){
+  const base=+document.getElementById('puEdit').value||0;
+  let add=0;opts.forEach(o=>add+=o.price);
+  const tot=base+add;
+  document.getElementById('puView').textContent=base.toLocaleString();
+  document.getElementById('total').firstChild&&(document.getElementById('total').textContent=tot.toLocaleString());
+}
+</script>
+</body></html>
