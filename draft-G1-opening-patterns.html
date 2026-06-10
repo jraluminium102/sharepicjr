@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G1 — รูปแบบเปิด/ติดตาย ทุกแบบ + สูตรโซลิด</title>
+<style>
+*{font-family:"Leelawadee UI","Tahoma",system-ui,sans-serif;box-sizing:border-box;}
+body{margin:0;background:#ececed;color:#1f2937;font-size:13.5px;padding:14px;}
+.wrap{max-width:920px;margin:0 auto;}
+h1{color:#B3151D;font-size:18px;margin:0 0 2px;}
+h2{color:#fff;background:#B3151D;font-size:14px;margin:16px 0 6px;padding:5px 11px;border-radius:6px;}
+.sub{color:#6b7280;font-size:12px;margin:0 0 12px;}
+table{border-collapse:collapse;width:100%;background:#fff;border-radius:8px;overflow:hidden;font-size:12.5px;box-shadow:0 1px 3px #0001;}
+th,td{border:1px solid #e5e7eb;padding:6px 9px;text-align:left;vertical-align:top;}
+th{background:#B3151D;color:#fff;}
+td.c{text-align:center;font-weight:700;}
+.op{color:#15803d;} .fx{color:#B3151D;}
+.q{background:#f0f9ff;border:1px solid #bae6fd;border-radius:7px;padding:7px 11px;margin:7px 0;font-size:12.5px;}
+.box{background:#fff;border:1px solid #d9d9dd;border-radius:9px;padding:11px 13px;margin:8px 0;}
+.calc{background:#f0f9ff;border:1px solid #bae6fd;border-radius:7px;padding:8px 11px;font-size:12.5px;margin-top:7px;}
+.calc table{box-shadow:none;} .calc td{border:none;padding:1px 4px;}
+.calc td.n{text-align:right;}
+.sz{color:#B3151D;font-weight:700;}
+.tip{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:9px 12px;font-size:12.5px;margin-bottom:12px;}
+small{color:#6b7280;}
+</style></head><body><div class="wrap">
+<h1>G1 — รูปแบบเปิด/ติดตาย ทุกแบบ + สูตรโซลิด</h1>
+<p class="sub">ระบุชัดทุกบรรทัด "แบ่งกี่บาน · เปิดกี่บาน · ติดตายกี่บาน" · READ-ONLY</p>
+
+<div class="tip"><b>กฎ:</b> <span class="op">เปิด</span> = บานที่เลื่อน/เปิดได้ · <span class="fx">ติดตาย</span> = บานที่ยึดอยู่กับที่ · มุ้งคิด<b>เฉพาะบานเปิด</b> · คาดตาราง เส้นตั้ง = จำนวนบานทั้งหมด</div>
+
+<h2>1. รูปแบบการเปิด (บานเลื่อน) — มีในระบบแล้ว</h2>
+<table>
+<tr><th>รูปแบบ</th><th>แบ่งบาน</th><th>เปิด</th><th>ติดตาย</th><th>ชื่อที่ออกในใบ</th></tr>
+<tr><td>2 บาน สลับ</td><td class="c">2</td><td class="c op">1</td><td class="c fx">1</td><td>บานเลื่อนสลับ แบ่ง 2 บาน (เปิด 1 ติดตาย 1)</td></tr>
+<tr><td>2 บาน เปิดอิสระ</td><td class="c">2</td><td class="c op">2</td><td class="c fx">0</td><td>บานเลื่อนเปิดอิสระ แบ่ง 2 บาน</td></tr>
+<tr><td>2 บาน + ติดตายข้าง</td><td class="c">3</td><td class="c op">2</td><td class="c fx">1</td><td>บานเลื่อน แบ่ง 2 บาน พร้อมกระจกติดตายด้านข้าง</td></tr>
+<tr><td>3 บาน เปิดอิสระ</td><td class="c">3</td><td class="c op">3</td><td class="c fx">0</td><td>บานเลื่อนเปิดอิสระ แบ่ง 3 บาน</td></tr>
+<tr><td>4 บาน เปิดคู่กลาง</td><td class="c">4</td><td class="c op">2</td><td class="c fx">2</td><td>บานเลื่อนเปิดคู่กลาง แบ่ง 4 บาน พร้อมกระจกติดตายด้านข้าง</td></tr>
+<tr><td>4 บาน เปิดอิสระ</td><td class="c">4</td><td class="c op">4</td><td class="c fx">0</td><td>บานเลื่อนเปิดอิสระ แบ่ง 4 บาน</td></tr>
+<tr><td>กรอกเอง</td><td class="c">N</td><td class="c op">X</td><td class="c fx">N−X</td><td>ระบุเอง (เช่น แบ่ง 6 บาน เปิด 2 ติดตาย 4)</td></tr>
+</table>
+<div class="q"><b>ตัวอย่างที่พี่นัทถาม — รางบน 4 บาน:</b><br>
+- ประตูบานเลื่อนรางบน (รุ่นโชว์ราง) แบ่ง 4 บาน <b>เปิดคู่กลาง (เปิด 2 ติดตาย 2)</b> <span class="sz">ขนาด 3.6×2.4 ม.</span></div>
+
+<h2>2. รูปแบบเต็ม/ครึ่ง (บานอื่น)</h2>
+<table>
+<tr><th>ชนิด</th><th>รูปแบบ</th><th>เปิด/ติดตาย</th></tr>
+<tr><td>บานเปิด เดี่ยว</td><td>เต็มพื้นที่</td><td>เปิด 1 บาน</td></tr>
+<tr><td>บานเปิด คู่</td><td>เต็มพื้นที่</td><td>เปิด 2 บาน</td></tr>
+<tr><td>บานเฟี้ยม</td><td>เต็มพื้นที่ (พับ)</td><td>เปิดทุกบาน เช่น 3+3</td></tr>
+<tr><td>บานกระทุ้ง</td><td>เต็ม</td><td>เปิด (กระทุ้งออก)</td></tr>
+<tr><td>บานยก</td><td>1/2 พื้นที่</td><td>เปิด 1 / ติดตาย 1</td></tr>
+<tr><td>กระจกติดตาย</td><td>—</td><td>ติดตายล้วน</td></tr>
+</table>
+
+<h2>3. สูตรโซลิดลูกฟูก — ยืนยันแล้ว ✅</h2>
+<div class="box">
+<b>โซลิด วัน (ลูกฟูกกลางบาน · inset) — ลูกฟูก 1 ฝั่ง</b>
+<div class="calc"><div class="sub">ตัวอย่าง 1.6×2.2 ม. (พื้นที่ 3.52)</div><table>
+<tr><td>ฐาน บานเปิดยูโร (min 18,000 / เรท 6,500)</td><td class="n">24,500</td></tr>
+<tr><td>+ ลูกฟูกเรียบ 2 ทาง (rnLF2-N 3,500 × 3.52) × <b>1 ฝั่ง</b></td><td class="n">12,320</td></tr>
+<tr><td>+ สี (540 × 3.52)</td><td class="n">1,901</td></tr>
+<tr style="font-weight:700;color:#B3151D"><td>รวม (ปัดขึ้นพัน)</td><td class="n">39,000</td></tr>
+</table></div>
+</div>
+<div class="box">
+<b>โซลิด ทู (ลูกฟูกเสมอกรอบ · flush · แข็งแรงกว่า) — ลูกฟูก 2 ฝั่ง</b>
+<div class="q">- ประตูบานเปิด โซลิด ทู (ลูกฟูกเสมอกรอบ) (รุ่น L ยูโร) <span class="sz">ขนาด 1.6×2.2 ม.</span></div>
+<div class="calc"><table>
+<tr><td>ฐาน บานเปิดยูโร</td><td class="n">24,500</td></tr>
+<tr><td>+ ลูกฟูกเรียบ 2 ทาง (3,500 × 3.52) × <b>2 ฝั่ง</b></td><td class="n">24,640</td></tr>
+<tr><td>+ สี</td><td class="n">1,901</td></tr>
+<tr style="font-weight:700;color:#B3151D"><td>รวม</td><td class="n">51,000</td></tr>
+</table></div>
+</div>
+<div class="tip"><b>สูตร:</b> โซลิด = บานเปิดยูโร(ฐาน) + (พื้นที่บาน × 3,500 × จำนวนฝั่ง) + สี · <b>วัน=1 ฝั่ง · ทู=2 ฝั่ง</b>
+<br>⚙ <b>ส่งแชทแก้:</b> เปลี่ยน <code>custom_price</code> → auto-คิดตามสูตรนี้ (เลิกกรอกมือ) · <small>(เช็คซ้ำ: โซลิดมีกระจกช่องแสงด้านบนไหม ถ้ามีบวกกระจกเฉพาะส่วนนั้น)</small></div>
+
+</div></body></html>
