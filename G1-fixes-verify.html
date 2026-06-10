@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G1 — สรุปการแก้ 14 จุด + ผล verify</title>
+<style>
+*{font-family:"Leelawadee UI","Tahoma",system-ui,sans-serif;box-sizing:border-box;}
+body{margin:0;background:#ececed;color:#1f2937;font-size:13.5px;padding:14px;}
+.wrap{max-width:920px;margin:0 auto;}
+h1{color:#B3151D;font-size:18px;margin:0 0 2px;}
+.sub{color:#6b7280;font-size:12px;margin:0 0 12px;}
+.cards{text-align:center;margin:8px 0 14px;}
+.card{display:inline-block;border:2px solid #B3151D;border-radius:8px;padding:5px 16px;margin:3px;}
+.card b{font-size:20px;display:block;}
+.item{background:#fff;border:1px solid #d9d9dd;border-radius:10px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 2px #0001;}
+.hd{padding:7px 12px;font-weight:700;display:flex;justify-content:space-between;align-items:center;font-size:13.5px;}
+.hd.ok{background:#ecfdf5;color:#065f46;} .hd.fail{background:#fef2f2;color:#991b1b;}
+.bd{padding:8px 12px;font-size:12.5px;}
+.bd .b{color:#B3151D;} .bd .a{color:#15803d;}
+.bd .row{padding:2px 0;}
+.badge{font-size:11px;font-weight:700;padding:2px 9px;border-radius:6px;}
+.badge.ok{background:#15803d;color:#fff;} .badge.fail{background:#B3151D;color:#fff;}
+.flag{background:#fef2f2;border-left:3px solid #B3151D;padding:7px 11px;border-radius:0 6px 6px 0;font-size:12.5px;color:#7f1d1d;margin-top:6px;}
+.note{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:9px 12px;font-size:12.5px;margin:10px 0;}
+code{background:#f3f4f6;padding:0 3px;border-radius:3px;font-size:11px;}
+</style></head><body><div class="wrap">
+<h1>G1 (บาน) — สรุปการแก้ 14 จุด + ผล verify</h1>
+<p class="sub">แชทแก้ทำ G1-1..14 (commit 1e17dff→930ef98) · ผมตรวจ render จริง 2026-06-10 · READ-ONLY</p>
+
+<div class="cards">
+<span class="card"><b style="color:#15803d">13</b>✅ ผ่าน</span>
+<span class="card"><b style="color:#B3151D">1</b>❌ ต้องแก้ซ้ำ</span>
+<span class="card"><b style="color:#0369a1">OK</b>ราคาไม่เพี้ยน</span>
+</div>
+
+<div class="item"><div class="hd fail"><span>8. ฝังรางยู ↔ ธรณีหลังเต่า</span><span class="badge fail">❌ FAIL</span></div><div class="bd">
+<div class="row b">ก่อน: เลือกได้ทั้งคู่ (จริงทำพร้อมกันไม่ได้)</div>
+<div class="row a">สั่งแก้: ติ๊กรางยู → ตัด/ซ่อนหลังเต่าอัตโนมัติ</div>
+<div class="flag">❌ <b>ยังเลือกซ้อนได้</b> · ซ้ำร้าย: เลือกทั้งคู่แล้ว "ฝังรางยู" <b>หายจากใบ</b> (ธรณีหลังเต่า override) → ต้องแก้ซ้ำ: disable หลังเต่าเมื่อติ๊กรางยู + กันไม่ให้ ฝังรางยู หาย</div>
+</div></div>
+
+<div class="item"><div class="hd ok"><span>1. โซลิดลูกฟูก (วัน/ทู)</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row b">ก่อน: custom_price ลืมกรอก = ใบต่ำ ~29k</div>
+<div class="row a">แก้: auto = บานเปิดยูโร + ลูกฟูก 3,500×พื้นที่×ฝั่ง (วัน1/ทู2) + <b>มีช่องแสงบนได้</b> (o-solidlight) ✓</div>
+</div></div>
+
+<div class="item"><div class="hd ok"><span>2. ดัดโค้ง</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row b">ก่อน: ลืมเลือกกระจกดัด → ขาด ~26,000</div>
+<div class="row a">แก้: default กระจกดัดโค้ง 10 มม. (glassDef:60) + เตือน🛑 ถ้าเลือกผิด ✓</div></div></div>
+
+<div class="item"><div class="hd ok"><span>3. มือจับ Cmech บานเปิด</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row b">ก่อน: UI วาดเฉพาะบานเลื่อน</div>
+<div class="row a">แก้: เพิ่มเงื่อนไข cat บานเปิด → เลือก Cmech ได้ ✓</div></div></div>
+
+<div class="item"><div class="hd ok"><span>4. PC Door — มือจับ + ชุดล็อค</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row a">แก้: เพิ่ม digihandle + ชุดล็อค/กุญแจ ✓</div></div></div>
+
+<div class="item"><div class="hd ok"><span>5. เสริมคาน บานเลื่อน/บานเปิด</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row a">แก้: บล็อกเสริมคานรวม บานเลื่อน/เลื่อนภายใน/บานเปิด/PC Door ✓</div></div></div>
+
+<div class="item"><div class="hd ok"><span>6. ykk_exhido min</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row a">แก้: min 50,000 → <b>120,000</b> (พี่นัทเคาะ) ✓</div></div></div>
+
+<div class="item"><div class="hd ok"><span>7. เมโทรไม่เขียนชุดล็อคซ้ำ</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row a">แก้: เลือก Cmech เมโทร (มีกุญแจ) → ใบไม่ขึ้น "ชุดล็อค" ซ้ำ ✓</div></div></div>
+
+<div class="item"><div class="hd ok"><span>9. มุ้ง non-sliding โชว์ขนาด</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row a">แก้: บานเปิด/กระทุ้ง โชว์ "ขนาด ~X ตร.ม." ในใบ ✓ <small>(เฉพาะมุ้ง addon ในบานหลัก)</small></div></div></div>
+
+<div class="item"><div class="hd ok"><span>10. Shower สีอุปกรณ์ + กระจก</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row a">แก้: สีอุปกรณ์ (เงิน/ดำ/ทอง) ลงใบ + กระจกตามที่เลือก (ไม่ hardcode) ✓</div></div></div>
+
+<div class="item"><div class="hd ok"><span>11. ธรณีบานเฟี้ยม ออกในใบ</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row a">แก้: branch บานเฟี้ยม → ใบมี "ธรณีหลังเต่าภายใน" ✓ <small>(ไม่มี commit G1-11 แต่ verify ผ่าน — รวมในจุดอื่น)</small></div></div></div>
+
+<div class="item"><div class="hd ok"><span>12. บานหมุน เลือกมือจับ</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row a">แก้: pivot เพิ่ม digihandle:1 ✓</div></div></div>
+
+<div class="item"><div class="hd ok"><span>13. สีกรอบมุ้งออกชื่อในใบ</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row a">แก้: ว่าง="ตามสีบาน {สี}" · special โชว์สีจริง ✓</div></div></div>
+
+<div class="item"><div class="hd ok"><span>14. คาดตาราง เส้นตั้ง = จำนวนบาน</span><span class="badge ok">✅ PASS</span></div><div class="bd">
+<div class="row a">แก้: ติ๊กแล้ว auto-fill เส้นตั้ง = i-panels (แก้เองได้) ✓</div></div></div>
+
+<div class="note"><b>Regression (ราคาไม่เพี้ยน):</b> บานเลื่อนยูโร 3.6×2.4 = 47,000 · บานเปิด >18,000(min) · บานเฟี้ยม สูตร fold · shower >12,000 — ฟอร์แมตใบถูก ✓</div>
+
+<div class="flag"><b>เหลือ 1 จุดเดียว (ข้อ 8) → ส่งแชทแก้ซ้ำ:</b> ฝังรางยู ↔ ธรณีหลังเต่า · (1) ติ๊กรางยู ต้อง disable/ซ่อนหลังเต่า · (2) เลือกรางยูแล้ว "ฝังรางยู" ต้องไม่หายจากใบ (ตอนนี้ธรณีหลังเต่า override) · แก้เสร็จ = G1 ปิด 100%</div>
+</div></body></html>
