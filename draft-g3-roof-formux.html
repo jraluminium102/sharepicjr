@@ -37,6 +37,11 @@
   .tg::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;}
   .slide.on .tg{background:#2563EB;}.slide.on .tg::after{left:23px;}
   .slide .sb{padding:0 11px 11px;display:none;}.slide.on .sb{display:block;}
+  .step{display:inline-flex;align-items:center;}
+  .step button{width:38px;height:40px;border:1px solid #C9CDD3;background:#fff;font-size:20px;cursor:pointer;color:#B3151D;line-height:1;font-family:inherit;}
+  .step button:first-child{border-radius:8px 0 0 8px;}.step button:last-child{border-radius:0 8px 8px 0;}
+  .step input{width:50px;border-radius:0;border-left:none;border-right:none;text-align:center;}
+  .cnt{display:flex;gap:22px;flex-wrap:wrap;}
   .reveal{display:none;}.reveal.show{display:block;}
   .tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:9px;background:#FEE2E2;color:#991B1B;margin-left:6px;}
   .tag.new{background:#DCFCE7;color:#166534;}
@@ -73,7 +78,7 @@
 <!-- AFTER -->
 <div id="after">
 <div class="phone">
-<div style="font-size:12px;color:#6B7280;margin-bottom:4px;">แบบ: <b>หลังคา ไวนิล</b> · กว้าง 6 × สูง 3.5 ม.</div>
+<div style="font-size:12px;color:#6B7280;margin-bottom:4px;">แบบ: <b>หลังคา ไวนิล</b> · ยาว 6 × ยื่น 3.5 ม. <span class="tag new">คำหลังคา</span></div>
 
 <!-- 1: หลังคา/วัสดุ -->
 <div class="box open" id="b1"><div class="bh" onclick="tog('b1')"><span>🏠 หลังคา · วัสดุมุง · โครง <span class="tag new">เปลี่ยนชื่อ</span></span><span class="ar">▼</span></div>
@@ -89,7 +94,7 @@
 <div class="fld"><div class="lab">ปลายหลังคา</div><div class="chips"><span class="chip" onclick="pickEnd(this,0)">ปล่อย (ไม่มีราง)</span><span class="chip on" onclick="pickEnd(this,1)">มีรางน้ำ</span></div></div>
 <div class="reveal show" id="gut">
 <div class="fld"><div class="lab">ชนิดราง (คิดราคา/ม.)</div><div class="chips"><span class="chip on" onclick="pick(this)">อลู S 1,000</span><span class="chip" onclick="pick(this)">สแตน M 2,000</span><span class="chip" onclick="pick(this)">สแตน L 3,000</span></div></div>
-<div class="fld row"><span class="lab" style="margin:0">ความยาว</span><input type="number" value="6" style="width:70px"> ม. <span class="hint">(ว่าง=ใช้ความกว้าง)</span></div>
+<div class="fld row"><span class="lab" style="margin:0">ความยาวราง (ฝั่งยาว)</span><input type="number" value="6" style="width:70px"> ม. <span class="hint">(ว่าง=ใช้ด้านยาว)</span></div>
 <div class="fld"><div class="lab">ระบบระบาย</div><div class="chips"><span class="chip on" onclick="pick(this)">ท่อ</span><span class="chip" onclick="pick(this)">โซ่</span></div></div>
 <div class="fld"><div class="lab">ท่อน้ำทิ้ง PVC 2.5″</div><div class="chips"><span class="chip on" onclick="pick(this)">สีดำ</span><span class="chip" onclick="pick(this)">ขาว</span><span class="chip" onclick="pick(this)">เทา</span></div></div>
 <div class="fld"><label style="display:flex;align-items:center;gap:8px;font-size:13px;"><input type="checkbox" checked style="width:20px;height:20px"> ตะแกรงพลาสติกกันใบไม้ สีดำ (รวมในราคา)</label></div>
@@ -99,9 +104,11 @@
 <div class="slide on" id="sl"><div class="sh" onclick="togSlide()"><span class="tg"></span><span>⬅️➡️ ทำเป็นหลังคาเลื่อน <span class="tag new">ย้ายขึ้น · เด่น</span></span></div>
 <div class="sb">
 <div class="fld"><div class="lab">ชนิดเลื่อน (เลือกอย่างเดียว · ราคาเท่ากัน) <span class="tag new">ใหม่</span></div><div class="chips"><span class="chip on" onclick="pick(this)">เลื่อนยื่น</span><span class="chip" onclick="pick(this)">เลื่อนข้าง</span></div></div>
-<div class="fld"><div class="lab">จำนวนบานเลื่อน</div><div class="chips"><span class="chip" onclick="pick(this)">2</span><span class="chip" onclick="pick(this)">3</span><span class="chip on" onclick="pick(this)">4</span><span class="chip" onclick="pick(this)">6</span></div></div>
-<div class="fld row"><span class="lab" style="margin:0">จำนวนบานติดตาย <span class="tag new">ใหม่</span></span><input type="number" value="1" style="width:60px"> บาน <span class="hint">(ส่วนที่ไม่เลื่อน)</span></div>
-<div class="fld"><div class="lab">พื้นที่เลื่อน <span class="tag new">ใหม่ · กรอกเอง</span></div><div class="row"><span>กว้าง</span><input type="number" value="3.0" style="width:70px"><span>×</span><span>ยาว</span><input type="number" value="4.0" style="width:70px"><span>ม.</span></div></div>
+<div class="fld"><div class="cnt">
+<div><div class="lab">จำนวนบานเลื่อน <span class="tag new">กด/กรอก</span></div><span class="step"><button type="button" onclick="stp(this,-1)">−</button><input type="number" value="4"><button type="button" onclick="stp(this,1)">+</button></span></div>
+<div><div class="lab">จำนวนบานติดตาย <span class="tag new">ใหม่</span></div><span class="step"><button type="button" onclick="stp(this,-1)">−</button><input type="number" value="1"><button type="button" onclick="stp(this,1)">+</button></span></div>
+</div></div>
+<div class="fld"><div class="lab">พื้นที่เลื่อน <span class="tag new">ยาว × ยื่น</span></div><div class="row"><span>ยาว</span><input type="number" value="3.0" style="width:70px"><span>×</span><span>ยื่น</span><input type="number" value="2.5" style="width:70px"><span>ม.</span></div></div>
 <div class="fld row"><span class="lab" style="margin:0">มอเตอร์</span><input type="number" value="1" style="width:60px"> ตัว <span class="hint">(ราคาออโต้ตามพื้นที่เลื่อน)</span></div>
 </div></div>
 
@@ -138,6 +145,7 @@ function tog(id){document.getElementById(id).classList.toggle('open');}
 function pick(el){[...el.parentElement.children].forEach(c=>c.classList.remove('on'));el.classList.add('on');}
 function pickEnd(el,i){pick(el);document.getElementById('gut').classList.toggle('show',i===1);}
 function togSlide(){document.getElementById('sl').classList.toggle('on');}
+function stp(b,d){var inp=b.parentElement.querySelector('input');var v=Math.max(0,(parseInt(inp.value)||0)+d);inp.value=v;}
 </script>
 </body>
 </html>
