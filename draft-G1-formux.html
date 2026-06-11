@@ -180,6 +180,19 @@ details.opt-section .opt-body .field-group:first-child { margin-top: 14px; }
   background: #FFF3E0; border-radius: 8px; font-size: 13px;
 }
 .cmechawn-row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--red-dark); flex: none; }
+/* ลักษณะการเปิดมุ้ง (.o-mosqopenstyle) */
+.mosqopenstyle-row {
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px dashed #90CAF9;
+}
+.mosqopenstyle-row .mos-label {
+  font-size: 12px; font-weight: 700; color: #1565C0; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.mos-label .label-only-badge {
+  display: inline-block; background: #E0F2FE; color: #0369A1;
+  font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px;
+}
 </style>
 </head>
 <body>
@@ -616,6 +629,33 @@ details.opt-section .opt-body .field-group:first-child { margin-top: 14px; }
                 </div>
               </div>
 
+              <!-- ====== ชิปลักษณะการเปิด (.o-mosqopenstyle) — ใหม่ 2026-06-11 ======
+                   มติพี่นัท: โผล่เฉพาะ imp21/imp23 · label-only ไม่กระทบราคา
+                   ต่อท้ายชื่อมุ้งในใบ เช่น "มุ้งเฟรมเล็ก บานเลื่อน"
+                   ห้ามใช้ .o-mosqopen (dead code if(false) คนละเรื่อง) — ใช้ .o-mosqopenstyle เท่านั้น
+              -->
+              <div class="mosqopenstyle-row" id="mosq-openstyle-row" style="display:none;">
+                <div class="mos-label">
+                  ลักษณะการเปิด
+                  <span class="label-only-badge">label-only</span>
+                  <span class="fix-tag">ชิปใหม่ · imp21/imp23 เท่านั้น</span>
+                </div>
+                <div class="chip-group chip-sm">
+                  <button class="chip on" data-group="mosqopenstyle" data-val="เปิด"
+                    onclick="selectChip(this)">เปิด</button>
+                  <button class="chip" data-group="mosqopenstyle" data-val="เลื่อน"
+                    onclick="selectChip(this)">เลื่อน</button>
+                  <button class="chip" data-group="mosqopenstyle" data-val="กระทุ้ง"
+                    onclick="selectChip(this)">กระทุ้ง</button>
+                  <button class="chip" data-group="mosqopenstyle" data-val="ยก"
+                    onclick="selectChip(this)">ยก</button>
+                </div>
+                <input type="hidden" id="af-mosqopenstyle" value="เปิด">
+                <div style="margin-top:6px;font-size:11px;color:var(--muted);">
+                  ค่าที่เลือกจะต่อท้ายชื่อมุ้งในใบ เช่น "มุ้งเฟรมเล็ก บานเลื่อน" · ไม่กระทบราคา
+                </div>
+              </div>
+
               <!-- ผ้ามุ้ง (o-mosqfabric) — คง dropdown 5 ตัว -->
               <div class="field-group">
                 <label class="field-label">
@@ -787,11 +827,12 @@ details.opt-section .opt-body .field-group:first-child { margin-top: 14px; }
           <td style="padding:7px 8px;border-bottom:1px solid var(--line);padding-left:16px;">
             .o-mosq (dropdown ชนิด)<br>
             .o-mosqw / .o-mosqh / .o-mosqpanels<br>
+            <b>.o-mosqopenstyle</b> (ลักษณะการเปิด · label-only)<br>
             .o-mosqfabric (ผ้า)<br>
             .o-mosqcolor (สีกรอบ)
           </td>
-          <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);vertical-align:middle;">4 ช่องกระจาย<br>โผล่ทั้งหมด</td>
-          <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);vertical-align:middle;"><span class="fix-tag">1 กล่อง<br>ซ่อนถ้า "ไม่ใส่"</span></td>
+          <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);vertical-align:middle;">4 ช่องกระจาย<br>โผล่ทั้งหมด<br><span style="font-size:11px;color:var(--muted);">ลักษณะการเปิดมัดในชื่อ</span></td>
+          <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);vertical-align:middle;"><span class="fix-tag">1 กล่อง<br>ซ่อนถ้า "ไม่ใส่"</span><br><span style="font-size:11px;color:var(--green);">ชิปลักษณะการเปิด<br>โผล่เฉพาะ imp21/imp23</span></td>
         </tr>
         <tr style="background:#F9FAFB;">
           <td style="padding:7px 8px;border-bottom:1px solid var(--line);">.o-mosqcolor (ชิปสีกรอบ)</td>
@@ -843,7 +884,8 @@ function selectChip(btn) {
   var inputMap = {
     itype:'af-itype', rail:'af-rail', lock:'af-lock',
     mosqcolor:'af-mosqcolor', solidlower:'af-solidlower',
-    fcsides:'af-fcsides', beamm:'af-beamm', cmechtype:'af-cmech'
+    fcsides:'af-fcsides', beamm:'af-beamm', cmechtype:'af-cmech',
+    mosqopenstyle:'af-mosqopenstyle'
   };
   var inputId = inputMap[group];
   if (inputId) document.getElementById(inputId).value = val;
@@ -946,10 +988,30 @@ function syncCmech() {
 }
 
 // ====== ก้อน 2: มุ้ง โผล่/ซ่อน ======
+// mosqChange: โผล่ mosq-details เมื่อเลือกมุ้ง
+//   + โผล่ชิปลักษณะการเปิด (.o-mosqopenstyle) เฉพาะ imp21/imp23
+//   + reset ชิปลักษณะการเปิด → default "เปิด" เมื่อเปลี่ยนชนิดมุ้ง
 function mosqChange() {
   var val = document.getElementById('af-mosq').value;
   var det = document.getElementById('mosq-details');
+  var openRow = document.getElementById('mosq-openstyle-row');
+
+  // โผล่/ซ่อน details ทั้งหมด
   if (det) det.style.display = val ? '' : 'none';
+
+  // โผล่ชิปลักษณะการเปิดเฉพาะ imp21 / imp23
+  var showOpenStyle = (val === 'imp21' || val === 'imp23');
+  if (openRow) openRow.style.display = showOpenStyle ? '' : 'none';
+
+  // reset ชิปลักษณะการเปิด → "เปิด" เมื่อเปลี่ยนชนิดมุ้ง
+  if (showOpenStyle) {
+    document.querySelectorAll('.chip[data-group="mosqopenstyle"]').forEach(function(c) {
+      c.classList.toggle('on', c.dataset.val === 'เปิด');
+    });
+    var hidOS = document.getElementById('af-mosqopenstyle');
+    if (hidOS) hidOS.value = 'เปิด';
+  }
+
   calcDemo();
 }
 
