@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ดราฟ UX ฟอร์มหลังคา (G3) — เครื่องคิดราคา JR</title>
+<style>
+  :root{--red:#B3151D;--line:#E5E7EB;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:"Leelawadee UI","Tahoma",sans-serif;color:#1F2937;font-size:14px;line-height:1.5;margin:0;background:#F3F4F6;padding:12px;}
+  .wrap{max-width:400px;margin:0 auto;}
+  h1{font-size:17px;color:var(--red);margin:0 0 2px;}
+  .sub{color:#6B7280;font-size:11px;margin-bottom:10px;}
+  .ba{display:flex;gap:6px;margin-bottom:10px;}
+  .ba button{flex:1;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;}
+  .ba button.on{background:var(--red);color:#fff;border-color:var(--red);}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;}
+  .phone{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;}
+  .box{border:1px solid #eedede;border-radius:9px;margin:7px 0;background:#fffafa;overflow:hidden;}
+  .box>.bh{font-weight:700;color:var(--red);font-size:13px;padding:10px 11px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:44px;}
+  .box>.bb{padding:2px 11px 10px;display:none;}
+  .box.open>.bb{display:block;}
+  .box>.bh .ar{transition:.2s;font-size:12px;color:#9CA3AF;}
+  .box.open>.bh .ar{transform:rotate(180deg);}
+  .fld{margin:8px 0;}
+  .lab{font-size:12px;color:#374151;margin-bottom:4px;font-weight:600;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{border:1px solid #C9CDD3;background:#fff;border-radius:18px;padding:7px 13px;font-size:13px;cursor:pointer;font-family:inherit;min-height:40px;display:inline-flex;align-items:center;}
+  .chip.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+  input[type=number],input[type=text]{height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:14px;font-family:inherit;width:90px;}
+  .row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;}
+  .hint{font-size:11px;color:#9CA3AF;}
+  /* หลังคาเลื่อน เด่น */
+  .slide{border:2px solid #2563EB;border-radius:10px;background:#EFF6FF;margin:7px 0;padding:0;}
+  .slide .sh{padding:11px;display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;color:#1E40AF;font-size:14px;}
+  .tg{width:46px;height:26px;border-radius:14px;background:#CBD5E1;position:relative;transition:.2s;flex-shrink:0;}
+  .tg::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;}
+  .slide.on .tg{background:#2563EB;}.slide.on .tg::after{left:23px;}
+  .slide .sb{padding:0 11px 11px;display:none;}.slide.on .sb{display:block;}
+  .reveal{display:none;}.reveal.show{display:block;}
+  .tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:9px;background:#FEE2E2;color:#991B1B;margin-left:6px;}
+  .tag.new{background:#DCFCE7;color:#166534;}
+  .note{background:#FFF7ED;border:1px solid #FDBA74;border-radius:8px;padding:9px 11px;font-size:12px;margin:8px 0;}
+  .opt-c{border:1px solid var(--red);border-radius:8px;padding:9px 11px;margin:8px 0;font-size:12.5px;color:var(--red);font-weight:700;}
+  .before-list{font-size:12.5px;}.before-list li{margin-bottom:6px;}
+  .x{color:#B3151D;font-weight:700;}.ok{color:#15803D;font-weight:700;}
+  .foot{margin-top:12px;font-size:10px;color:#9CA3AF;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>ดราฟ UX — ฟอร์มกรอก "หลังคา" (G3)</h1>
+<div class="sub">กดสลับ Before/After · กดชิป/กล่องเล่นได้ · มือถือ · เครื่องคิดราคา JR · 11 มิ.ย. 2026</div>
+
+<div class="ba">
+  <button id="bBefore" onclick="show('before')">ก่อนแก้ (ปัญหา)</button>
+  <button id="bAfter" class="on" onclick="show('after')">หลังแก้ (ใหม่)</button>
+</div>
+
+<!-- BEFORE -->
+<div id="before" style="display:none;">
+<div class="panel">
+<div style="font-weight:700;color:var(--red);margin-bottom:6px;">ปัญหาเดิม 4 จุด</div>
+<ul class="before-list">
+<li><span class="x">①</span> กล่อง <b>OPTION ทางเลือกลูกค้า</b> เขียน "เปลี่ยน<b>กระจก/มุ้ง/มือจับ</b>" — หลังคาไม่มีพวกนี้ ทำให้สับสน</li>
+<li><span class="x">②</span> <b>"ทำเป็นหลังคาเลื่อน"</b> ซ่อนอยู่ในกล่อง "อื่นๆ" ล่างสุด — เป็นออปชั่นสำคัญแต่หาไม่เจอ</li>
+<li><span class="x">③</span> หัวข้อ <b>"🚪 ชนิด / การเปิด (10)"</b> — หลังคาไม่มี "การเปิด" ชื่อไม่ตรงงาน + ช่องเรียงมั่ว</li>
+<li><span class="x">④</span> <b>ของเสริมหลังคา</b> (เสา/คาน/ซ่อนสโลป) ซ่อนใน details ซ้อนใน accordion = <b>ลึก 2 ชั้น</b> · กล่อง <b>"อื่นๆ (ครอบวงกบ/ดรอปพื้น)"</b> — ครอบวงกบเป็นของบาน ไม่เกี่ยวหลังคา</li>
+</ul>
+</div>
+</div>
+
+<!-- AFTER -->
+<div id="after">
+<div class="phone">
+<div style="font-size:12px;color:#6B7280;margin-bottom:4px;">แบบ: <b>หลังคา ไวนิล</b> · กว้าง 6 × สูง 3.5 ม.</div>
+
+<!-- 1: หลังคา/วัสดุ -->
+<div class="box open" id="b1"><div class="bh" onclick="tog('b1')"><span>🏠 หลังคา · วัสดุมุง · โครง <span class="tag new">เปลี่ยนชื่อ</span></span><span class="ar">▼</span></div>
+<div class="bb">
+<div class="fld"><div class="lab">สีวัสดุมุง</div><div class="chips"><span class="chip" onclick="pick(this)">สีเทา</span><span class="chip on" onclick="pick(this)">สีขาว</span><span class="chip" onclick="pick(this)">สีน้ำตาล</span></div></div>
+<div class="fld"><div class="lab">แป</div><div class="chips"><span class="chip" onclick="pick(this)">แปเดี่ยว</span><span class="chip on" onclick="pick(this)">แปคู่</span></div></div>
+<div class="fld"><div class="lab">โครงสร้าง</div><div class="chips"><span class="chip on" onclick="pick(this)">โครงอลูมิเนียม</span><span class="chip" onclick="pick(this)">โครงเหล็กชุบซิงค์</span></div></div>
+</div></div>
+
+<!-- 2: ปลายหลังคา/รางน้ำ -->
+<div class="box open" id="b2"><div class="bh" onclick="tog('b2')"><span>🌧️ ปลายหลังคา · รางน้ำ</span><span class="ar">▼</span></div>
+<div class="bb">
+<div class="fld"><div class="lab">ปลายหลังคา</div><div class="chips"><span class="chip" onclick="pickEnd(this,0)">ปล่อย (ไม่มีราง)</span><span class="chip on" onclick="pickEnd(this,1)">มีรางน้ำ</span></div></div>
+<div class="reveal show" id="gut">
+<div class="fld"><div class="lab">ชนิดราง (คิดราคา/ม.)</div><div class="chips"><span class="chip on" onclick="pick(this)">อลู S 1,000</span><span class="chip" onclick="pick(this)">สแตน M 2,000</span><span class="chip" onclick="pick(this)">สแตน L 3,000</span></div></div>
+<div class="fld row"><span class="lab" style="margin:0">ความยาว</span><input type="number" value="6" style="width:70px"> ม. <span class="hint">(ว่าง=ใช้ความกว้าง)</span></div>
+<div class="fld"><div class="lab">ระบบระบาย</div><div class="chips"><span class="chip on" onclick="pick(this)">ท่อ</span><span class="chip" onclick="pick(this)">โซ่</span></div></div>
+<div class="fld"><div class="lab">ท่อน้ำทิ้ง PVC 2.5″</div><div class="chips"><span class="chip on" onclick="pick(this)">สีดำ</span><span class="chip" onclick="pick(this)">ขาว</span><span class="chip" onclick="pick(this)">เทา</span></div></div>
+<div class="fld"><label style="display:flex;align-items:center;gap:8px;font-size:13px;"><input type="checkbox" checked style="width:20px;height:20px"> ตะแกรงพลาสติกกันใบไม้ สีดำ (รวมในราคา)</label></div>
+</div></div></div>
+
+<!-- 3: หลังคาเลื่อน เด่น -->
+<div class="slide" id="sl"><div class="sh" onclick="togSlide()"><span class="tg"></span><span>⬅️➡️ ทำเป็นหลังคาเลื่อน <span class="tag new">ย้ายขึ้น · เด่น</span></span></div>
+<div class="sb">
+<div class="fld"><div class="lab">จำนวนบานเลื่อน</div><div class="chips"><span class="chip" onclick="pick(this)">2</span><span class="chip" onclick="pick(this)">3</span><span class="chip on" onclick="pick(this)">4</span><span class="chip" onclick="pick(this)">6</span></div></div>
+<div class="fld row"><span class="lab" style="margin:0">มอเตอร์</span><input type="number" value="1" style="width:60px"> ตัว <span class="hint">(ราคาออโต้)</span></div>
+</div></div>
+
+<!-- 4: ของเสริมหลังคา ไม่ซ่อนลึก -->
+<div class="box" id="b4"><div class="bh" onclick="tog('b4')"><span>🔩 ของเสริมหลังคา (เสา/คาน/ซ่อนสโลป) <span class="tag new">ดึงออกมา 1 ชั้น</span></span><span class="ar">▼</span></div>
+<div class="bb">
+<div class="fld row"><span class="lab" style="margin:0">เสาแผง</span><input type="number" value="0" style="width:55px"> ต้น <span class="hint">×4,000</span></div>
+<div class="fld row"><span class="lab" style="margin:0">คานเหล็กถัก</span><div class="chips"><span class="chip on" onclick="pick(this)">ไม่มี</span><span class="chip" onclick="pick(this)">รุ่น1</span><span class="chip" onclick="pick(this)">รุ่น2</span><span class="chip" onclick="pick(this)">รุ่น3</span></div></div>
+<div class="fld row"><span class="lab" style="margin:0">ซ่อนสโลป</span><div class="chips"><span class="chip on" onclick="pick(this)">ไม่มี</span><span class="chip" onclick="pick(this)">คอมโพสิต</span><span class="chip" onclick="pick(this)">สมาร์ทบอร์ด</span></div></div>
+<div class="hint" style="margin-top:4px;">+ โซ่รางน้ำ · ปิดปลายกันน้ำ · ครอบท่อ PVC · วัสดุปิดรอยต่อ · เพลทเหล็ก · เหล็กดึง</div>
+</div></div>
+
+<!-- 5: หลังคาผสม -->
+<div class="box" id="b5"><div class="bh" onclick="tog('b5')"><span>➕ ต่อปลายวัสดุที่ 2 (หลังคาผสม)</span><span class="ar">▼</span></div>
+<div class="bb"><div class="hint">เลือกหลังคาอีกชนิด + พื้นที่ส่วนที่ 2 (คิด ตร.ม.แยก)</div></div></div>
+
+<!-- 6: หมายเหตุ/งานเสริม (เปลี่ยนชื่อ) -->
+<div class="box" id="b6"><div class="bh" onclick="tog('b6')"><span>📝 หมายเหตุ / งานเสริม <span class="tag new">เปลี่ยนชื่อ</span></span><span class="ar">▼</span></div>
+<div class="bb">
+<div class="hint">งานเสริม/วิศวกรรม (ระบุถ้ามี) · รื้อของเดิม · ฯลฯ <br><s style="color:#aaa">เดิม: "ครอบวงกบ/ดรอปพื้น" (ของบาน ไม่เกี่ยวหลังคา)</s></div>
+</div></div>
+
+<!-- OPTION (context หลังคา) -->
+<div class="opt-c">▶ + OPTION ทางเลือกลูกค้า (เปลี่ยน<u>สี/วัสดุมุง/หลังคา</u> · คิดราคาให้) <span class="tag new">ตัด กระจก/มุ้ง/มือจับ ออก</span></div>
+
+</div>
+</div>
+
+<div class="foot">ดราฟ UX · ไม่กระทบราคา/ใบ (เปลี่ยนแค่หน้าตา) · สเปกแก้จริงส่ง dev แยก</div>
+</div>
+<script>
+function show(m){document.getElementById('before').style.display=m==='before'?'block':'none';document.getElementById('after').style.display=m==='after'?'block':'none';document.getElementById('bBefore').classList.toggle('on',m==='before');document.getElementById('bAfter').classList.toggle('on',m==='after');}
+function tog(id){document.getElementById(id).classList.toggle('open');}
+function pick(el){[...el.parentElement.children].forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+function pickEnd(el,i){pick(el);document.getElementById('gut').classList.toggle('show',i===1);}
+function togSlide(){document.getElementById('sl').classList.toggle('on');}
+</script>
+</body>
+</html>
