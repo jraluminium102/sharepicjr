@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>DEMO — G1 Form UX Redesign (JR)</title>
+<style>
+:root {
+  --red: #E61E28;
+  --red-dark: #B3151D;
+  --bg: #F7F8FA;
+  --card: #fff;
+  --line: #E5E7EB;
+  --muted: #6B7280;
+  --ink: #1F2937;
+  --redbg: #FDECEC;
+  --blue: #1E5AA8;
+  --bluebg: #EAF3FF;
+  --blueline: #9DBCE0;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0;
+  font-family: "Sarabun", "Prompt", "Leelawadee UI", "Noto Sans Thai", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ===== DEMO BANNER ===== */
+.demo-banner {
+  background: #7C3AED;
+  color: #fff;
+  text-align: center;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+.demo-banner span {
+  background: #FCD34D;
+  color: #1F2937;
+  border-radius: 4px;
+  padding: 1px 8px;
+  font-weight: 800;
+  margin-right: 6px;
+}
+
+/* ===== LAYOUT ===== */
+.wrap { max-width: 480px; margin: 0 auto; padding: 14px 12px 80px; }
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+.logo { font-size: 28px; font-weight: 800; color: var(--red); font-style: italic; letter-spacing: -1px; }
+.header-info { border-left: 3px solid var(--red); padding-left: 12px; }
+.header-info h1 { font-size: 15px; margin: 0; font-weight: 700; }
+.header-info p { font-size: 11px; margin: 2px 0 0; color: var(--muted); }
+
+/* ===== CARD ===== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.card h2 {
+  font-size: 13px;
+  margin: 0 0 12px;
+  color: var(--red-dark);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===== FIELD GROUPS ===== */
+.field-group { margin-bottom: 14px; }
+.field-group:last-child { margin-bottom: 0; }
+
+label.field-label {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+input[type=text], input[type=number], select, textarea {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--ink);
+  appearance: none;
+  -webkit-appearance: none;
+}
+input[type=text]:focus, input[type=number]:focus, select:focus {
+  outline: none;
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(179,21,29,.12);
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Cpath fill='%236B7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ===== CHIPS ===== */
+.chip-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  line-height: 1.3;
+  text-align: center;
+  user-select: none;
+}
+.chip:hover { border-color: var(--red-dark); background: var(--redbg); }
+.chip.on {
+  background: var(--red-dark);
+  border-color: var(--red-dark);
+  color: #fff;
+}
+/* large 2-up chips (ประเภท) */
+.chip-2up .chip {
+  flex: 1;
+  font-size: 16px;
+  min-height: 52px;
+  padding: 10px 8px;
+}
+/* small 3+ chips */
+.chip-sm .chip {
+  min-height: 40px;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* ===== SLIDING BLOCK (blue box) ===== */
+.slide-block {
+  background: var(--bluebg);
+  border: 1px solid var(--blueline);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+.slide-block .sb-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 10px;
+}
+.slide-block .row2 { gap: 8px; }
+
+/* ===== SECTION DIVIDER ===== */
+.sec-divider {
+  border: none;
+  border-top: 1px dashed var(--line);
+  margin: 14px 0;
+}
+
+/* ===== DETAILS / COLLAPSE ===== */
+details.opt-section {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+details.opt-section summary {
+  cursor: pointer;
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red-dark);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+details.opt-section summary::-webkit-details-marker { display: none; }
+details.opt-section summary::after {
+  content: "▾";
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform .2s;
+}
+details.opt-section[open] summary::after { transform: rotate(180deg); }
+details.opt-section .opt-body {
+  padding: 0 14px 14px;
+  border-top: 1px solid var(--line);
+}
+details.opt-section .opt-body .field-group:first-child { margin-top: 14px; }
+
+/* ===== CHECKBOX ===== */
+.chk-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.chk-row input[type=checkbox] {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  accent-color: var(--red-dark);
+}
+
+/* ===== PRICE FOOTER ===== */
+.price-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+  margin-top: 12px;
+}
+.price-footer .area { font-size: 13px; color: var(--muted); }
+.price-footer .price {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--red-dark);
+}
+
+/* ===== DEMO PRICE TAG ===== */
+.demo-price {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.demo-price::before {
+  content: "DEMO";
+  background: #7C3AED;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+/* ===== SUBMIT BTN ===== */
+.btn-add {
+  width: 100%;
+  height: 52px;
+  background: var(--red-dark);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+/* ===== BEFORE/AFTER TABS ===== */
+.ba-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ba-tab {
+  flex: 1;
+  height: 44px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.ba-tab.on { background: var(--red-dark); border-color: var(--red-dark); color: #fff; }
+
+.view { display: none; }
+.view.active { display: block; }
+
+/* ===== BEFORE FORM (greyed-out mockup) ===== */
+.before-form .field-group { opacity: 1; }
+.before-note {
+  background: #FFF7ED;
+  border: 1px solid #F59E0B;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #92400E;
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+.friction-tag {
+  display: inline-block;
+  background: #FEE2E2;
+  color: var(--red-dark);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.fix-tag {
+  display: inline-block;
+  background: #D1FAE5;
+  color: #065F46;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* ===== STEPPER ===== */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stepper button {
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stepper button:active { background: var(--redbg); }
+.stepper input[type=number] {
+  width: 70px;
+  text-align: center;
+  flex: none;
+}
+
+/* auto badge */
+.auto-badge {
+  display: inline-block;
+  background: #E0F2FE;
+  color: #0369A1;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">
+  <span>DEMO</span>ดราฟ UX Redesign — G1 บานกระจก · ราคาเป็นตัวเลขสมมติ · ยังไม่ใช่ระบบจริง
+</div>
+
+<div class="wrap">
+
+  <header>
+    <div class="logo">JR</div>
+    <div class="header-info">
+      <h1>ดราฟ: G1 Form UX Redesign</h1>
+      <p>เปรียบ Before / After · กดสลับมุมมองได้</p>
+    </div>
+  </header>
+
+  <!-- BEFORE / AFTER TOGGLE -->
+  <div class="ba-tabs">
+    <button class="ba-tab" id="btn-before" onclick="showView('before')">Before (ปัจจุบัน)</button>
+    <button class="ba-tab on" id="btn-after" onclick="showView('after')">After (ดราฟใหม่)</button>
+  </div>
+
+  <!-- ==================== BEFORE ==================== -->
+  <div class="view" id="view-before">
+    <div class="before-note">
+      <b>จุด friction ที่พบ (Before):</b><br>
+      1. "แบบ" อยู่อันดับ 4 — เลื่อนหา (ควรอยู่ที่ 2)<br>
+      2. "ประเภท" เป็น dropdown 2 ตัว — ต้องแตะแล้วเลือกจาก popup<br>
+      3. "ราง / ชุดล็อค / สีกรอบมุ้ง / ฯลฯ" ทุกอย่างเป็น dropdown แม้ตัวเลือกน้อย<br>
+      4. ช่องระดับ Option ปะปนกับช่องหลัก — ยาวมาก ต้องเลื่อนเยอะ
+    </div>
+
+    <div class="card before-form">
+      <h2>ส่วนที่ 1 (ลำดับปัจจุบัน)</h2>
+
+      <div class="field-group">
+        <label class="field-label">กลุ่มงาน</label>
+        <select>
+          <option selected>1. บานกระจก (ประตู/หน้าต่าง)</option>
+          <option>2. ระแนง/รั้ว/ราวกันตก</option>
+          <option>3. หลังคา/ฝ้า-ผนัง</option>
+          <option>4. ตู้อลู/ฝาตู้</option>
+          <option>5. มุ้ง</option>
+          <option>6. กั้นห้องกระจก</option>
+          <option>7. ม่านซิป</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">ด้าน/ตำแหน่ง (กดเลือกหรือพิมพ์เอง)</label>
+        <input type="text" placeholder="เช่น ห้องนั่งเล่น">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">ประเภท <span class="friction-tag">FRICTION: dropdown 2 ตัว</span></label>
+        <select>
+          <option>ประตู</option>
+          <option>หน้าต่าง</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">แบบ <span class="friction-tag">FRICTION: อยู่อันดับ 4 ควรอยู่ 2</span></label>
+        <select>
+          <option>บานเลื่อน SMS 2 บาน</option>
+          <option>บานเลื่อน SMS 3 บาน</option>
+          <option>บานเปิด ยูโร</option>
+          <option>บานกระทุ้ง ยูโร</option>
+        </select>
+      </div>
+
+      <div class="row2">
+        <div class="field-group">
+          <label class="field-label">กว้าง (ม.)</label>
+          <input type="number" value="1.8">
+        </div>
+        <div class="field-group">
+          <label class="field-label">สูง (ม.)</label>
+          <input type="number" value="2.0">
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field-group">
+          <label class="field-label">จำนวนบาน</label>
+          <input type="number" value="2">
+        </div>
+        <div class="field-group">
+          <label class="field-label">จำนวนชุด</label>
+          <input type="number" value="1">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">ราง <span class="friction-tag">FRICTION: dropdown 2 ตัว</span></label>
+        <select>
+          <option>รางล่าง (รุ่นกันน้ำ)</option>
+          <option>รางล่าง (รุ่นรางเตี้ย 7 มม.)</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">ชุดล็อค <span class="friction-tag">FRICTION: dropdown 2 ตัว</span></label>
+        <select>
+          <option>มีกุญแจ</option>
+          <option>ไม่มีกุญแจ</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">มือจับ Cmech <span class="friction-tag">FRICTION: dropdown 3 ตัว</span></label>
+        <select>
+          <option>ไม่ใส่</option>
+          <option>ฝัง</option>
+          <option>เมโทร</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">สีกรอบมุ้ง <span class="friction-tag">FRICTION: dropdown 4 ตัว</span></label>
+        <select>
+          <option>ตามสีบาน (ฟรี)</option>
+          <option>เทาซาฮาร่า (×0.5)</option>
+          <option>เคแอลอบพิเศษ (×0.5)</option>
+          <option>เคแอลลายไม้ (×0.5)</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">ผ้ามุ้ง <span class="friction-tag">FRICTION: dropdown 5 ตัว (พอดี)</span></label>
+        <select>
+          <option>ไฟเบอร์เทา (default)</option>
+          <option>ไฟเบอร์ดำ</option>
+          <option>กันแมว/หมา +800</option>
+          <option>สแตนกันหนู +1,200</option>
+          <option>สแตนนิรภัย 0.8มม.</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">แผ่นทึบล่าง <span class="friction-tag">FRICTION: dropdown 3 ตัว</span></label>
+        <select>
+          <option>ไม่มี</option>
+          <option>อลูลูกฟูก (3,500/ตร.ม.)</option>
+          <option>คอมโพสิท (3,300/ตร.ม.)</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">ครอบวงกบอลู <span class="friction-tag">FRICTION: dropdown 3 ตัว</span></label>
+        <select>
+          <option>ไม่มี</option>
+          <option>3 ด้าน</option>
+          <option>4 ด้าน</option>
+        </select>
+      </div>
+
+      <div class="price-footer">
+        <span class="area">3.60 ตร.ม.</span>
+        <span class="price demo-price">฿99,000</span>
+      </div>
+    </div>
+  </div><!-- /before -->
+
+  <!-- ==================== AFTER ==================== -->
+  <div class="view active" id="view-after">
+
+    <div class="card">
+      <h2>ส่วนที่ 1 <span style="color:var(--muted);font-weight:400;font-size:12px;">— ลำดับใหม่</span></h2>
+
+      <!-- 1. กลุ่มงาน — คง dropdown (7 ตัว) -->
+      <div class="field-group">
+        <label class="field-label">กลุ่มงาน</label>
+        <select id="af-group" onchange="afGroupChange()">
+          <option value="1" selected>1. บานกระจก (ประตู/หน้าต่าง)</option>
+          <option value="2">2. ระแนง/รั้ว/ราวกันตก</option>
+          <option value="3">3. หลังคา/ฝ้า-ผนัง</option>
+          <option value="4">4. ตู้อลู/ฝาตู้</option>
+          <option value="5">5. มุ้ง</option>
+          <option value="6">6. กั้นห้องกระจก</option>
+          <option value="7">7. ม่านซิป</option>
+        </select>
+      </div>
+
+      <!-- 2. แบบ — ย้ายขึ้นมาทันที (เดิมอันดับ 4) -->
+      <div class="field-group">
+        <label class="field-label">
+          แบบ
+          <span class="fix-tag">ย้ายขึ้น #2</span>
+        </label>
+        <select id="af-prod" onchange="afProdChange()">
+          <optgroup label="บานเลื่อน">
+            <option value="sms2" selected>บานเลื่อน SMS 2 บาน</option>
+            <option value="sms3">บานเลื่อน SMS 3 บาน</option>
+            <option value="sms4">บานเลื่อน SMS 4 บาน</option>
+            <option value="euro_sl">บานเลื่อน ยูโร 2 บาน</option>
+          </optgroup>
+          <optgroup label="บานเปิด">
+            <option value="euro_open">บานเปิด ยูโร</option>
+            <option value="euro_awn">บานกระทุ้ง ยูโร</option>
+            <option value="casement">บานเปิด D-Series</option>
+          </optgroup>
+          <optgroup label="อื่นๆ">
+            <option value="folding">บานเฟี้ยม</option>
+            <option value="fixed">กระจกติดตาย</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- 3. ประเภท — เปลี่ยนเป็นชิป 2 ปุ่มใหญ่ -->
+      <div class="field-group">
+        <label class="field-label">
+          ประเภท
+          <span class="fix-tag">ชิปใหม่</span>
+        </label>
+        <div class="chip-group chip-2up">
+          <button class="chip on" data-group="itype" data-val="door" onclick="selectChip(this)">
+            ประตู
+          </button>
+          <button class="chip" data-group="itype" data-val="window" onclick="selectChip(this)">
+            หน้าต่าง
+          </button>
+        </div>
+        <!-- hidden input ส่งค่า (ชื่อ class .i-type · value เดิม) -->
+        <input type="hidden" id="af-itype" value="door">
+      </div>
+
+      <!-- 4. ด้าน/ตำแหน่ง -->
+      <div class="field-group">
+        <label class="field-label">ด้าน/ตำแหน่ง (เว้นว่างได้)</label>
+        <input type="text" list="af-poslist" placeholder="เช่น ห้องนั่งเล่น · ด้านหน้า">
+        <datalist id="af-poslist">
+          <option value="ห้องนั่งเล่น">
+          <option value="ห้องนอน">
+          <option value="ห้องครัว">
+          <option value="ด้านหน้า">
+          <option value="ด้านหลัง">
+          <option value="ด้านข้าง">
+        </datalist>
+      </div>
+
+      <!-- 5. ขนาด -->
+      <div class="row2">
+        <div class="field-group">
+          <label class="field-label">กว้าง (ม.)</label>
+          <input type="number" id="af-w" value="1.8" step="0.1" min="0" oninput="calcDemo()">
+        </div>
+        <div class="field-group">
+          <label class="field-label">สูง (ม.)</label>
+          <input type="number" id="af-h" value="2.0" step="0.1" min="0" oninput="calcDemo()">
+        </div>
+      </div>
+
+      <!-- 6. บล็อกฟ้า: บานเลื่อน -->
+      <div class="slide-block" id="af-slide-block">
+        <div class="sb-title">บานเลื่อน: จำนวนบาน &amp; ชนิดเปิด</div>
+        <div class="field-group">
+          <label class="field-label">ชนิดการเปิด</label>
+          <select style="height:44px;">
+            <option value="" disabled selected>— เลือกลักษณะการเปิด —</option>
+            <option value="slide">บานเลื่อน (ระบุติดตายเอง)</option>
+            <option value="alt">บานเลื่อนสลับ</option>
+            <option value="center">บานเลื่อนเปิดคู่กลาง</option>
+            <option value="tow">บานเลื่อนลากจูง</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <label class="field-label">จำนวนบานทั้งหมด</label>
+            <div class="stepper">
+              <button onclick="stepVal('af-panels',-1)">−</button>
+              <input type="number" id="af-panels" value="2" min="1" style="flex:1;">
+              <button onclick="stepVal('af-panels',1)">+</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">ติดตาย</label>
+            <div class="stepper">
+              <button onclick="stepVal('af-fixed',-1)">−</button>
+              <input type="number" id="af-fixed" value="0" min="0" style="flex:1;">
+              <button onclick="stepVal('af-fixed',1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ราง — ชิป 2 ตัว -->
+        <div class="field-group">
+          <label class="field-label">
+            ราง
+            <span class="fix-tag">ชิปใหม่</span>
+          </label>
+          <div class="chip-group chip-sm">
+            <button class="chip on" data-group="rail" data-val="กันน้ำ" onclick="selectChip(this)">
+              รางกันน้ำ
+            </button>
+            <button class="chip" data-group="rail" data-val="เตี้ย" onclick="selectChip(this)">
+              รางเตี้ย 7 มม.
+            </button>
+          </div>
+          <input type="hidden" id="af-rail" value="กันน้ำ">
+        </div>
+
+        <!-- ชุดล็อค — ชิป 2 ตัว (เฉพาะ itype=ประตู) -->
+        <div class="field-group" id="af-lock-wrap">
+          <label class="field-label">
+            ชุดล็อค
+            <span class="fix-tag">ชิปใหม่</span>
+          </label>
+          <div class="chip-group chip-sm">
+            <button class="chip on" data-group="lock" data-val="มีกุญแจ" onclick="selectChip(this)">
+              มีกุญแจ
+            </button>
+            <button class="chip" data-group="lock" data-val="ไม่มีกุญแจ" onclick="selectChip(this)">
+              ไม่มีกุญแจ
+            </button>
+          </div>
+          <input type="hidden" id="af-lock" value="มีกุญแจ">
+        </div>
+      </div><!-- /slide-block -->
+
+      <!-- จำนวนชุด -->
+      <div class="field-group">
+        <label class="field-label">จำนวนชุด</label>
+        <div class="stepper">
+          <button onclick="stepVal('af-qty',-1)">−</button>
+          <input type="number" id="af-qty" value="1" min="1" style="flex:1;" oninput="calcDemo()">
+          <button onclick="stepVal('af-qty',1)">+</button>
+        </div>
+      </div>
+
+      <hr class="sec-divider">
+
+      <!-- OPTIONS SECTION — พับ default -->
+      <details class="opt-section" id="af-opts">
+        <summary>อุปกรณ์เสริม / ออปชั่น</summary>
+        <div class="opt-body">
+
+          <!-- มือจับ Cmech — ชิป 3 ตัว -->
+          <div class="field-group">
+            <label class="field-label">
+              มือจับ Cmech
+              <span class="fix-tag">ชิปใหม่</span>
+            </label>
+            <div class="chip-group chip-sm">
+              <button class="chip on" data-group="cmech" data-val="" onclick="selectChip(this)">ไม่ใส่</button>
+              <button class="chip" data-group="cmech" data-val="embed" onclick="selectChip(this)">ฝัง</button>
+              <button class="chip" data-group="cmech" data-val="metro" onclick="selectChip(this)">เมโทร</button>
+            </div>
+            <input type="hidden" id="af-cmech" value="">
+          </div>
+
+          <!-- สีกรอบมุ้ง — ชิป 4 ตัว -->
+          <div class="field-group">
+            <label class="field-label">
+              สีกรอบมุ้ง
+              <span class="fix-tag">ชิปใหม่</span>
+            </label>
+            <div class="chip-group chip-sm">
+              <button class="chip on" data-group="mosqcolor" data-val="" onclick="selectChip(this)">ตามสีบาน</button>
+              <button class="chip" data-group="mosqcolor" data-val="sahara" onclick="selectChip(this)">เทาซาฮาร่า</button>
+              <button class="chip" data-group="mosqcolor" data-val="kl_special" onclick="selectChip(this)">KL พิเศษ</button>
+              <button class="chip" data-group="mosqcolor" data-val="kl_wood" onclick="selectChip(this)">KL ลายไม้</button>
+            </div>
+            <input type="hidden" id="af-mosqcolor" value="">
+          </div>
+
+          <!-- ผ้ามุ้ง — 5 ตัว → คง dropdown (เกิน 4) -->
+          <div class="field-group">
+            <label class="field-label">ผ้ามุ้ง <span style="color:var(--muted);font-weight:400;">(5 ตัวเลือก · คง dropdown)</span></label>
+            <select>
+              <option value="fiber_gray" selected>ไฟเบอร์เทา (default)</option>
+              <option value="fiber_black">ไฟเบอร์ดำ</option>
+              <option value="anti_pet">กันแมว/หมา +800</option>
+              <option value="stainless">สแตนกันหนู +1,200</option>
+              <option value="safety08">สแตนนิรภัย 0.8มม.</option>
+            </select>
+          </div>
+
+          <!-- แผ่นทึบล่าง — ชิป 3 ตัว -->
+          <div class="field-group">
+            <label class="field-label">
+              แผ่นทึบล่าง
+              <span class="fix-tag">ชิปใหม่</span>
+            </label>
+            <div class="chip-group chip-sm">
+              <button class="chip on" data-group="solidlower" data-val="" onclick="selectChip(this)">ไม่มี</button>
+              <button class="chip" data-group="solidlower" data-val="corrugated" onclick="selectChip(this)">อลูลูกฟูก</button>
+              <button class="chip" data-group="solidlower" data-val="composite" onclick="selectChip(this)">คอมโพสิท</button>
+            </div>
+            <input type="hidden" id="af-solidlower" value="">
+          </div>
+
+          <!-- ครอบวงกบอลู — ชิป 3 ตัว -->
+          <div class="field-group">
+            <label class="field-label">
+              ครอบวงกบอลู
+              <span class="fix-tag">ชิปใหม่</span>
+            </label>
+            <div class="chip-group chip-sm">
+              <button class="chip on" data-group="fcsides" data-val="0" onclick="selectChip(this)">ไม่มี</button>
+              <button class="chip" data-group="fcsides" data-val="3" onclick="selectChip(this)">3 ด้าน</button>
+              <button class="chip" data-group="fcsides" data-val="4" onclick="selectChip(this)">4 ด้าน</button>
+            </div>
+            <input type="hidden" id="af-fcsides" value="0">
+            <div class="field-group" style="margin-top:8px;margin-bottom:0;">
+              <label class="field-label" style="margin-bottom:4px;">หรือระบุความยาว (ม.) เอง</label>
+              <input type="number" placeholder="0" step="0.1" min="0" style="height:40px;">
+            </div>
+          </div>
+
+          <!-- เสริมคาน — ชิป 4 ตัว (ไม่มี/รุ่น1/รุ่น2/รุ่น3) -->
+          <div class="field-group">
+            <label class="field-label">
+              เสริมคาน
+              <span class="fix-tag">ชิปใหม่</span>
+            </label>
+            <div class="chip-group chip-sm">
+              <button class="chip on" data-group="beamm" data-val="0" onclick="selectChip(this)">ไม่มี</button>
+              <button class="chip" data-group="beamm" data-val="2400" onclick="selectChip(this)">รุ่น1 2,400/ม.</button>
+              <button class="chip" data-group="beamm" data-val="3600" onclick="selectChip(this)">รุ่น2 3,600/ม.</button>
+              <button class="chip" data-group="beamm" data-val="4400" onclick="selectChip(this)">รุ่น3 4,400/ม.</button>
+            </div>
+            <input type="hidden" id="af-beamm" value="0">
+          </div>
+
+          <!-- ดรอปพื้น -->
+          <div class="field-group">
+            <label class="field-label">ดรอปพื้น (ม.)</label>
+            <input type="number" step="0.1" min="0" value="0" style="height:44px;">
+          </div>
+
+        </div>
+      </details>
+
+      <!-- หมายเหตุ -->
+      <details class="opt-section">
+        <summary>หมายเหตุ / สเปกพิเศษ</summary>
+        <div class="opt-body">
+          <div class="field-group">
+            <textarea rows="3" placeholder="หมายเหตุ / สเปกพิเศษ เช่น รวมงานรื้อบานเดิม · กระจกหนาพิเศษ" style="height:auto;padding:10px;"></textarea>
+          </div>
+        </div>
+      </details>
+
+      <!-- ผลิตส่ง checkbox -->
+      <label class="chk-row">
+        <input type="checkbox">
+        ผลิตส่ง (ไม่ติดตั้ง)
+      </label>
+
+      <!-- PRICE FOOTER (demo) -->
+      <div class="price-footer">
+        <span class="area" id="af-area">3.60 ตร.ม. × 1 ชุด</span>
+        <span class="price demo-price" id="af-price">฿ 99,000</span>
+      </div>
+
+    </div><!-- /card -->
+
+    <!-- SUMMARY TABLE -->
+    <div class="card">
+      <h2>สรุป: ช่องที่เปลี่ยนเป็นชิป</h2>
+      <table style="width:100%;font-size:13px;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#F3F4F6;">
+            <th style="padding:8px;text-align:left;border-bottom:1px solid var(--line);">ช่อง (.class)</th>
+            <th style="padding:8px;text-align:center;border-bottom:1px solid var(--line);">ตัวเลือก</th>
+            <th style="padding:8px;text-align:center;border-bottom:1px solid var(--line);">Control</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:7px 8px;border-bottom:1px solid var(--line);">.i-type (ประเภท)</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);">2</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);"><span class="fix-tag">ชิป 2up</span></td>
+          </tr>
+          <tr style="background:#F9FAFB;">
+            <td style="padding:7px 8px;border-bottom:1px solid var(--line);">.o-bottomrail (ราง)</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);">2</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);"><span class="fix-tag">ชิป sm</span></td>
+          </tr>
+          <tr>
+            <td style="padding:7px 8px;border-bottom:1px solid var(--line);">.o-slidelock (ชุดล็อค)</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);">2</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);"><span class="fix-tag">ชิป sm</span></td>
+          </tr>
+          <tr style="background:#F9FAFB;">
+            <td style="padding:7px 8px;border-bottom:1px solid var(--line);">.o-cmech (มือจับ Cmech)</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);">3</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);"><span class="fix-tag">ชิป sm</span></td>
+          </tr>
+          <tr>
+            <td style="padding:7px 8px;border-bottom:1px solid var(--line);">.o-mosqcolor (สีกรอบมุ้ง)</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);">4</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);"><span class="fix-tag">ชิป sm</span></td>
+          </tr>
+          <tr style="background:#F9FAFB;">
+            <td style="padding:7px 8px;border-bottom:1px solid var(--line);">.o-mosqfabric (ผ้ามุ้ง)</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);">5</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);color:var(--muted);">คง dropdown</td>
+          </tr>
+          <tr>
+            <td style="padding:7px 8px;border-bottom:1px solid var(--line);">.o-solidlower (แผ่นทึบล่าง)</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);">3</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);"><span class="fix-tag">ชิป sm</span></td>
+          </tr>
+          <tr style="background:#F9FAFB;">
+            <td style="padding:7px 8px;border-bottom:1px solid var(--line);">.o-fcsides (ครอบวงกบ)</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);">3</td>
+            <td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);"><span class="fix-tag">ชิป sm</span></td>
+          </tr>
+          <tr>
+            <td style="padding:7px 8px;">.o-beamm (เสริมคาน)</td>
+            <td style="padding:7px 8px;text-align:center;">4</td>
+            <td style="padding:7px 8px;text-align:center;"><span class="fix-tag">ชิป sm</span></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr style="background:var(--redbg);">
+            <td style="padding:8px;font-weight:700;">รวมเปลี่ยนเป็นชิป</td>
+            <td style="padding:8px;text-align:center;font-weight:700;">8 ช่อง</td>
+            <td style="padding:8px;text-align:center;color:var(--muted);">1 ช่องคงไว้</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div><!-- /after -->
+
+</div><!-- /wrap -->
+
+<script>
+// ===== VIEW TOGGLE =====
+function showView(v) {
+  document.getElementById('view-before').classList.toggle('active', v === 'before');
+  document.getElementById('view-after').classList.toggle('active', v === 'after');
+  document.getElementById('btn-before').classList.toggle('on', v === 'before');
+  document.getElementById('btn-after').classList.toggle('on', v === 'after');
+}
+
+// ===== CHIP TOGGLE (single-select per group) =====
+function selectChip(btn) {
+  const group = btn.dataset.group;
+  const val = btn.dataset.val;
+  // deactivate siblings in same group
+  document.querySelectorAll('.chip[data-group="' + group + '"]').forEach(function(c) {
+    c.classList.remove('on');
+  });
+  btn.classList.add('on');
+  // sync hidden input
+  const inputMap = {
+    itype: 'af-itype',
+    rail: 'af-rail',
+    lock: 'af-lock',
+    cmech: 'af-cmech',
+    mosqcolor: 'af-mosqcolor',
+    solidlower: 'af-solidlower',
+    fcsides: 'af-fcsides',
+    beamm: 'af-beamm'
+  };
+  const inputId = inputMap[group];
+  if (inputId) document.getElementById(inputId).value = val;
+  // ชุดล็อค show/hide ตาม itype
+  if (group === 'itype') {
+    var lw = document.getElementById('af-lock-wrap');
+    if (lw) lw.style.display = val === 'door' ? '' : 'none';
+  }
+  calcDemo();
+}
+
+// ===== STEPPER =====
+function stepVal(id, delta) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var v = (parseInt(el.value) || 0) + delta;
+  var mn = parseInt(el.min) || 0;
+  if (v < mn) v = mn;
+  el.value = v;
+  calcDemo();
+}
+
+// ===== GROUP CHANGE =====
+function afGroupChange() {
+  var grp = document.getElementById('af-group').value;
+  var sb = document.getElementById('af-slide-block');
+  if (sb) sb.style.display = grp === '1' ? '' : 'none';
+}
+
+// ===== PROD CHANGE =====
+function afProdChange() {
+  var prod = document.getElementById('af-prod').value;
+  var isSlide = ['sms2','sms3','sms4','euro_sl'].indexOf(prod) >= 0;
+  var sb = document.getElementById('af-slide-block');
+  if (sb) sb.style.display = isSlide ? '' : 'none';
+  calcDemo();
+}
+
+// ===== DEMO PRICE CALC (สมมติ) =====
+function calcDemo() {
+  var w = parseFloat(document.getElementById('af-w').value) || 0;
+  var h = parseFloat(document.getElementById('af-h').value) || 0;
+  var qty = parseInt(document.getElementById('af-qty').value) || 1;
+  var area = Math.round(w * h * 100) / 100;
+  var base = area * 18500 * qty; // DEMO rate
+  document.getElementById('af-area').textContent = area.toFixed(2) + ' ตร.ม. × ' + qty + ' ชุด';
+  document.getElementById('af-price').textContent = '฿ ' + base.toLocaleString('th-TH', {maximumFractionDigits: 0});
+}
+
+// init
+calcDemo();
+afProdChange();
+</script>
+
+</body>
+</html>
