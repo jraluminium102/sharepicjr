@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DRAFT G5 — มุ้ง Form UX (กดเล่นได้)</title>
+<style>
+:root{
+  --red:#B3151D;
+  --red-light:#FFF9F9;
+  --red-border:#e5d3d4;
+  --blue:#1E5AA8;
+  --blue-bg:#EAF3FF;
+  --orange:#FF9800;
+  --orange-bg:#FFF3E0;
+  --green:#1D9E75;
+  --chip-on:#B3151D;
+  --chip-off:#fff;
+  --chip-border:#d0a0a3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Tahoma,sans-serif;color:#222;background:#f5f5f5;font-size:14px;line-height:1.5}
+
+/* ---- layout ---- */
+.page{max-width:420px;margin:0 auto;padding:12px}
+.demo-banner{background:var(--red);color:#fff;text-align:center;padding:6px;font-size:12px;font-weight:700;letter-spacing:.5px}
+.card{background:#fff;border-radius:12px;margin:10px 0;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.card-head{background:var(--red);color:#fff;padding:10px 14px;font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.card-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+
+/* ---- product selector ---- */
+.prod-select{width:100%;height:44px;border:2px solid var(--red);border-radius:8px;padding:0 10px;font-size:14px;background:#fff}
+
+/* ---- mode B banner (top) ---- */
+.mode-b-row{display:flex;align-items:center;gap:10px;background:var(--orange-bg);border:1.5px solid var(--orange);border-radius:8px;padding:10px 12px}
+.mode-b-row label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;cursor:pointer;flex:1}
+.mode-b-row input[type=checkbox]{width:22px;height:22px;accent-color:var(--orange);cursor:pointer}
+.mode-b-extra{display:none;flex-direction:column;gap:6px;background:var(--orange-bg);border:1.5px solid var(--orange);border-radius:8px;padding:10px 12px;margin-top:-5px}
+.mode-b-extra label{font-size:12px;color:#555}
+.mode-b-extra input{height:40px;width:140px;border:1px solid #ccc;border-radius:6px;padding:0 8px;font-size:14px}
+
+/* ---- chip system ---- */
+.chip-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{
+  height:40px;min-width:44px;padding:0 14px;
+  border:1.5px solid var(--chip-border);
+  border-radius:20px;background:var(--chip-off);
+  color:#555;font-size:13px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .15s,color .15s,border-color .15s;
+  user-select:none;
+}
+.chip.on{background:var(--red);color:#fff;border-color:var(--red)}
+.chip:active{opacity:.8}
+
+/* ---- row labels ---- */
+.row{display:flex;flex-direction:column;gap:4px}
+.row-label{font-size:12px;font-weight:700;color:#444;display:flex;align-items:center;gap:6px}
+.row-label .tag{font-size:10px;background:#e8f4e8;color:#1D7A45;border-radius:10px;padding:1px 7px;font-weight:700}
+.row-label .tag-main{font-size:10px;background:#fdeaea;color:var(--red);border-radius:10px;padding:1px 7px;font-weight:700}
+
+/* ---- dropdown ---- */
+.opt-select{width:100%;height:44px;border:1.5px solid #ccc;border-radius:8px;padding:0 10px;font-size:13px;background:#fff}
+.opt-select:focus{border-color:var(--red);outline:none}
+
+/* ---- size inputs ---- */
+.size-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.size-row input{height:44px;width:80px;border:1.5px solid #ccc;border-radius:8px;padding:0 8px;font-size:14px;text-align:center}
+.size-row input:focus{border-color:var(--red);outline:none}
+.size-label{font-size:12px;color:#666}
+
+/* ---- divider ---- */
+.sep{border:none;border-top:1px dashed var(--red-border);margin:4px 0}
+
+/* ---- price box ---- */
+.price-box{background:var(--red-light);border:1.5px solid var(--red-border);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.price-main{font-size:22px;font-weight:700;color:var(--red)}
+.price-detail{font-size:11px;color:#888;line-height:1.6}
+.price-demo-tag{font-size:10px;background:#fdeaea;color:var(--red);border-radius:4px;padding:1px 6px;display:inline-block;margin-bottom:4px}
+
+/* ---- hidden screen_addon block ---- */
+.screen-addon-block{display:none;flex-direction:column;gap:10px;padding:10px 0 0}
+
+/* ---- section header ---- */
+.section-header{font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.4px;padding-bottom:6px;border-bottom:1px solid var(--red-border)}
+
+/* ---- accordion (optional items) ---- */
+details.optional-acc{border:1px solid var(--red-border);border-radius:8px;overflow:hidden}
+details.optional-acc summary{
+  background:var(--red-light);
+  padding:10px 14px;
+  font-size:12px;font-weight:700;color:var(--red);
+  cursor:pointer;min-height:44px;display:flex;align-items:center;
+  list-style:none;
+}
+details.optional-acc summary::-webkit-details-marker{display:none}
+details.optional-acc summary::before{content:"▶  ";font-size:10px;margin-right:4px}
+details.optional-acc[open] summary::before{content:"▼  "}
+details.optional-acc .acc-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:#fff}
+
+/* ---- info note ---- */
+.note{font-size:11px;color:#888;padding:4px 0}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">DEMO — ดราฟ G5 มุ้ง · ราคาเป็นตัวอย่างเท่านั้น</div>
+
+<div class="page">
+
+<!-- product selector -->
+<div class="card">
+  <div class="card-head">
+    <span>เลือกสินค้า (กลุ่ม 5 — มุ้ง)</span>
+  </div>
+  <div class="card-body">
+    <select class="prod-select" id="prodSelect" onchange="onProdChange()">
+      <optgroup label="มุ้งเฟรม (screen_addon)">
+        <option value="imp21">imp21 — มุ้งเฟรมเล็ก (บานเปิด/เลื่อน/กระทุ้ง/ยก)</option>
+        <option value="imp22">imp22 — มุ้งเฟรมเล็กติดตาย</option>
+        <option value="imp23">imp23 — มุ้งเฟรมใหญ่ (เลื่อน/เปิด/กระทุ้ง/ยก)</option>
+      </optgroup>
+      <optgroup label="มุ้งทั่วไป (ไม่มี screen_addon)">
+        <option value="imp28">imp28 — มุ้งจีบ ตีนตะขาบ</option>
+        <option value="mj_kick_300">mj_kick_300 — มุ้งม้วนเก็บข้างเตะได้ รุ่น 300</option>
+        <option value="mj_screen_safety">mj_screen_safety — มุ้งจีบนิรภัย</option>
+      </optgroup>
+    </select>
+  </div>
+</div>
+
+<!-- main form card -->
+<div class="card">
+  <div class="card-head">
+    <span id="prodNameHead">imp21 — มุ้งเฟรมเล็ก</span>
+    <span style="font-size:11px;opacity:.8;">กลุ่ม 5</span>
+  </div>
+  <div class="card-body" id="formBody">
+
+    <!-- [A] โหมด B ดึงขึ้นบนสุด -->
+    <div id="modeB-section">
+      <div class="section-header">โหมดติดตั้ง</div>
+      <div class="mode-b-row">
+        <label>
+          <input type="checkbox" id="chkModeB" onchange="onModeBChange()">
+          <span>ติดมุ้งบานเดิม (โหมด B)<br><span style="font-size:11px;font-weight:400;color:#a05000;">ลูกค้าเก่ามาเพิ่มมุ้ง — ราคา/ตร.ม. เท่าโหมด A</span></span>
+        </label>
+      </div>
+      <div class="mode-b-extra" id="modeB-extra">
+        <label>
+          ค่าเสริมกล่อง/ราง (กรอกถ้ารางเดิมใช้ไม่ได้)
+          <input type="number" id="screenExtra" min="0" step="500" value="0" placeholder="0 = ไม่เสริม" oninput="recalc()">
+        </label>
+      </div>
+    </div>
+
+    <hr class="sep">
+
+    <!-- [B] ขนาด -->
+    <div class="row">
+      <div class="row-label">ขนาด (ม.) <span class="tag-main">หลัก</span></div>
+      <div class="size-row">
+        <span class="size-label">กว้าง</span>
+        <input type="number" id="iW" min="0" step="0.1" value="1.0" oninput="recalc()">
+        <span class="size-label">×  สูง</span>
+        <input type="number" id="iH" min="0" step="0.1" value="1.5" oninput="recalc()">
+        <span class="size-label">ม.</span>
+      </div>
+    </div>
+
+    <!-- [C] ประเภท (ประตู/หน้าต่าง) -->
+    <div class="row">
+      <div class="row-label">ประเภท <span class="tag-main">หลัก</span></div>
+      <div class="chip-group" id="chips-itype">
+        <button class="chip on" data-val="door" onclick="setChip('chips-itype','itype',this)">ประตู</button>
+        <button class="chip" data-val="window" onclick="setChip('chips-itype','itype',this)">หน้าต่าง</button>
+      </div>
+      <input type="hidden" id="itype" value="door">
+    </div>
+
+    <!-- [D] ผ้ามุ้ง + สีผ้า (เฉพาะ screen_addon) — ดึงขึ้นหลัก ไม่ซ่อน accordion -->
+    <div class="screen-addon-block" id="screenAddonBlock">
+      <div class="row">
+        <div class="row-label">ผ้ามุ้ง <span class="tag-main">หลัก</span></div>
+        <div class="chip-group" id="chips-screenfabric">
+          <button class="chip on" data-val="fiber" onclick="setChip('chips-screenfabric','screenfabric',this)">ไฟเบอร์ เทา/ดำ</button>
+          <button class="chip" data-val="cat" onclick="setChip('chips-screenfabric','screenfabric',this)">กันแมว/หมา ขาว +800</button>
+          <button class="chip" data-val="rat" onclick="setChip('chips-screenfabric','screenfabric',this)">สแตนกันหนู +1,200</button>
+          <!-- ปุ่ม safety: โผล่เฉพาะ imp23 -->
+          <button class="chip" id="chip-safety" data-val="safety" onclick="setChip('chips-screenfabric','screenfabric',this)" style="display:none;">นิรภัยสแตน 304 ดำ 0.8มม.</button>
+        </div>
+        <input type="hidden" id="screenfabric" value="fiber">
+      </div>
+
+      <div class="row">
+        <div class="row-label">สีผ้า <span class="tag-main">หลัก</span></div>
+        <div class="chip-group" id="chips-screenfabriccolor">
+          <button class="chip on" data-val="ดำ" onclick="setChip('chips-screenfabriccolor','screenfabriccolor',this)">ดำ</button>
+          <button class="chip" data-val="เทา" onclick="setChip('chips-screenfabriccolor','screenfabriccolor',this)">เทา</button>
+          <button class="chip" data-val="ขาว" onclick="setChip('chips-screenfabriccolor','screenfabriccolor',this)">ขาว</button>
+        </div>
+        <input type="hidden" id="screenfabriccolor" value="ดำ">
+      </div>
+
+      <div class="note">ไม่รวมเสริมวงกบ/ราง</div>
+    </div>
+
+    <hr class="sep">
+
+    <!-- [E] สีกรอบมุ้ง + หมายเหตุ — ใน accordion (>5 ตัวเลือก) -->
+    <details class="optional-acc" id="accOptional">
+      <summary id="accSummary">อุปกรณ์เสริม / หมายเหตุ</summary>
+      <div class="acc-body">
+
+        <!-- สีกรอบมุ้ง (12 สี — คง dropdown) -->
+        <div class="row" id="mscolor-row">
+          <div class="row-label">สีกรอบมุ้ง <span class="tag">>5 → dropdown</span></div>
+          <select class="opt-select" id="mscolor" onchange="recalc()">
+            <option value="">ตามสีบาน (ฟรี)</option>
+            <option value="2">ขาว</option>
+            <option value="3">ดำ</option>
+            <option value="4">เทาซาฮาร่า</option>
+            <option value="5">ทองซาฮาร่า</option>
+            <option value="6">KL อบพิเศษ</option>
+            <option value="7">KL ลายไม้</option>
+            <option value="8">ลายไม้สต๊อก</option>
+            <option value="9">อบสีพิเศษ</option>
+            <option value="10">Fuji</option>
+            <option value="11">ลายไม้อบพิเศษ</option>
+            <option value="12">Aztec gray</option>
+          </select>
+          <div class="note">ค่าทำสีกรอบ × 0.5 ของสินค้า</div>
+        </div>
+
+        <!-- หมายเหตุ (18 รายการ — คง dropdown) -->
+        <div class="row">
+          <div class="row-label">หมายเหตุเพิ่ม <span class="tag">>5 → dropdown</span></div>
+          <select class="opt-select" id="remarkAdd" onchange="recalc()">
+            <option value="">— ไม่มี —</option>
+            <option value="1">ยิงตะกั่ว</option>
+            <option value="2">ซีลรอบกรอบ</option>
+            <option value="3">เสริมวงกบ</option>
+            <option value="4">เสริมราง</option>
+            <option value="5">ขยายกรอบ</option>
+            <option value="6">งานพิเศษ (ระบุในหมายเหตุ)</option>
+          </select>
+        </div>
+
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<!-- price preview -->
+<div class="card">
+  <div class="card-head">
+    <span>ราคาตัวอย่าง</span>
+  </div>
+  <div class="card-body">
+    <div class="price-box">
+      <div class="price-demo-tag">DEMO — ราคาจำลอง ไม่ใช้กับงานจริง</div>
+      <div class="price-main" id="priceMain">฿ —</div>
+      <div class="price-detail" id="priceDetail">กรอกขนาดเพื่อดูราคา</div>
+    </div>
+  </div>
+</div>
+
+<!-- UX notes -->
+<div style="background:#fffbe6;border:1px solid #f0c040;border-radius:8px;padding:12px 14px;margin:10px 0;font-size:12px;line-height:1.7;">
+  <b>UX ดราฟนี้ทดสอบ:</b><br>
+  1. โหมด B (ติดบานเดิม) ขึ้นบนสุด — กดติ๊กแล้วกล่องเสริมโผล่<br>
+  2. ผ้ามุ้ง + สีผ้า เป็นชิปหลัก (ไม่ซ่อน accordion)<br>
+  3. ชิปผ้ามุ้งมี 3 ปุ่ม (imp21/imp22) หรือ 4 ปุ่ม (imp23 มี "นิรภัยสแตน 304")<br>
+  4. สีกรอบมุ้ง + หมายเหตุ คง dropdown ใน accordion<br>
+  5. กระจก (i-glass) / สีอลู (i-color) / คาดตาราง (o-gridmark) — ไม่โผล่ในมุ้ง
+</div>
+
+</div><!-- /page -->
+
+<script>
+// ---- DEMO DATA ----
+var PRODUCTS = {
+  imp21: {id:'imp21', name:'มุ้งเฟรมเล็ก (บานเปิด/เลื่อน/กระทุ้ง/ยก)', screen_addon:true, mscolor:true, rates:'IMP21', min_door:2400, min_window:1200},
+  imp22: {id:'imp22', name:'มุ้งเฟรมเล็กติดตาย', screen_addon:true, mscolor:true, rates:'IMP22', min_door:1500, min_window:800},
+  imp23: {id:'imp23', name:'มุ้งเฟรมใหญ่ (เลื่อน/เปิด/กระทุ้ง/ยก)', screen_addon:true, mscolor:true, rates:'IMP23', min_door:7200, min_window:4800},
+  imp28: {id:'imp28', name:'มุ้งจีบ ตีนตะขาบ รุ่งรางเตี้ยแบบพิเศษ', screen_addon:false, mscolor:true, rates:'IMP28', min_door:0, min_window:0},
+  mj_kick_300: {id:'mj_kick_300', name:'มุ้งม้วนเก็บข้างเตะได้ รุ่น 300', screen_addon:false, mscolor:true, rates:'MJ_KICK_300', min:37500},
+  mj_screen_safety: {id:'mj_screen_safety', name:'มุ้งจีบนิรภัย (สีขาว/ดำ/เทา)', screen_addon:false, mscolor:false, rates:'MJ_SCREEN_SAFETY', min:5000}
+};
+
+// DEMO rates (ตัวอย่างเท่านั้น)
+var RATES = {
+  IMP21: [[0,2,1200],[2,5,1100],[5,10,1000],[10,999,900]],
+  IMP22: [[0,2,900],[2,5,850],[5,10,800],[10,999,750]],
+  IMP23: [[0,3,1800],[3,8,1600],[8,15,1400],[15,999,1200]],
+  IMP28: [[0,2,950],[2,5,880],[5,10,820],[10,999,760]],
+  MJ_KICK_300: 'flat37500',
+  MJ_SCREEN_SAFETY: [[0,2,2200],[2,5,2000],[5,999,1800]]
+};
+
+function rateOf(area, table) {
+  if(typeof table === 'string') return 0;
+  for(var i=0; i<table.length; i++){
+    if(area >= table[i][0] && area < table[i][1]) return table[i][2];
+  }
+  return table[table.length-1][2];
+}
+
+function fmt(n){ return '฿' + Math.round(n).toLocaleString('th-TH'); }
+
+// ---- STATE ----
+var state = {
+  prod: 'imp21',
+  w: 1.0, h: 1.5,
+  itype: 'door',
+  screenfabric: 'fiber',
+  screenfabriccolor: 'ดำ',
+  mscolor: '',
+  modeB: false,
+  screenExtra: 0
+};
+
+// ---- CHIP HELPER ----
+function setChip(groupId, stateKey, btn){
+  var group = document.getElementById(groupId);
+  group.querySelectorAll('.chip').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  state[stateKey] = btn.dataset.val;
+  document.getElementById(stateKey).value = btn.dataset.val;
+  recalc();
+}
+
+// ---- PRODUCT CHANGE ----
+function onProdChange(){
+  var sel = document.getElementById('prodSelect');
+  state.prod = sel.value;
+  var p = PRODUCTS[state.prod];
+
+  // update header
+  document.getElementById('prodNameHead').textContent = p.id + ' — ' + p.name;
+
+  // show/hide screen_addon block
+  var saBlock = document.getElementById('screenAddonBlock');
+  saBlock.style.display = p.screen_addon ? 'flex' : 'none';
+
+  // show/hide safety chip
+  var safetyChip = document.getElementById('chip-safety');
+  safetyChip.style.display = (p.rates === 'IMP23') ? 'inline-flex' : 'none';
+  // ถ้าซ่อน safety แล้ว chip นั้น on อยู่ ให้ reset เป็น fiber
+  if(p.rates !== 'IMP23' && state.screenfabric === 'safety'){
+    document.querySelectorAll('#chips-screenfabric .chip').forEach(function(b){ b.classList.remove('on'); });
+    document.querySelector('#chips-screenfabric .chip[data-val="fiber"]').classList.add('on');
+    state.screenfabric = 'fiber';
+    document.getElementById('screenfabric').value = 'fiber';
+  }
+
+  // show/hide mscolor row
+  var msRow = document.getElementById('mscolor-row');
+  msRow.style.display = p.mscolor ? '' : 'none';
+
+  // โหมด B โผล่ทุก cat มุ้ง
+  document.getElementById('modeB-section').style.display = '';
+
+  recalc();
+}
+
+// ---- MODE B ----
+function onModeBChange(){
+  state.modeB = document.getElementById('chkModeB').checked;
+  document.getElementById('modeB-extra').style.display = state.modeB ? 'flex' : 'none';
+  recalc();
+}
+
+// ---- RECALC ----
+function recalc(){
+  var p = PRODUCTS[state.prod];
+  var W = parseFloat(document.getElementById('iW').value) || 0;
+  var H = parseFloat(document.getElementById('iH').value) || 0;
+  var A = W * H;
+  state.screenExtra = parseFloat(document.getElementById('screenExtra').value) || 0;
+
+  var msgs = [];
+  var sell = 0;
+
+  if(A <= 0){
+    document.getElementById('priceMain').textContent = '฿ —';
+    document.getElementById('priceDetail').textContent = 'กรอกขนาดเพื่อดูราคา';
+    return;
+  }
+
+  if(p.screen_addon){
+    // ราคาฐาน
+    var rate = rateOf(A, RATES[p.rates]);
+    var baseSell = A * rate;
+    // min ตาม itype
+    var itype = state.itype;
+    var minPerPanel = (itype === 'window') ? (p.min_window || 0) : (p.min_door || 0);
+    sell = Math.max(minPerPanel, baseSell);
+    msgs.push('เฟรมมุ้ง: ' + A.toFixed(2) + ' ตร.ม. × ' + rate.toLocaleString() + ' = ' + fmt(baseSell));
+    if(minPerPanel > baseSell) msgs.push('ใช้ min ' + (itype === 'window' ? 'หน้าต่าง' : 'ประตู') + ' ' + fmt(minPerPanel));
+
+    // option ผ้ามุ้ง
+    var fabric = state.screenfabric;
+    if(fabric === 'cat'){ sell += A * 800; msgs.push('ผ้ากันแมว/หมา +' + fmt(A*800)); }
+    else if(fabric === 'rat'){ sell += A * 1200; msgs.push('ผ้าสแตนกันหนู +' + fmt(A*1200)); }
+    else if(fabric === 'safety' && p.rates === 'IMP23'){ var sr = rateOf(A, RATES.IMP28); sell += A * sr; msgs.push('ผ้านิรภัยสแตน 0.8มม. +' + fmt(A*sr)); }
+    else { msgs.push('ผ้าไฟเบอร์ (default)'); }
+
+    // สีผ้า — label only
+    msgs.push('สีผ้า: ' + (document.getElementById('screenfabriccolor').value || 'ดำ'));
+
+  } else if(p.rates === 'MJ_KICK_300'){
+    sell = 37500;
+    msgs.push('ราคาชุด flat: ' + fmt(sell));
+  } else {
+    var rate2 = rateOf(A, RATES[p.rates]);
+    sell = Math.max(p.min || 0, A * rate2);
+    msgs.push(A.toFixed(2) + ' ตร.ม. × ' + rate2.toLocaleString() + ' = ' + fmt(A * rate2));
+    if(p.min && p.min > A * rate2) msgs.push('ใช้ min ' + fmt(p.min));
+  }
+
+  // โหมด B
+  if(state.modeB && state.screenExtra > 0){
+    sell += state.screenExtra;
+    msgs.push('ค่าเสริมกล่อง/ราง +' + fmt(state.screenExtra));
+  }
+
+  // ปัดขึ้นพัน
+  sell = Math.ceil(sell / 1000) * 1000;
+
+  document.getElementById('priceMain').textContent = fmt(sell);
+  document.getElementById('priceDetail').innerHTML = msgs.join('<br>');
+}
+
+// ---- INIT ----
+onProdChange();
+recalc();
+</script>
+</body>
+</html>

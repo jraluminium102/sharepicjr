@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ดราฟ G6 กั้นห้องกระจก — UX กรอกง่าย</title>
+<style>
+  :root{--red:#B3151D;--line:#e3d3d3;--muted:#777;--bg:#faf7f7;}
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,"Segoe UI",Tahoma,sans-serif;margin:0;background:var(--bg);color:#1a1a1a;-webkit-text-size-adjust:100%;}
+  .wrap{max-width:430px;margin:0 auto;padding:14px;}
+  h1{font-size:19px;margin:6px 0 2px;color:var(--red);}
+  .sub{font-size:13px;color:var(--muted);margin:0 0 14px;}
+  .seg{display:flex;gap:6px;margin:0 0 14px;}
+  .seg button{flex:1;min-height:40px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:14px;cursor:pointer;color:var(--muted);}
+  .seg button.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;}
+  .side-badge{display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;margin-bottom:10px;}
+  .tag{font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700;}
+  .tag.bad{background:#fde7e7;color:#a32d2d;}
+  .tag.good{background:#e3f4e6;color:#1f7a33;}
+  label{display:block;font-size:12px;color:var(--muted);margin:0 0 5px;font-weight:700;}
+  .lblred{color:var(--red);}
+  select,input{width:100%;height:40px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff;color:#111;padding:0 8px;}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{min-height:44px;padding:0 14px;border:1.5px solid #d6cccc;border-radius:11px;background:#fff;font-size:14px;cursor:pointer;color:#222;}
+  .chip.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+  .chip.more{border-style:dashed;color:var(--muted);}
+  .fld{margin:0 0 13px;}
+  .row{display:flex;gap:10px;}
+  .row>div{flex:1;}
+  .step{display:flex;align-items:center;}
+  .step button{width:46px;height:46px;border:1.5px solid #d6cccc;background:#fff;font-size:22px;cursor:pointer;color:var(--red);border-radius:11px;flex:none;}
+  .step input{width:62px;height:46px;text-align:center;margin:0 9px;font-size:17px;font-weight:700;}
+  .det{margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--red);background:#fff7f7;cursor:pointer;}
+  .hide{display:none;}
+  .hint{font-size:11px;color:#999;margin:4px 0 0;}
+  .note{font-size:12px;color:var(--muted);margin:12px 2px 0;line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>กั้นห้องกระจก (กลุ่ม 6) — ดราฟ UX</h1>
+  <p class="sub">การ์ด "ด้าน" · เปลี่ยนดรอปดาวน์ 154 แบบ → ชิปชนิดบาน · กดเล่นได้</p>
+
+  <div class="seg">
+    <button id="bAfter" class="on" onclick="jrMode('after')">After (ชิป)</button>
+    <button id="bBefore" onclick="jrMode('before')">Before (เดิม)</button>
+  </div>
+
+  <div id="afterView">
+    <div class="card">
+      <span class="side-badge" id="sideName">ด้าน A</span> <span class="tag good">กดชนิด 1 แตะ</span>
+      <div class="fld" style="margin-top:10px;">
+        <label class="lblred">ชนิดบาน — แตะเลือก</label>
+        <div class="chips" id="typeChips">
+          <button class="chip on" data-t="slide" onclick="jrType(this)">บานเลื่อน</button>
+          <button class="chip" data-t="open" onclick="jrType(this)">บานเปิด</button>
+          <button class="chip" data-t="fold" onclick="jrType(this)">บานเฟี้ยม</button>
+          <button class="chip" data-t="fixed" onclick="jrType(this)">กระจกติดตาย</button>
+          <button class="chip" data-t="screen" onclick="jrType(this)">ระแนงบังตา</button>
+          <button class="chip" data-t="frameless" onclick="jrType(this)">บานเปลือย</button>
+          <button class="chip more" data-t="more" onclick="jrType(this)">อื่นๆ ▾</button>
+        </div>
+        <p class="hint">เลือกชนิดที่ใช้บ่อย — แทนการเลื่อนดรอปดาวน์ 154 แบบ</p>
+      </div>
+      <div class="fld" id="modelFld">
+        <label>รุ่น <span id="modelCount" style="color:#bbb;"></span></label>
+        <select id="modelSel"></select>
+      </div>
+      <div class="fld hide" id="openFld">
+        <label>ชนิดการเปิด</label>
+        <div class="chips" id="openChips">
+          <button class="chip on" onclick="jrChip(this)">บานเลื่อน (ระบุติดตายเอง)</button>
+          <button class="chip" onclick="jrChip(this)">บานเลื่อนสลับ</button>
+          <button class="chip" onclick="jrChip(this)">เปิดคู่กลาง</button>
+          <button class="chip" onclick="jrChip(this)">ลากจูง</button>
+        </div>
+      </div>
+      <div class="row fld">
+        <div><label>กว้าง (ม.)</label><input type="number" value="3.0" step="0.1"></div>
+        <div><label>สูง (ม.)</label><input type="number" value="2.4" step="0.1"></div>
+      </div>
+      <div class="fld">
+        <label>จำนวนบาน</label>
+        <div class="step">
+          <button onclick="jrStep(-1)">−</button>
+          <input id="panels" type="number" value="4" min="1">
+          <button onclick="jrStep(1)">+</button>
+        </div>
+      </div>
+      <div class="det">⚙ ตัวเลือกเพิ่มเติม (มือจับ/ล็อค/มุ้ง/คาดตาราง) — กดถ้าต้องใช้</div>
+    </div>
+    <p class="note">✓ สี/กระจก ตั้ง "ทั้งห้อง" ที่หัวชุดครั้งเดียว — ไม่ต้องเลือกซ้ำทุกด้าน (ของเดิมดีอยู่แล้ว คงไว้)</p>
+  </div>
+
+  <div id="beforeView" class="hide">
+    <div class="card">
+      <span class="side-badge">ด้าน A</span> <span class="tag bad">แบบ = ดรอปดาวน์ 154 แถว</span>
+      <div class="fld" style="margin-top:10px;">
+        <label>แบบ</label>
+        <select id="beforeSel"></select>
+        <p class="hint">ต้องเลื่อนหา door type ในลิสต์ 154 อัน × ทุกด้าน (A/B/C/D)</p>
+      </div>
+      <div class="row fld">
+        <div><label>กว้าง (ม.)</label><input type="number" value="3.0"></div>
+        <div><label>สูง (ม.)</label><input type="number" value="2.4"></div>
+      </div>
+      <div class="fld"><label>จำนวนบานทั้งหมด</label><input type="number" value="4"></div>
+    </div>
+    <p class="note">ของเดิม: ทุกด้านเริ่มจากดรอปดาวน์ 154 แบบ (มี optgroup 19 หมวดช่วย แต่ยังยาวบนมือถือ)</p>
+  </div>
+
+  <p class="note">หมายเหตุ: ดราฟนี้เป็นแค่ "หน้าตา" — ของจริงชิปจะ sync ค่ากลับเข้า control เดิม (.i-prod / .o-opentype / .i-panels) ราคา/ใบไม่เปลี่ยน</p>
+</div>
+<script>
+(function(){
+  var MODELS={
+    slide:['บานเลื่อน เซมิยูโร','บานเลื่อน ยูโร','เลื่อนภายในรางบน (ซ้อน)','เลื่อนภายในรางบน SlimLux','บานยก SMS'],
+    open:['บานเปิด ยูโร','บานเปิด Velora (รวมเทมเปอร์6มม.)','ประตูบานเปิด โซลิด ทู','ประตูบานเปิด โซลิด วัน','บานเปิด X-series (ภายใน)'],
+    fold:['บานเฟี้ยม เซมิยูโร','บานเฟี้ยม ยูโร','บานเฟี้ยม X-series (ภายใน)'],
+    fixed:['กระจกติดตาย'],
+    screen:['ระแนงบังตา 1×5 ยัดโครง','ระแนงบังตา 1×1.6 แปะนอก','ระแนงบังตา 2×2','ระแนงบังตาเกล็ด'],
+    frameless:['บานเปลือยติดตาย','ประตูสวิง/เลื่อน บานเปลือย','shower กั้นห้องอาบน้ำ'],
+    more:['— เลือกจากทั้งหมด 154 แบบ —']
+  };
+  var ALL=[];Object.keys(MODELS).forEach(function(k){if(k!=='more')MODELS[k].forEach(function(m){ALL.push(m);});});
+  for(var i=ALL.length;i<154;i++)ALL.push('แบบอื่น #'+(i+1));
+  var bs=document.getElementById('beforeSel');
+  ALL.forEach(function(m){var o=document.createElement('option');o.textContent=m;bs.appendChild(o);});
+  window.jrMode=function(m){
+    document.getElementById('afterView').classList.toggle('hide',m!=='after');
+    document.getElementById('beforeView').classList.toggle('hide',m!=='before');
+    document.getElementById('bAfter').classList.toggle('on',m==='after');
+    document.getElementById('bBefore').classList.toggle('on',m==='before');
+  };
+  function fillModels(t){
+    var sel=document.getElementById('modelSel');sel.innerHTML='';
+    (MODELS[t]||[]).forEach(function(m){var o=document.createElement('option');o.textContent=m;sel.appendChild(o);});
+    var n=(MODELS[t]||[]).length;
+    document.getElementById('modelCount').textContent=t==='more'?'(154 แบบ)':'('+n+' รุ่น)';
+    document.getElementById('openFld').classList.toggle('hide',t!=='slide');
+    document.getElementById('modelFld').classList.toggle('hide',t==='fixed');
+  }
+  window.jrType=function(b){
+    var box=document.getElementById('typeChips');
+    [].forEach.call(box.querySelectorAll('.chip'),function(c){c.classList.remove('on');});
+    b.classList.add('on');fillModels(b.dataset.t);
+  };
+  window.jrChip=function(b){
+    var box=b.parentElement;[].forEach.call(box.querySelectorAll('.chip'),function(c){c.classList.remove('on');});b.classList.add('on');
+  };
+  window.jrStep=function(d){var i=document.getElementById('panels');i.value=Math.max(1,(parseInt(i.value)||1)+d);};
+  fillModels('slide');
+})();
+</script>
+</body>
+</html>
