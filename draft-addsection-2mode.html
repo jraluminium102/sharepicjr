@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ดราฟ — เพิ่มส่วน 2 โหมด (ใช้บ่อย / ทั่วไป)</title>
+<style>
+:root{--red:#B3151D;--ink:#1f2937;--mut:#6b7280;--line:#e5e7eb;}
+*{font-family:"Leelawadee UI","Tahoma",system-ui,sans-serif;box-sizing:border-box;}
+body{margin:0;background:#ececed;color:var(--ink);font-size:14px;padding:14px;}
+.wrap{max-width:400px;margin:0 auto;}
+h1{color:var(--red);font-size:18px;margin:0 0 2px;}
+.sub{color:var(--mut);font-size:12.5px;margin:0 0 12px;}
+.demo-banner{background:#fff3cd;border:1px solid #ffe69c;border-radius:7px;padding:7px 11px;font-size:12px;margin-bottom:12px;}
+.card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px;box-shadow:0 1px 4px #0001;margin-bottom:13px;}
+.addbtn{width:100%;background:var(--red);color:#fff;border:none;border-radius:11px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;}
+.addbtn.ghost{background:#fff;color:var(--red);border:2px solid var(--red);}
+.modes{display:flex;gap:10px;margin-top:12px;}
+.modebtn{flex:1;border:2px solid var(--red);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;background:#fff;}
+.modebtn .ico{font-size:26px;display:block;}
+.modebtn .t{font-weight:800;color:var(--red);font-size:15px;margin-top:4px;}
+.modebtn .d{font-size:11px;color:var(--mut);margin-top:2px;line-height:1.3;}
+.modebtn.fast{background:#fff8f0;border-color:#E67E22;}
+.modebtn.fast .t,.modebtn.fast .ico{color:#E67E22;}
+.section-t{font-size:12.5px;color:var(--mut);font-weight:700;margin:12px 0 5px;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{min-height:44px;display:flex;align-items:center;padding:8px 14px;border:1.5px solid #E67E22;border-radius:10px;background:#fff8f0;color:#9a4a00;font-size:14px;font-weight:600;cursor:pointer;}
+.chip:active{background:#E67E22;color:#fff;}
+.gbadge{font-size:10px;background:#eef2ff;color:#3730a3;border-radius:5px;padding:1px 6px;margin-left:6px;}
+.flow2{margin-top:12px;}
+label{display:block;font-size:12px;color:var(--mut);margin:6px 0 3px;}
+select{width:100%;height:46px;border:1.5px solid #94a3b8;border-radius:9px;padding:0 10px;font-size:15px;background:#fff;}
+.added{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:11px 13px;margin-top:11px;font-size:13.5px;color:#065f46;display:none;}
+.added b{color:#15803d;}
+.back{font-size:12.5px;color:var(--red);cursor:pointer;margin-top:10px;display:inline-block;}
+.cmp{background:#f0f9ff;border:1px solid #bae6fd;border-radius:9px;padding:9px 12px;font-size:12px;margin-top:14px;}
+.hidden{display:none;}
+</style></head><body><div class="wrap">
+
+<h1>ดราฟ — "+ เพิ่มส่วน" 2 โหมด</h1>
+<p class="sub">ของใช้บ่อย (กดชิปลัด) / งานบานทั่วไป (flow เดิม) · กดเล่นได้จริง</p>
+<div class="demo-banner">⚡ DEMO · กดปุ่ม/ชิปดูได้ · ราคาจริงอยู่ในระบบ</div>
+
+<div class="card">
+  <!-- ขั้น 0: ปุ่มเพิ่มส่วน -->
+  <div id="step0">
+    <button class="addbtn" onclick="show('step1')">+ เพิ่มส่วน</button>
+  </div>
+
+  <!-- ขั้น 1: เลือกโหมด -->
+  <div id="step1" class="hidden">
+    <div class="section-t">เพิ่มอะไรดี?</div>
+    <div class="modes">
+      <div class="modebtn fast" onclick="show('stepFast')">
+        <span class="ico">⚡</span><div class="t">ของใช้บ่อย</div><div class="d">ติดตาย · ลูกฟูก/คอมโพสิท · ผนังเบา</div>
+      </div>
+      <div class="modebtn" onclick="show('stepGen')">
+        <span class="ico">🚪</span><div class="t">งานบานทั่วไป</div><div class="d">เลือกกลุ่ม → แบบ (เหมือนเดิม)</div>
+      </div>
+    </div>
+    <span class="back" onclick="show('step0')">← ยกเลิก</span>
+  </div>
+
+  <!-- ขั้น 2a: ของใช้บ่อย -->
+  <div id="stepFast" class="hidden">
+    <div class="section-t">⚡ ของใช้บ่อย — กดชิปเดียวเพิ่มเลย</div>
+    <div class="section-t" style="color:#9a4a00;margin-top:8px;">บานติดตาย</div>
+    <div class="chips">
+      <div class="chip" onclick="addFast('กระจกติดตาย','G1')">กระจกติดตาย</div>
+    </div>
+    <div class="section-t" style="color:#9a4a00;">ลูกฟูก / คอมโพสิท</div>
+    <div class="chips">
+      <div class="chip" onclick="addFast('ลูกฟูกเรียบ 1 ทาง','G1')">ลูกฟูก 1 ทาง</div>
+      <div class="chip" onclick="addFast('ลูกฟูกเรียบ 2 ทาง','G1')">ลูกฟูก 2 ทาง</div>
+      <div class="chip" onclick="addFast('คอมโพสิต 3 มม.','G1')">คอมโพสิต 3 มม.</div>
+      <div class="chip" onclick="addFast('คอมโพสิต 4 มม.','G1')">คอมโพสิต 4 มม.</div>
+    </div>
+    <div class="section-t" style="color:#9a4a00;">ผนังเบา</div>
+    <div class="chips">
+      <div class="chip" onclick="addFast('ISOWALL','G3')">ISOWALL</div>
+      <div class="chip" onclick="addFast('ผนังเบาภายนอก','G3')">ผนังเบาภายนอก</div>
+      <div class="chip" onclick="addFast('ผนังเบาภายใน','G3')">ผนังเบาภายใน</div>
+    </div>
+    <div class="added" id="addedBox">✅ เพิ่มแล้ว: <b id="addedName"></b> <span id="addedG" class="gbadge"></span> — เปิดการ์ดให้กรอกขนาดต่อทันที</div>
+    <span class="back" onclick="show('step1')">← กลับไปเลือกโหมด</span>
+  </div>
+
+  <!-- ขั้น 2b: ทั่วไป -->
+  <div id="stepGen" class="hidden">
+    <div class="section-t">🚪 งานบานทั่วไป (flow เดิม)</div>
+    <div class="flow2">
+      <label>กลุ่มงาน</label>
+      <select><option>1. บานกระจก (ประตู/หน้าต่าง)</option><option>2. ระแนง/รั้ว/ราวกันตก</option><option>3. หลังคา/ฝ้า-ผนัง</option><option>…</option></select>
+      <label>แบบ</label>
+      <select><option>บานเลื่อน ยูโร</option><option>บานเปิด ยูโร</option><option>… (40+ แบบ)</option></select>
+    </div>
+    <span class="back" onclick="show('step1')">← กลับไปเลือกโหมด</span>
+  </div>
+</div>
+
+<div class="cmp"><b>เทียบ Before / After</b><br>
+<b>Before:</b> กด "+ เพิ่มส่วน" → การ์ดโผล่ default บานเลื่อน → ต้องเลือกกลุ่ม → ไล่ dropdown 40+ แบบ หา "กระจกติดตาย/คอมโพสิท/ผนังเบา" ทุกครั้ง<br>
+<b>After:</b> กด "+ เพิ่มส่วน" → เลือก ⚡ ของใช้บ่อย → <b>กดชิปเดียวเพิ่มเลย</b> (auto กลุ่ม+แบบ) · ของแผ่นๆ ที่ใช้บ่อยเพิ่มไว ข้ามกลุ่ม G1↔G3 ให้อัตโนมัติ · งานบานปกติยังกด 🚪 ทั่วไปได้เหมือนเดิม</div>
+
+<script>
+function show(id){
+  ['step0','step1','stepFast','stepGen'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  if(id!=='stepFast') document.getElementById('addedBox').style.display='none';
+}
+function addFast(name,g){
+  document.getElementById('addedName').textContent=name;
+  document.getElementById('addedG').textContent=g;
+  document.getElementById('addedBox').style.display='block';
+}
+</script>
+</div></body></html>
