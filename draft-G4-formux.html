@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ดราฟ UX กลุ่ม 4 — ตู้อลู + ฝาตู้</title>
+<style>
+  :root{ --red:#B3151D; --line:#E5E7EB; --ink:#1F2937; --muted:#6B7280; }
+  *{box-sizing:border-box;}
+  body{ font-family:'Segoe UI',Tahoma,sans-serif; margin:0; background:#F3F4F6; color:var(--ink); }
+  .wrap{ max-width:430px; margin:0 auto; padding:14px 12px 60px; }
+  h1{ font-size:18px; margin:6px 0 2px; }
+  .sub{ font-size:12px; color:var(--muted); margin-bottom:14px; }
+  .tag{ display:inline-block; background:var(--red); color:#fff; font-size:11px; font-weight:700; padding:2px 9px; border-radius:20px; }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:13px 13px 15px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .ttl{ font-size:14px; font-weight:700; margin-bottom:3px; }
+  .ttl .n{ background:#FEE2E2; color:var(--red); font-size:11px; padding:1px 7px; border-radius:6px; margin-left:4px; }
+  .ba{ font-size:11px; font-weight:700; letter-spacing:.5px; margin:14px 0 6px; color:var(--muted); text-transform:uppercase; }
+  .ba.after{ color:var(--red); }
+
+  label.fld{ display:block; font-size:12.5px; font-weight:600; margin:11px 0 5px; }
+  select,input[type=number]{ height:38px; border:1px solid #D1D5DB; border-radius:8px; padding:0 9px; font-size:13.5px; width:100%; background:#fff; }
+  .inline{ display:flex; gap:8px; }
+  .inline>div{ flex:1; }
+  .hint{ font-size:11px; color:var(--muted); margin-top:3px; }
+  .warn{ font-size:11px; color:var(--red); margin-top:3px; }
+
+  .chip-group{ display:flex; gap:6px; flex-wrap:wrap; }
+  .chip{ min-height:40px; padding:8px 13px; border:1.5px solid #D1D5DB; border-radius:9px; background:#fff; font-size:13.5px; cursor:pointer; flex:1; min-width:60px; }
+  .chip.on{ background:var(--red); color:#fff; border-color:var(--red); font-weight:700; }
+  .pill{ display:inline-flex; align-items:center; gap:7px; min-height:40px; padding:7px 14px; border:1.5px solid #D1D5DB; border-radius:9px; background:#fff; font-size:13px; cursor:pointer; }
+  .pill.on{ background:#065F46; color:#fff; border-color:#065F46; font-weight:700; }
+  .pill .bx{ width:16px; height:16px; border:2px solid currentColor; border-radius:4px; display:inline-block; position:relative; }
+  .pill.on .bx::after{ content:'✓'; position:absolute; inset:-3px 0 0 1px; font-size:13px; }
+
+  .boxw{ background:#FAFAFA; border:1px solid var(--line); border-radius:10px; padding:11px; margin-top:4px; }
+  .boxw .bttl{ font-size:12px; font-weight:700; color:var(--red); margin-bottom:2px; }
+  .auto{ background:#ECFDF5; border:1px solid #A7F3D0; color:#065F46; font-size:10px; font-weight:700; padding:1px 6px; border-radius:5px; }
+  .out{ background:#FFFBEB; border:1px dashed #FCD34D; border-radius:8px; padding:8px 10px; font-size:12px; margin-top:10px; color:#92400E; }
+  .out b{ color:#78350F; }
+  .legend{ font-size:11px; color:var(--muted); background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 11px; margin-bottom:14px; }
+  .legend b{ color:var(--ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">ดราฟ UX · กลุ่ม 4</span>
+  <h1>ตู้อลู + ฝาตู้ — กรอกง่าย เน้นติ๊ก</h1>
+  <div class="sub">กดเล่นได้จริง · มือถือ-first · 11 มิ.ย. 2026 · READ-ONLY (ดราฟส่ง dev)</div>
+
+  <div class="legend">
+    <b>หลัก:</b> select ≤5 ตัว → ชิปกดติ๊ก · ≥6 ตัว (เช่น สีฝาตู้ 12 สี) คงดรอปดาวน์ ·
+    รวบช่องตู้ทั้งหมดเป็น <b>กล่องเดียว</b> · ช่องที่ auto (ลึก/จำนวนชั้น) ติดป้าย <span class="auto">auto</span>
+  </div>
+
+  <!-- ================= ตู้อลู ================= -->
+  <div class="card">
+    <div class="ttl">🗄️ ตู้อลูมิเนียม <span class="n">cabinet_alu</span></div>
+
+    <div class="ba">BEFORE — ดรอปดาวน์ 4 ช่อง กระจาย</div>
+    <label class="fld">จำนวนบานหน้าตู้</label>
+    <select><option>1 บาน</option><option selected>2 บาน</option><option>3 บาน</option></select>
+    <label class="fld">ประเภท</label>
+    <select><option selected>ตู้ทั่วไป (ชั้น~40ซม.)</option><option>ตู้รองเท้า (ชั้น~20ซม.)</option></select>
+    <label class="fld">ชนิดชั้น</label>
+    <select><option selected>ตามประเภท</option><option>อลู (1,200)</option><option>กระจก (1,000)</option></select>
+    <div class="inline" style="margin-top:11px;">
+      <div><label class="fld" style="margin-top:0">ลึก (ม.)</label><input type="number" value="0.6"></div>
+      <div><label class="fld" style="margin-top:0">จำนวนชั้น</label><input type="number" placeholder="auto"></div>
+    </div>
+
+    <div class="ba after">AFTER — ติ๊กชิป + รวบกล่องเดียว</div>
+    <div class="boxw">
+      <div class="bttl">รายละเอียดตู้</div>
+      <div class="hint" style="margin-top:0;margin-bottom:9px;">เลือกประเภทก่อน — ระบบตั้ง สูง/ลึก ให้อัตโนมัติ</div>
+
+      <label class="fld" style="margin-top:0">ประเภทตู้</label>
+      <div class="chip-group" id="g-cabtype">
+        <button type="button" class="chip on" onclick="pick('g-cabtype',this,'cabtype','wardrobe')">ตู้ทั่วไป<br><small style="font-weight:400;opacity:.8">ชั้น ~40ซม.</small></button>
+        <button type="button" class="chip" onclick="pick('g-cabtype',this,'cabtype','shoe')">ตู้รองเท้า<br><small style="font-weight:400;opacity:.8">ชั้น ~20ซม.</small></button>
+      </div>
+
+      <label class="fld">จำนวนบานหน้าตู้</label>
+      <div class="chip-group" id="g-doors">
+        <button type="button" class="chip" onclick="pick('g-doors',this,'doors','1')">1 บาน</button>
+        <button type="button" class="chip on" onclick="pick('g-doors',this,'doors','2')">2 บาน</button>
+        <button type="button" class="chip" onclick="pick('g-doors',this,'doors','3')">3 บาน</button>
+      </div>
+
+      <label class="fld">ชนิดชั้น</label>
+      <div class="chip-group" id="g-shelf">
+        <button type="button" class="chip on" onclick="pick('g-shelf',this,'shelf','ตามประเภท')">ตามประเภท</button>
+        <button type="button" class="chip" onclick="pick('g-shelf',this,'shelf','อลู 1,200')">อลู<br><small style="font-weight:400;opacity:.8">1,200</small></button>
+        <button type="button" class="chip" onclick="pick('g-shelf',this,'shelf','กระจก 1,000')">กระจก<br><small style="font-weight:400;opacity:.8">1,000</small></button>
+      </div>
+
+      <div class="inline" style="margin-top:11px;">
+        <div>
+          <label class="fld" style="margin-top:0">ลึก (ม.) <span class="auto">auto</span></label>
+          <input type="number" id="depth" value="0.6">
+        </div>
+        <div>
+          <label class="fld" style="margin-top:0">จำนวนชั้น <span class="auto">auto</span></label>
+          <input type="number" placeholder="auto">
+        </div>
+      </div>
+
+      <label class="fld">ผนังหลัง</label>
+      <span class="pill" id="pill-back" onclick="togBack(this)"><span class="bx"></span> +ผนังหลัง (ด้าน 4)</span>
+      <div class="hint">ปกติใช้ผนังปูน — ติ๊กเมื่อต้องการปิดด้านหลัง</div>
+    </div>
+    <div class="out" id="out-cab">เลือกแล้ว: <b>ตู้ทั่วไป · 2 บาน · ชั้นตามประเภท</b> · สูง/ลึก = auto</div>
+  </div>
+
+  <!-- ================= ฝาตู้ ================= -->
+  <div class="card">
+    <div class="ttl">🚪 ฝาตู้ Future Tech <span class="n">future_tech</span></div>
+    <div class="hint" style="margin-top:0">/บาน · max 3 บาน/ชุด</div>
+
+    <div class="ba">BEFORE</div>
+    <label class="fld">ประเภท</label>
+    <select><option selected>ประตู</option><option>หน้าต่าง</option></select>
+    <label class="fld">สีฝาตู้</label>
+    <select><option selected>ขาว/ดำ (ฟรี)</option><option>...อีก 11 สี (เลือก)</option></select>
+
+    <div class="ba after">AFTER — ประเภทเป็นชิป · สีคงดรอปดาวน์ (12 สี ≥6)</div>
+    <label class="fld" style="margin-top:4px">ประเภท</label>
+    <div class="chip-group" id="g-ft" style="max-width:230px">
+      <button type="button" class="chip on" onclick="pick('g-ft',this,null,null)">ประตู</button>
+      <button type="button" class="chip" onclick="pick('g-ft',this,null,null)">หน้าต่าง</button>
+    </div>
+    <label class="fld">สีฝาตู้ <span style="font-weight:400;color:var(--muted)">(12 สี — คงดรอปดาวน์)</span></label>
+    <select><option selected>ขาว/ดำ (ฟรี)</option><option>สีเทาซาฮาร่า</option><option>สีลายไม้สต๊อก</option><option>... (รวม 12)</option></select>
+    <div class="warn">⚠ สีเส้นสำเร็จ ดูตัวอย่างจริงก่อน</div>
+  </div>
+
+  <div class="legend" style="margin-top:4px">
+    <b>ไม่แตะ logic/ราคา:</b> ชิปแค่ set ค่ากลับเข้า <code>&lt;select&gt;</code> เดิม (ซ่อน) + ยิง <code>change</code> →
+    <code>readItem</code>/<code>calcQuote</code> อ่านเหมือนเดิม · cabtype ยังสั่ง auto สูง/ลึก ได้ (listener เดิม)
+  </div>
+</div>
+
+<script>
+  function pick(gid, btn, key, val){
+    var g=document.getElementById(gid);
+    g.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+    btn.classList.add('on');
+    if(key==='cabtype'){ document.getElementById('depth').value = (val==='shoe')?'0.4':'0.6'; }
+    updateOut();
+  }
+  function togBack(el){ el.classList.toggle('on'); updateOut(); }
+  function txt(gid){ var b=document.querySelector('#'+gid+' .chip.on'); return b? b.innerText.replace(/\s+/g,' ').trim() : '—'; }
+  function updateOut(){
+    var t=txt('g-cabtype'), d=txt('g-doors'), s=txt('g-shelf');
+    var back=document.getElementById('pill-back').classList.contains('on')?' · +ผนังหลัง':'';
+    document.getElementById('out-cab').innerHTML='เลือกแล้ว: <b>'+t+' · '+d+' · '+s+'</b>'+back;
+  }
+  updateOut();
+</script>
+</body>
+</html>

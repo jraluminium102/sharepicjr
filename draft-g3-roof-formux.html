@@ -5,147 +5,486 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ดราฟ UX ฟอร์มหลังคา (G3) — เครื่องคิดราคา JR</title>
 <style>
-  :root{--red:#B3151D;--line:#E5E7EB;}
+  :root{--red:#B3151D;--blue:#2563EB;--line:#E5E7EB;}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{font-family:"Leelawadee UI","Tahoma",sans-serif;color:#1F2937;font-size:14px;line-height:1.5;margin:0;background:#F3F4F6;padding:12px;}
   .wrap{max-width:400px;margin:0 auto;}
   h1{font-size:17px;color:var(--red);margin:0 0 2px;}
   .sub{color:#6B7280;font-size:11px;margin-bottom:10px;}
+  /* Before/After switcher */
   .ba{display:flex;gap:6px;margin-bottom:10px;}
   .ba button{flex:1;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;}
   .ba button.on{background:var(--red);color:#fff;border-color:var(--red);}
+  /* panels */
   .panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;}
   .phone{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;}
-  .box{border:1px solid #eedede;border-radius:9px;margin:7px 0;background:#fffafa;overflow:hidden;}
-  .box>.bh{font-weight:700;color:var(--red);font-size:13px;padding:10px 11px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:44px;}
-  .box>.bb{padding:2px 11px 10px;display:none;}
+  /* accordion box */
+  .box{border:1px solid #eedede;border-radius:9px;margin:6px 0;background:#fffafa;overflow:hidden;}
+  .box>.bh{font-weight:700;color:var(--red);font-size:13px;padding:9px 11px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:44px;user-select:none;}
+  .box>.bb{padding:4px 11px 10px;display:none;}
   .box.open>.bb{display:block;}
-  .box>.bh .ar{transition:.2s;font-size:12px;color:#9CA3AF;}
+  .box>.bh .ar{transition:.2s;font-size:12px;color:#9CA3AF;flex-shrink:0;}
   .box.open>.bh .ar{transform:rotate(180deg);}
-  .fld{margin:8px 0;}
-  .lab{font-size:12px;color:#374151;margin-bottom:4px;font-weight:600;}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;}
-  .chip{border:1px solid #C9CDD3;background:#fff;border-radius:18px;padding:7px 13px;font-size:13px;cursor:pointer;font-family:inherit;min-height:40px;display:inline-flex;align-items:center;}
+  /* fields */
+  .fld{margin:7px 0;}
+  .lab{font-size:12px;color:#374151;margin-bottom:3px;font-weight:600;}
+  /* chips — wrap แถวเดียวก่อน ถ้าล้นค่อย wrap */
+  .chips{display:flex;flex-wrap:wrap;gap:5px;}
+  .chip{border:1px solid #C9CDD3;background:#fff;border-radius:18px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;min-height:40px;display:inline-flex;align-items:center;white-space:nowrap;}
   .chip.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
-  input[type=number],input[type=text]{height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:14px;font-family:inherit;width:90px;}
-  .row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;}
+  /* input */
+  input[type=number],input[type=text]{height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:14px;font-family:inherit;width:88px;}
+  /* row สำหรับ label+input อยู่บรรทัดเดียวกัน */
+  .row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;}
+  /* สองคอลัมน์ขนาด+วัสดุ */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  /* hint */
   .hint{font-size:11px;color:#9CA3AF;}
-  /* หลังคาเลื่อน เด่น */
-  .slide{border:2px solid #2563EB;border-radius:10px;background:#EFF6FF;margin:7px 0;padding:0;}
-  .slide .sh{padding:11px;display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;color:#1E40AF;font-size:14px;}
+  /* หลังคาเลื่อน เด่น สีฟ้า */
+  .slide{border:2px solid var(--blue);border-radius:10px;background:#EFF6FF;margin:6px 0;padding:0;}
+  .slide .sh{padding:10px 11px;display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;color:#1E40AF;font-size:14px;min-height:44px;user-select:none;}
   .tg{width:46px;height:26px;border-radius:14px;background:#CBD5E1;position:relative;transition:.2s;flex-shrink:0;}
   .tg::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;}
-  .slide.on .tg{background:#2563EB;}.slide.on .tg::after{left:23px;}
+  .slide.on .tg{background:var(--blue);}.slide.on .tg::after{left:23px;}
   .slide .sb{padding:0 11px 11px;display:none;}.slide.on .sb{display:block;}
+  /* stepper */
   .step{display:inline-flex;align-items:center;}
-  .step button{width:38px;height:40px;border:1px solid #C9CDD3;background:#fff;font-size:20px;cursor:pointer;color:#B3151D;line-height:1;font-family:inherit;}
+  .step button{width:38px;height:40px;border:1px solid #C9CDD3;background:#fff;font-size:20px;cursor:pointer;color:var(--red);line-height:1;font-family:inherit;}
   .step button:first-child{border-radius:8px 0 0 8px;}.step button:last-child{border-radius:0 8px 8px 0;}
   .step input{width:50px;border-radius:0;border-left:none;border-right:none;text-align:center;}
-  .cnt{display:flex;gap:22px;flex-wrap:wrap;}
+  /* stepper pair row */
+  .cnt{display:flex;gap:16px;flex-wrap:wrap;}
+  /* reveal/hide cascade */
   .reveal{display:none;}.reveal.show{display:block;}
-  .tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:9px;background:#FEE2E2;color:#991B1B;margin-left:6px;}
+  /* tags */
+  .tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:9px;background:#FEE2E2;color:#991B1B;margin-left:5px;}
   .tag.new{background:#DCFCE7;color:#166534;}
-  .note{background:#FFF7ED;border:1px solid #FDBA74;border-radius:8px;padding:9px 11px;font-size:12px;margin:8px 0;}
-  .opt-c{border:1px solid var(--red);border-radius:8px;padding:9px 11px;margin:8px 0;font-size:12.5px;color:var(--red);font-weight:700;}
-  .before-list{font-size:12.5px;}.before-list li{margin-bottom:6px;}
+  .tag.blue{background:#DBEAFE;color:#1D4ED8;}
+  /* note/info box */
+  .note{background:#FFF7ED;border:1px solid #FDBA74;border-radius:8px;padding:8px 11px;font-size:12px;margin:6px 0;}
+  /* OPTION bar */
+  .opt-c{border:1px solid var(--red);border-radius:8px;padding:8px 11px;margin:8px 0;font-size:12.5px;color:var(--red);font-weight:700;}
+  /* before list */
+  .before-list{font-size:12.5px;margin:0;padding-left:18px;}.before-list li{margin-bottom:6px;}
   .x{color:#B3151D;font-weight:700;}.ok{color:#15803D;font-weight:700;}
+  /* divider ภายในกล่อง */
+  .div{border:none;border-top:1px dashed #E5E7EB;margin:8px 0;}
+  /* label + checkbox */
+  .chklabel{display:flex;align-items:center;gap:8px;font-size:13px;padding:4px 0;}
+  .chklabel input[type=checkbox]{width:20px;height:20px;accent-color:var(--red);flex-shrink:0;}
+  /* sub-section ภายในกล่อง เปิดพับ cascade */
+  .subbox{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:7px;margin:6px 0;overflow:hidden;}
+  .subbox .sbh{padding:7px 10px;font-size:12px;font-weight:700;color:#374151;cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:40px;user-select:none;}
+  .subbox .sbb{padding:4px 10px 8px;display:none;}
+  .subbox.open .sbb{display:block;}
+  .subbox .sbh .ar2{font-size:11px;color:#9CA3AF;transition:.2s;}
+  .subbox.open .sbh .ar2{transform:rotate(180deg);}
+  /* footer */
   .foot{margin-top:12px;font-size:10px;color:#9CA3AF;text-align:center;}
+  /* เดโม badge */
+  .demo-bar{background:#FEF9C3;border:1px solid #FDE047;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#854D0E;margin-bottom:8px;text-align:center;}
 </style>
 </head>
 <body>
 <div class="wrap">
-<h1>ดราฟ UX — ฟอร์มกรอก "หลังคา" (G3)</h1>
+<h1>ดราฟ UX — ฟอร์มกรอก "หลังคา" (G3) v2</h1>
 <div class="sub">กดสลับ Before/After · กดชิป/กล่องเล่นได้ · มือถือ · เครื่องคิดราคา JR · 11 มิ.ย. 2026</div>
 
 <div class="ba">
-  <button id="bBefore" onclick="show('before')">ก่อนแก้ (ปัญหา)</button>
-  <button id="bAfter" class="on" onclick="show('after')">หลังแก้ (ใหม่)</button>
+  <button id="bBefore" onclick="show('before')">ก่อนแก้ (v1)</button>
+  <button id="bAfter" class="on" onclick="show('after')">หลังแก้ (v2)</button>
 </div>
 
-<!-- BEFORE -->
+<!-- ====================== BEFORE ====================== -->
 <div id="before" style="display:none;">
 <div class="panel">
-<div style="font-weight:700;color:var(--red);margin-bottom:6px;">ปัญหาเดิม 4 จุด</div>
+<div style="font-weight:700;color:var(--red);margin-bottom:8px;">v1 — ปัญหา 5 จุด</div>
 <ul class="before-list">
-<li><span class="x">①</span> กล่อง <b>OPTION ทางเลือกลูกค้า</b> เขียน "เปลี่ยน<b>กระจก/มุ้ง/มือจับ</b>" — หลังคาไม่มีพวกนี้ ทำให้สับสน</li>
-<li><span class="x">②</span> <b>"ทำเป็นหลังคาเลื่อน"</b> ซ่อนอยู่ในกล่อง "อื่นๆ" ล่างสุด — เป็นออปชั่นสำคัญแต่หาไม่เจอ</li>
-<li><span class="x">③</span> หัวข้อ <b>"🚪 ชนิด / การเปิด (10)"</b> — หลังคาไม่มี "การเปิด" ชื่อไม่ตรงงาน + ช่องเรียงมั่ว</li>
-<li><span class="x">④</span> <b>ของเสริมหลังคา</b> (เสา/คาน/ซ่อนสโลป) ซ่อนใน details ซ้อนใน accordion = <b>ลึก 2 ชั้น</b> · กล่อง <b>"อื่นๆ (ครอบวงกบ/ดรอปพื้น)"</b> — ครอบวงกบเป็นของบาน ไม่เกี่ยวหลังคา</li>
+<li><span class="x">①</span> <b>ขนาดยาว/ยื่น</b> ไม่มีในฟอร์ม — หน้าจอเริ่มต้นที่ "สีวัสดุมุง" ทันที ไม่รู้ว่างานเท่าไหร่</li>
+<li><span class="x">②</span> กล่อง <b>"ปลายหลังคา/รางน้ำ"</b> ถ้าเลือก "มีรางน้ำ" รายการขยายออกมา 5 รายการ ≈ 180px ทันที — ยาวมาก กินหน้าจอ</li>
+<li><span class="x">③</span> กล่อง <b>"ของเสริมหลังคา"</b> มี hint ข้อความยาวบรรยายรายการ แต่ไม่มีช่องกรอกจริงในดราฟ → ไม่รู้มีอะไรซ่อน</li>
+<li><span class="x">④</span> <b>วัสดุมุง + แป + โครง</b> อยู่กล่องเดียวกัน 3 รายการ chips ล้นแถว เพราะ chip กว้าง</li>
+<li><span class="x">⑤</span> <b>หลังคาเลื่อน</b> (toggle เด่น) อยู่ <i>หลัง</i> กล่องรางน้ำ — สายตาไม่เจอเร็ว · stepper บานติดตาย/เลื่อนอยู่ถูกแล้วแต่ label ยาวเกิน</li>
 </ul>
 </div>
 </div>
 
-<!-- AFTER -->
+<!-- ====================== AFTER ====================== -->
 <div id="after">
+<div class="demo-bar">ดราฟเดโม — ราคา/ตัวเลขในฟอร์มนี้ไม่ใช่ค่าจริง</div>
 <div class="phone">
-<div style="font-size:12px;color:#6B7280;margin-bottom:4px;">แบบ: <b>หลังคา ไวนิล</b> · ยาว 6 × ยื่น 3.5 ม. <span class="tag new">คำหลังคา</span></div>
+<div style="font-size:12px;color:#6B7280;margin-bottom:6px;">แบบ: <b>หลังคา ไวนิล</b> <span class="tag blue">เดโม</span></div>
 
-<!-- 1: หลังคา/วัสดุ -->
-<div class="box open" id="b1"><div class="bh" onclick="tog('b1')"><span>🏠 หลังคา · วัสดุมุง · โครง <span class="tag new">เปลี่ยนชื่อ</span></span><span class="ar">▼</span></div>
-<div class="bb">
-<div class="fld"><div class="lab">สีวัสดุมุง</div><div class="chips"><span class="chip" onclick="pick(this)">สีเทา</span><span class="chip on" onclick="pick(this)">สีขาว</span><span class="chip" onclick="pick(this)">สีน้ำตาล</span></div></div>
-<div class="fld"><div class="lab">แป</div><div class="chips"><span class="chip" onclick="pick(this)">แปเดี่ยว</span><span class="chip on" onclick="pick(this)">แปคู่</span></div></div>
-<div class="fld"><div class="lab">โครงสร้าง</div><div class="chips"><span class="chip on" onclick="pick(this)">โครงอลูมิเนียม</span><span class="chip" onclick="pick(this)">โครงเหล็กชุบซิงค์</span></div></div>
-</div></div>
-
-<!-- 2: ปลายหลังคา/รางน้ำ -->
-<div class="box open" id="b2"><div class="bh" onclick="tog('b2')"><span>🌧️ ปลายหลังคา · รางน้ำ</span><span class="ar">▼</span></div>
-<div class="bb">
-<div class="fld"><div class="lab">ปลายหลังคา</div><div class="chips"><span class="chip" onclick="pickEnd(this,0)">ปล่อย (ไม่มีราง)</span><span class="chip on" onclick="pickEnd(this,1)">มีรางน้ำ</span></div></div>
-<div class="reveal show" id="gut">
-<div class="fld"><div class="lab">ชนิดราง (คิดราคา/ม.)</div><div class="chips"><span class="chip on" onclick="pick(this)">อลู S 1,000</span><span class="chip" onclick="pick(this)">สแตน M 2,000</span><span class="chip" onclick="pick(this)">สแตน L 3,000</span></div></div>
-<div class="fld row"><span class="lab" style="margin:0">ความยาวราง (ฝั่งยาว)</span><input type="number" value="6" style="width:70px"> ม. <span class="hint">(ว่าง=ใช้ด้านยาว)</span></div>
-<div class="fld"><div class="lab">ระบบระบาย</div><div class="chips"><span class="chip on" onclick="pick(this)">ท่อ</span><span class="chip" onclick="pick(this)">โซ่</span></div></div>
-<div class="fld"><div class="lab">ท่อน้ำทิ้ง PVC 2.5″</div><div class="chips"><span class="chip on" onclick="pick(this)">สีดำ</span><span class="chip" onclick="pick(this)">ขาว</span><span class="chip" onclick="pick(this)">เทา</span></div></div>
-<div class="fld"><label style="display:flex;align-items:center;gap:8px;font-size:13px;"><input type="checkbox" checked style="width:20px;height:20px"> ตะแกรงพลาสติกกันใบไม้ สีดำ (รวมในราคา)</label></div>
-</div></div></div>
-
-<!-- 3: หลังคาเลื่อน เด่น -->
-<div class="slide on" id="sl"><div class="sh" onclick="togSlide()"><span class="tg"></span><span>⬅️➡️ ทำเป็นหลังคาเลื่อน <span class="tag new">ย้ายขึ้น · เด่น</span></span></div>
-<div class="sb">
-<div class="fld"><div class="lab">ชนิดเลื่อน (เลือกอย่างเดียว · ราคาเท่ากัน) <span class="tag new">ใหม่</span></div><div class="chips"><span class="chip on" onclick="pick(this)">เลื่อนยื่น</span><span class="chip" onclick="pick(this)">เลื่อนข้าง</span></div></div>
-<div class="fld"><div class="cnt">
-<div><div class="lab">จำนวนบานเลื่อน <span class="tag new">กด/กรอก</span></div><span class="step"><button type="button" onclick="stp(this,-1)">−</button><input type="number" value="4"><button type="button" onclick="stp(this,1)">+</button></span></div>
-<div><div class="lab">จำนวนบานติดตาย <span class="tag new">ใหม่</span></div><span class="step"><button type="button" onclick="stp(this,-1)">−</button><input type="number" value="1"><button type="button" onclick="stp(this,1)">+</button></span></div>
-</div></div>
-<div class="fld"><div class="lab">พื้นที่เลื่อน <span class="tag new">ยาว × ยื่น</span></div><div class="row"><span>ยาว</span><input type="number" value="3.0" style="width:70px"><span>×</span><span>ยื่น</span><input type="number" value="2.5" style="width:70px"><span>ม.</span></div></div>
-<div class="fld row"><span class="lab" style="margin:0">มอเตอร์</span><input type="number" value="1" style="width:60px"> ตัว <span class="hint">(ราคาออโต้ตามพื้นที่เลื่อน)</span></div>
-</div></div>
-
-<!-- 4: ของเสริมหลังคา ไม่ซ่อนลึก -->
-<div class="box" id="b4"><div class="bh" onclick="tog('b4')"><span>🔩 ของเสริมหลังคา (เสา/คาน/ซ่อนสโลป) <span class="tag new">ดึงออกมา 1 ชั้น</span></span><span class="ar">▼</span></div>
-<div class="bb">
-<div class="fld row"><span class="lab" style="margin:0">เสาแผง</span><input type="number" value="0" style="width:55px"> ต้น <span class="hint">×4,000</span></div>
-<div class="fld row"><span class="lab" style="margin:0">คานเหล็กถัก</span><div class="chips"><span class="chip on" onclick="pick(this)">ไม่มี</span><span class="chip" onclick="pick(this)">รุ่น1</span><span class="chip" onclick="pick(this)">รุ่น2</span><span class="chip" onclick="pick(this)">รุ่น3</span></div></div>
-<div class="fld row"><span class="lab" style="margin:0">ซ่อนสโลป</span><div class="chips"><span class="chip on" onclick="pick(this)">ไม่มี</span><span class="chip" onclick="pick(this)">คอมโพสิต</span><span class="chip" onclick="pick(this)">สมาร์ทบอร์ด</span></div></div>
-<div class="hint" style="margin-top:4px;">+ โซ่รางน้ำ · ปิดปลายกันน้ำ · ครอบท่อ PVC · วัสดุปิดรอยต่อ · เพลทเหล็ก · เหล็กดึง</div>
-</div></div>
-
-<!-- 5: หลังคาผสม -->
-<div class="box" id="b5"><div class="bh" onclick="tog('b5')"><span>➕ ต่อปลายวัสดุที่ 2 (หลังคาผสม)</span><span class="ar">▼</span></div>
-<div class="bb"><div class="hint">เลือกหลังคาอีกชนิด + พื้นที่ส่วนที่ 2 (คิด ตร.ม.แยก)</div></div></div>
-
-<!-- 6: หมายเหตุ/งานเสริม (เปลี่ยนชื่อ) -->
-<div class="box" id="b6"><div class="bh" onclick="tog('b6')"><span>📝 หมายเหตุ / งานเสริม <span class="tag new">เปลี่ยนชื่อ</span></span><span class="ar">▼</span></div>
-<div class="bb">
-<div class="hint">งานเสริม/วิศวกรรม (ระบุถ้ามี) · รื้อของเดิม · ฯลฯ <br><s style="color:#aaa">เดิม: "ครอบวงกบ/ดรอปพื้น" (ของบาน ไม่เกี่ยวหลังคา)</s></div>
-</div></div>
-
-<!-- OPTION (context หลังคา) -->
-<div class="opt-c">▶ + OPTION ทางเลือกลูกค้า (เปลี่ยน<u>สี/วัสดุมุง/หลังคา</u> · คิดราคาให้) <span class="tag new">ตัด กระจก/มุ้ง/มือจับ ออก</span></div>
-
-</div>
+<!-- =============== กล่อง 1: ขนาด (เปิดเสมอ บนสุด) =============== -->
+<div class="box open" id="b1">
+  <div class="bh" onclick="tog('b1')">
+    <span>ขนาดหลังคา <span class="tag new">บนสุด ใหม่</span></span>
+    <span class="ar">▼</span>
+  </div>
+  <div class="bb">
+    <div class="fld">
+      <div class="row">
+        <span class="lab" style="margin:0;min-width:28px;">ยาว</span>
+        <input type="number" value="6.0" style="width:76px;">
+        <span>×</span>
+        <span class="lab" style="margin:0;min-width:28px;">ยื่น</span>
+        <input type="number" value="3.5" style="width:76px;">
+        <span>ม.</span>
+      </div>
+      <div class="hint" style="margin-top:3px;">ยาว = ด้านขนานบ้าน · ยื่น = ระยะยื่นออก · รางอยู่ฝั่งยาว</div>
+    </div>
+  </div>
 </div>
 
-<div class="foot">ดราฟ UX · ไม่กระทบราคา/ใบ (เปลี่ยนแค่หน้าตา) · สเปกแก้จริงส่ง dev แยก</div>
+<!-- =============== กล่อง 2: วัสดุมุง + สี + โครง (เปิด) =============== -->
+<div class="box open" id="b2">
+  <div class="bh" onclick="tog('b2')">
+    <span>วัสดุมุง · สี · โครง</span>
+    <span class="ar">▼</span>
+  </div>
+  <div class="bb">
+    <!-- สีวัสดุมุง -->
+    <div class="fld">
+      <div class="lab">สีวัสดุมุง</div>
+      <div class="chips">
+        <span class="chip" onclick="pick(this)">สีเทา</span>
+        <span class="chip on" onclick="pick(this)">สีขาว</span>
+        <span class="chip" onclick="pick(this)">สีน้ำตาล</span>
+      </div>
+    </div>
+    <hr class="div">
+    <!-- แป + โครง รวมแถว -->
+    <div class="grid2">
+      <div class="fld">
+        <div class="lab">แป</div>
+        <div class="chips">
+          <span class="chip" onclick="pick(this)">เดี่ยว</span>
+          <span class="chip on" onclick="pick(this)">คู่</span>
+        </div>
+      </div>
+      <div class="fld">
+        <div class="lab">โครง</div>
+        <div class="chips" style="flex-direction:column;gap:4px;">
+          <span class="chip on" onclick="pick(this)">อลูมิเนียม</span>
+          <span class="chip" onclick="pick(this)">เหล็กชุบซิงค์</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- =============== กล่อง 3: หลังคาเลื่อน (เด่น สีฟ้า) =============== -->
+<div class="slide" id="sl">
+  <div class="sh" onclick="togSlide()">
+    <span class="tg"></span>
+    <span>ทำเป็นหลังคาเลื่อน <span class="tag blue">ออปชั่นเด่น</span></span>
+  </div>
+  <div class="sb">
+    <div class="fld">
+      <div class="lab">ชนิดเลื่อน <span class="hint">(ราคาเท่ากัน)</span></div>
+      <div class="chips">
+        <span class="chip on" onclick="pick(this)">เลื่อนยื่น</span>
+        <span class="chip" onclick="pick(this)">เลื่อนข้าง</span>
+      </div>
+    </div>
+    <div class="fld">
+      <div class="cnt">
+        <div>
+          <div class="lab">บานเลื่อน</div>
+          <span class="step">
+            <button type="button" onclick="stp(this,-1)">−</button>
+            <input type="number" value="4">
+            <button type="button" onclick="stp(this,1)">+</button>
+          </span>
+        </div>
+        <div>
+          <div class="lab">บานติดตาย</div>
+          <span class="step">
+            <button type="button" onclick="stp(this,-1)">−</button>
+            <input type="number" value="1">
+            <button type="button" onclick="stp(this,1)">+</button>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="fld">
+      <div class="lab">พื้นที่เลื่อน (ยาว × ยื่น)</div>
+      <div class="row">
+        <span>ยาว</span><input type="number" value="3.0" style="width:70px;">
+        <span>×</span>
+        <span>ยื่น</span><input type="number" value="2.5" style="width:70px;">
+        <span>ม.</span>
+      </div>
+    </div>
+    <div class="fld row">
+      <span class="lab" style="margin:0;">มอเตอร์</span>
+      <input type="number" value="1" style="width:58px;"> ตัว
+      <span class="hint">(auto ตามพื้นที่)</span>
+    </div>
+  </div>
+</div>
+
+<!-- =============== กล่อง 4: ปลายหลังคา / รางน้ำ (เปิด) =============== -->
+<div class="box open" id="b4">
+  <div class="bh" onclick="tog('b4')">
+    <span>ปลายหลังคา · รางน้ำ</span>
+    <span class="ar">▼</span>
+  </div>
+  <div class="bb">
+    <!-- ปลายหลังคา chip 2 ตัว -->
+    <div class="fld">
+      <div class="lab">ปลายหลังคา</div>
+      <div class="chips">
+        <span class="chip on" onclick="pickEnd(this,0)">ปล่อย (ไม่มีราง)</span>
+        <span class="chip" onclick="pickEnd(this,1)">มีรางน้ำ</span>
+      </div>
+    </div>
+
+    <!-- รายละเอียดรางน้ำ — ซ่อนเริ่มต้น โชว์เมื่อเลือก "มีรางน้ำ" -->
+    <div class="reveal" id="gut">
+      <hr class="div">
+      <!-- ชนิดราง -->
+      <div class="fld">
+        <div class="lab">ชนิดราง <span class="hint">(คิด/ม.)</span></div>
+        <div class="chips">
+          <span class="chip on" onclick="pick(this)">อลู S 1,000</span>
+          <span class="chip" onclick="pick(this)">สแตน M 2,000</span>
+          <span class="chip" onclick="pick(this)">สแตน L 3,000</span>
+        </div>
+      </div>
+      <!-- ยาวราง + ระบบระบาย รวมแถวเดียว -->
+      <div class="fld row" style="gap:8px 14px;">
+        <span class="lab" style="margin:0;">ยาวราง (ฝั่งยาว)</span>
+        <input type="number" value="6" style="width:68px;"> ม.
+        <span class="hint">(ว่าง=ใช้ด้านยาว)</span>
+      </div>
+      <!-- subbox ระบบระบาย — พับเริ่มต้น (ไม่ค่อยเปลี่ยน) -->
+      <div class="subbox" id="sb-drain">
+        <div class="sbh" onclick="togSub('sb-drain')">
+          <span>รายละเอียดการระบาย <span class="hint">(ท่อ/โซ่/สี)</span></span>
+          <span class="ar2">▼</span>
+        </div>
+        <div class="sbb">
+          <div class="fld">
+            <div class="lab">ระบบระบาย</div>
+            <div class="chips">
+              <span class="chip on" onclick="pickDrain(this,'pipe')">ท่อ</span>
+              <span class="chip" onclick="pickDrain(this,'chain')">โซ่</span>
+            </div>
+          </div>
+          <div class="reveal show" id="pipe-opts">
+            <div class="fld">
+              <div class="lab">สีท่อ PVC 2.5″</div>
+              <div class="chips">
+                <span class="chip on" onclick="pick(this)">ดำ</span>
+                <span class="chip" onclick="pick(this)">ขาว</span>
+                <span class="chip" onclick="pick(this)">เทา</span>
+              </div>
+            </div>
+          </div>
+          <div class="reveal" id="chain-opts">
+            <div class="fld">
+              <div class="lab">ลายโซ่</div>
+              <div class="chips">
+                <span class="chip on" onclick="pick(this)">ทิวลิป</span>
+                <span class="chip" onclick="pick(this)">โลตัส</span>
+              </div>
+            </div>
+            <div class="fld">
+              <div class="lab">สีโซ่</div>
+              <div class="chips">
+                <span class="chip on" onclick="pick(this)">ขาว</span>
+                <span class="chip" onclick="pick(this)">น้ำตาล</span>
+              </div>
+            </div>
+          </div>
+          <div class="fld">
+            <label class="chklabel">
+              <input type="checkbox" checked>
+              <span>ตะแกรงกันใบไม้ สีดำ (รวมราคา)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============== กล่อง 5: ของเสริมหลังคา (พับ) =============== -->
+<div class="box" id="b5">
+  <div class="bh" onclick="tog('b5')">
+    <span>ของเสริมหลังคา <span class="tag">ปิดเริ่มต้น</span></span>
+    <span class="ar">▼</span>
+  </div>
+  <div class="bb">
+    <!-- คานเหล็กถัก -->
+    <div class="fld">
+      <div class="lab">คานเหล็กถัก</div>
+      <div class="chips">
+        <span class="chip on" onclick="pick(this)">ไม่มี</span>
+        <span class="chip" onclick="pick(this)">รุ่น1 2,400/ม.</span>
+        <span class="chip" onclick="pick(this)">รุ่น2 3,600/ม.</span>
+        <span class="chip" onclick="pick(this)">รุ่น3 4,400/ม.</span>
+      </div>
+    </div>
+    <!-- เสา 2 ชนิด รวมแถว -->
+    <div class="fld">
+      <div class="lab">เสา</div>
+      <div class="row" style="gap:6px 12px;">
+        <span style="font-size:12px;">แผง (4,000/ต้น)</span>
+        <span class="step">
+          <button type="button" onclick="stp(this,-1)">−</button>
+          <input type="number" value="0" style="width:46px;">
+          <button type="button" onclick="stp(this,1)">+</button>
+        </span>
+        <span style="font-size:12px;">4″×8″ (2,000/ต้น)</span>
+        <span class="step">
+          <button type="button" onclick="stp(this,-1)">−</button>
+          <input type="number" value="0" style="width:46px;">
+          <button type="button" onclick="stp(this,1)">+</button>
+        </span>
+      </div>
+    </div>
+    <!-- ซ่อนสโลป -->
+    <div class="fld">
+      <div class="lab">ซ่อนสโลป</div>
+      <div class="chips">
+        <span class="chip on" onclick="pick(this)">ไม่มี</span>
+        <span class="chip" onclick="pick(this)">คอมโพสิต 3,500/ตร.ม.</span>
+        <span class="chip" onclick="pick(this)">สมาร์ทบอร์ด 4,000/ตร.ม.</span>
+      </div>
+    </div>
+    <hr class="div">
+    <!-- รายการฟรี ลงใบ — ยุบเป็น subbox -->
+    <div class="subbox" id="sb-extras">
+      <div class="sbh" onclick="togSub('sb-extras')">
+        <span>รายการอื่น (ปิดปลาย/โซ่/ครอบท่อ/วัสดุปิดรอยต่อ)</span>
+        <span class="ar2">▼</span>
+      </div>
+      <div class="sbb">
+        <div class="fld row">
+          <span class="lab" style="margin:0;min-width:120px;">ปิดปลายกันน้ำ 1,000/ม.</span>
+          <input type="number" value="0" style="width:60px;"> ม.
+        </div>
+        <div class="fld row">
+          <span class="lab" style="margin:0;min-width:120px;">โซ่รางน้ำ 3,000/เส้น</span>
+          <span class="step">
+            <button type="button" onclick="stp(this,-1)">−</button>
+            <input type="number" value="0" style="width:46px;">
+            <button type="button" onclick="stp(this,1)">+</button>
+          </span>
+        </div>
+        <div class="fld row">
+          <span class="lab" style="margin:0;min-width:120px;">ครอบท่อ PVC 1,500/1.5ม.</span>
+          <input type="number" value="0" style="width:60px;"> ม.
+        </div>
+        <div class="fld">
+          <div class="lab">วัสดุปิดรอยต่อ</div>
+          <label class="chklabel">
+            <input type="checkbox">
+            <span>มี · สี:</span>
+          </label>
+          <div class="chips" style="margin-top:4px;">
+            <span class="chip on" onclick="pick(this)">ขาว</span>
+            <span class="chip" onclick="pick(this)">ดำ</span>
+            <span class="chip" onclick="pick(this)">เทา</span>
+          </div>
+        </div>
+        <div class="fld">
+          <label class="chklabel"><input type="checkbox"><span>เสริมเพลทเหล็กล่าง (ฟรี)</span></label>
+          <label class="chklabel"><input type="checkbox"><span>เหล็กดึงด้านบน (ฟรี)</span></label>
+        </div>
+        <div class="fld">
+          <div class="lab">ปิดซ่อนราง <span class="hint">(กรอกถ้ามี)</span></div>
+          <div class="row" style="gap:6px 8px;">
+            <span style="font-size:12px;">กว้าง</span><input type="number" value="0" style="width:52px;"> <span style="font-size:12px;">ซม.</span>
+            <span style="font-size:12px;">สูง</span><input type="number" value="10" style="width:52px;"> <span style="font-size:12px;">ซม.</span>
+            <span style="font-size:12px;">ยาว</span><input type="number" value="0" style="width:60px;"> <span style="font-size:12px;">ม.</span>
+          </div>
+        </div>
+        <div class="fld">
+          <div class="lab">ครอบคาน <span class="hint">(ลด 40%)</span></div>
+          <div class="row" style="gap:6px 8px;">
+            <span style="font-size:12px;">กว้างห่อ</span><input type="number" value="0" style="width:60px;"> <span style="font-size:12px;">ม.</span>
+            <span style="font-size:12px;">ยาวคาน</span><input type="number" value="0" style="width:60px;"> <span style="font-size:12px;">ม.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============== กล่อง 6: หลังคาผสม (พับ) =============== -->
+<div class="box" id="b6">
+  <div class="bh" onclick="tog('b6')">
+    <span>ต่อปลายวัสดุที่ 2 (หลังคาผสม) <span class="tag">ปิดเริ่มต้น</span></span>
+    <span class="ar">▼</span>
+  </div>
+  <div class="bb">
+    <div class="hint">เลือกหลังคาอีกชนิด + พื้นที่ส่วนที่ 2 (คิด ตร.ม.แยก)</div>
+  </div>
+</div>
+
+<!-- =============== กล่อง 7: หมายเหตุ/งานเสริม (พับ) =============== -->
+<div class="box" id="b7">
+  <div class="bh" onclick="tog('b7')">
+    <span>หมายเหตุ / งานเสริม <span class="tag">ปิดเริ่มต้น</span></span>
+    <span class="ar">▼</span>
+  </div>
+  <div class="bb">
+    <div class="hint">งานเสริม/วิศวกรรม (ระบุถ้ามี) · รื้อของเดิม · ฯลฯ</div>
+  </div>
+</div>
+
+<!-- OPTION bar (ปรับข้อความให้ตรงหลังคา) -->
+<div class="opt-c">+ OPTION ทางเลือกลูกค้า (เปลี่ยนสี / วัสดุมุง / หลังคา — คิดราคาให้)</div>
+
+</div><!-- end .phone -->
+</div><!-- end #after -->
+
+<!-- ====================== NOTE กล่องล่างสุด ====================== -->
+<div class="panel" style="margin-top:10px;font-size:12px;">
+  <div style="font-weight:700;color:var(--red);margin-bottom:6px;">v2 — จัดเรียงใหม่ (7 กล่อง)</div>
+  <ol style="margin:0;padding-left:18px;line-height:1.8;">
+    <li><b>ขนาด (ยาว×ยื่น)</b> — ขึ้นมาบนสุด <span class="ok">ใหม่</span> กรอกทุกงาน</li>
+    <li><b>วัสดุมุง+สี+โครง</b> — ยุบแป+โครงเป็น grid2 ชิดกัน ลดความสูง</li>
+    <li><b>หลังคาเลื่อน</b> — toggle เด่นสีฟ้า ขยับขึ้นมาหลังวัสดุ</li>
+    <li><b>ปลายหลังคา/รางน้ำ</b> — รายละเอียดการระบาย (ท่อ/โซ่/สี) ยุบใน subbox พับ · ลดจาก 5 ช่องโชว่เสมอ → 2 ช่อง + พับ</li>
+    <li><b>ของเสริมหลังคา</b> — <span style="color:var(--red);">พับเริ่มต้น</span> · รายการฟรีลงใบยุบใน subbox อีกชั้น</li>
+    <li><b>หลังคาผสม</b> — พับเริ่มต้น</li>
+    <li><b>หมายเหตุ/งานเสริม</b> — พับเริ่มต้น</li>
+  </ol>
+  <div style="margin-top:6px;color:#374151;"><b>ผลลัพธ์:</b> หน้าเริ่มต้น (กล่อง 1-4 เปิด + กล่อง 5-7 ปิด) สั้นลงประมาณ 35% · subbox "ระบบระบาย" ยุบช่วยอีก 80px ถ้าไม่เปลี่ยน</div>
+</div>
+
+<div class="foot">ดราฟ UX v2 · ไม่กระทบราคา/ใบ (เปลี่ยนแค่หน้าตา) · สเปกแก้จริงส่ง dev แยก</div>
+</div><!-- end .wrap -->
+
 <script>
-function show(m){document.getElementById('before').style.display=m==='before'?'block':'none';document.getElementById('after').style.display=m==='after'?'block':'none';document.getElementById('bBefore').classList.toggle('on',m==='before');document.getElementById('bAfter').classList.toggle('on',m==='after');}
+function show(m){
+  document.getElementById('before').style.display=m==='before'?'block':'none';
+  document.getElementById('after').style.display=m==='after'?'block':'none';
+  document.getElementById('bBefore').classList.toggle('on',m==='before');
+  document.getElementById('bAfter').classList.toggle('on',m==='after');
+}
 function tog(id){document.getElementById(id).classList.toggle('open');}
+function togSub(id){document.getElementById(id).classList.toggle('open');}
 function pick(el){[...el.parentElement.children].forEach(c=>c.classList.remove('on'));el.classList.add('on');}
-function pickEnd(el,i){pick(el);document.getElementById('gut').classList.toggle('show',i===1);}
+function pickEnd(el,i){
+  pick(el);
+  document.getElementById('gut').classList.toggle('show',i===1);
+}
+function pickDrain(el,type){
+  pick(el);
+  document.getElementById('pipe-opts').classList.toggle('show',type==='pipe');
+  document.getElementById('chain-opts').classList.toggle('show',type==='chain');
+}
 function togSlide(){document.getElementById('sl').classList.toggle('on');}
-function stp(b,d){var inp=b.parentElement.querySelector('input');var v=Math.max(0,(parseInt(inp.value)||0)+d);inp.value=v;}
+function stp(b,d){
+  var inp=b.parentElement.querySelector('input');
+  var v=Math.max(0,(parseInt(inp.value)||0)+d);
+  inp.value=v;
+}
 </script>
 </body>
 </html>
