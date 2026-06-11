@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ลองเล่น — เพิ่มส่วน (1 แตะ) + มุ้งเลือกจำนวนบาน</title>
+<style>
+:root{--red:#B3151D;--org:#E67E22;--ink:#1f2937;--mut:#6b7280;--line:#e5e7eb;--blue:#1E5AA8;}
+*{font-family:"Leelawadee UI","Tahoma",system-ui,sans-serif;box-sizing:border-box;}
+body{margin:0;background:#ececed;color:var(--ink);font-size:14px;padding:14px;}
+.wrap{max-width:400px;margin:0 auto;}
+h1{color:var(--red);font-size:18px;margin:0 0 2px;}
+.sub{color:var(--mut);font-size:12.5px;margin:0 0 12px;}
+.demo-banner{background:#fff3cd;border:1px solid #ffe69c;border-radius:7px;padding:7px 11px;font-size:12px;margin-bottom:12px;}
+.setbox{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px;box-shadow:0 1px 4px #0001;margin-bottom:13px;}
+.set-head{font-weight:700;color:var(--red);font-size:14px;margin-bottom:9px;}
+/* quickstrip — เห็นตลอด */
+.qs-label{font-size:12px;font-weight:800;color:var(--org);margin:2px 0 6px;display:flex;align-items:center;gap:5px;}
+.qs-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px;}
+.qs-chip{min-height:42px;padding:0 13px;display:flex;align-items:center;border:1.5px solid var(--org);border-radius:21px;background:#fff8f0;color:#9a4a00;font-size:13px;font-weight:600;cursor:pointer;transition:transform .08s;}
+.qs-chip:active{transform:scale(.94);}
+.qs-chip.flash{background:var(--org);color:#fff;}
+.addbtn{width:100%;background:var(--red);color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;}
+.addbtn:active{background:#8d1016;}
+/* การ์ดที่เพิ่ม */
+.parts{margin-top:11px;}
+.card{border:1px solid var(--line);border-radius:11px;padding:11px;margin-bottom:9px;background:#fcfcfc;position:relative;animation:pop .25s;}
+@keyframes pop{from{transform:scale(.96);opacity:.4;}to{transform:scale(1);opacity:1;}}
+.card.flash{box-shadow:0 0 0 3px #E67E2266;}
+.card .nm{font-weight:700;font-size:13.5px;color:var(--ink);}
+.card .meta{font-size:12px;color:var(--mut);margin-top:2px;}
+.del{position:absolute;top:9px;right:10px;color:var(--red);cursor:pointer;font-weight:700;font-size:15px;}
+/* มุ้ง box */
+.mosq{margin-top:9px;border-top:1px dashed var(--line);padding-top:9px;background:#EAF3FB;border-radius:9px;padding:9px;}
+.mosq .t{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px;}
+.pchips{display:flex;flex-wrap:wrap;gap:6px;}
+.pchip{min-width:42px;min-height:40px;padding:0 12px;display:flex;align-items:center;justify-content:center;border:1.5px solid #9DBCE0;border-radius:9px;background:#fff;color:#1E5AA8;font-size:14px;font-weight:600;cursor:pointer;}
+.pchip.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.mosq .hint{font-size:11px;color:var(--mut);margin-top:5px;}
+details{margin-top:7px;} summary{font-size:12px;color:var(--blue);cursor:pointer;}
+.sizerow{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12.5px;color:var(--mut);}
+.sizerow input{width:64px;height:38px;border:1.5px solid var(--line);border-radius:7px;text-align:center;font-size:14px;}
+.empty{color:#9ca3af;font-size:12.5px;text-align:center;padding:8px;}
+.foot{font-size:11.5px;color:var(--mut);text-align:center;margin-top:6px;}
+</style></head><body><div class="wrap">
+
+<h1>ลองเล่น — เพิ่มส่วน + มุ้งเลือกจำนวนบาน</h1>
+<p class="sub">กดเล่นเหมือนใช้จริง · ดูว่ากดแล้วเพิ่มทันทีไหม + มุ้งเลือกบานง่ายไหม</p>
+<div class="demo-banner">⚡ DEMO เล่นได้จริง · ราคาสมมติ · ลองกดทุกปุ่ม/ชิป</div>
+
+<div class="setbox">
+  <div class="set-head">ชุดที่ 1</div>
+
+  <!-- quickstrip เห็นตลอด -->
+  <div class="qs-label">⚡ ของใช้บ่อย <span style="font-weight:400;color:var(--mut);">— แตะเพิ่มได้เลย</span></div>
+  <div class="qs-chips" id="qs"></div>
+
+  <!-- ปุ่มเพิ่มส่วน = เพิ่มทันที -->
+  <button class="addbtn" onclick="addCard('ประตู/หน้าต่าง (เลือกแบบในการ์ด)', 4, true)">+ เพิ่มส่วน (งานบานทั่วไป)</button>
+
+  <div class="parts" id="parts"><div class="empty">ยังไม่มีรายการ — กดชิปด้านบน หรือ "+ เพิ่มส่วน"</div></div>
+  <div class="foot" id="count"></div>
+</div>
+
+<script>
+var CHIPS=[
+  {n:'กระจกติดตาย',g:'G1',mosq:false},
+  {n:'ลูกฟูก 1 ทาง',g:'G1',mosq:false},{n:'ลูกฟูก 2 ทาง',g:'G1',mosq:false},
+  {n:'คอมโพสิต 3 มม.',g:'G1',mosq:false},{n:'คอมโพสิต 4 มม.',g:'G1',mosq:false},
+  {n:'ISOWALL',g:'G3',mosq:false},{n:'ผนังเบาภายนอก',g:'G3',mosq:false},{n:'ผนังเบาภายใน',g:'G3',mosq:false}
+];
+var seq=0;
+// สร้าง quickstrip
+var qs=document.getElementById('qs');
+CHIPS.forEach(function(c){
+  var b=document.createElement('div'); b.className='qs-chip'; b.textContent=c.n;
+  b.onclick=function(){ flashChip(b); addCard(c.n+' ('+c.g+')', 0, false); };
+  qs.appendChild(b);
+});
+function flashChip(b){ b.classList.add('flash'); setTimeout(function(){b.classList.remove('flash');},220); }
+
+function addCard(name, panels, isDoor){
+  seq++;
+  var parts=document.getElementById('parts');
+  var empty=parts.querySelector('.empty'); if(empty)empty.remove();
+  var card=document.createElement('div'); card.className='card flash';
+  var mosqHtml='';
+  if(isDoor){
+    mosqHtml='<div class="mosq"><div class="t">🪟 มุ้ง — เลือกจำนวนบาน (ประตู '+panels+' บาน)</div>'
+      +'<div class="pchips" data-max="'+panels+'">'
+      +'<div class="pchip on" onclick="pickMosq(this)" data-v="auto">auto</div>'
+      + Array.from({length:panels},function(_,i){return '<div class="pchip" onclick="pickMosq(this)" data-v="'+(i+1)+'">'+(i+1)+'</div>';}).join('')
+      +'</div>'
+      +'<div class="hint" id="mh'+seq+'">auto = เท่าจำนวนบานประตู ('+panels+' บาน) · เลือกน้อยกว่าได้ถ้าใส่มุ้งบางบาน</div>'
+      +'<details><summary>บานไม่เท่ากัน? กรอกขนาดเอง</summary>'
+      +'<div class="sizerow">กว้าง <input placeholder="auto"> × ยาว <input placeholder="auto"> ม.</div></details>'
+      +'</div>';
+  }
+  card.innerHTML='<span class="del" onclick="this.parentNode.remove();updateCount();">✕</span>'
+    +'<div class="nm">'+name+'</div>'
+    +'<div class="meta">ส่วนที่ '+seq+' · กรอกขนาด/ออปชั่นต่อ…</div>'+mosqHtml;
+  parts.appendChild(card);
+  setTimeout(function(){card.classList.remove('flash');},400);
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+  updateCount();
+}
+function pickMosq(el){
+  var box=el.parentNode; box.querySelectorAll('.pchip').forEach(function(c){c.classList.remove('on');});
+  el.classList.add('on');
+  var hint=box.parentNode.querySelector('.hint');
+  var v=el.dataset.v, max=box.dataset.max;
+  hint.textContent = v==='auto' ? ('auto = เท่าจำนวนบานประตู ('+max+' บาน)') : ('ใส่มุ้ง '+v+' บาน (จาก '+max+' บาน) · ราคาคิด '+v+' บาน');
+}
+function updateCount(){
+  var n=document.querySelectorAll('#parts .card').length;
+  document.getElementById('count').textContent = n? ('รวม '+n+' รายการ') : '';
+  var parts=document.getElementById('parts');
+  if(!n && !parts.querySelector('.empty')){ var e=document.createElement('div'); e.className='empty'; e.textContent='ยังไม่มีรายการ — กดชิปด้านบน หรือ "+ เพิ่มส่วน"'; parts.appendChild(e); }
+}
+</script>
+</div></body></html>
