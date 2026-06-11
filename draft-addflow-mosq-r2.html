@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DRAFT UX — เพิ่มส่วน + มุ้งบาน [DEMO]</title>
+<style>
+:root{--red:#B3151D;--red2:#8E0F15;--blue:#1565C0;--bg:#F5F5F5;--line:#E5E7EB;--card:#fff;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Sarabun',sans-serif;}
+body{background:#F0F0F0;padding:12px;font-size:15px;}
+
+/* ── page header ── */
+.page-header{background:var(--red);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+.page-header h1{font-size:18px;font-weight:800;margin-bottom:2px;}
+.page-header p{font-size:12px;opacity:.85;}
+.demo-badge{display:inline-block;background:#FFD600;color:#222;font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px;margin-left:8px;letter-spacing:.5px;}
+
+/* ── tab switcher ── */
+.tabs{display:flex;gap:6px;margin-bottom:14px;}
+.tab{flex:1;padding:10px 6px;border:2px solid var(--red);border-radius:8px;background:#fff;color:var(--red);font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;}
+.tab.on{background:var(--red);color:#fff;}
+
+/* ── section card ── */
+.section{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid var(--line);}
+.section-head{font-weight:800;font-size:15px;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.label-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.tag-before{background:#FFCDD2;color:#B71C1C;}
+.tag-after{background:#C8E6C9;color:#1B5E20;}
+.divider{border:none;border-top:1px dashed var(--line);margin:14px 0;}
+.note{font-size:11px;color:#888;margin-top:6px;line-height:1.5;}
+
+/* ── set box (simulated) ── */
+.setbox{background:#FAFAFA;border:1px solid #E0E0E0;border-radius:10px;padding:12px;margin-bottom:10px;}
+.set-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.set-badge{background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.set-name-fake{flex:1;height:36px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:13px;display:flex;align-items:center;color:#888;}
+
+/* ── BEFORE: toggle panel ── */
+.btn-add-old{min-height:44px;padding:0 18px;border:2px solid var(--red);border-radius:9px;background:#fff;color:var(--red);font-size:14px;font-weight:700;cursor:pointer;width:100%;}
+.addsec-panel-old{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 10px;background:#FAFAFA;}
+.chip-old{min-height:44px;padding:0 14px;border:1px solid #CBD5E1;border-radius:22px;background:#fff;cursor:pointer;font-size:13px;color:#374151;}
+.chip-old:active,.chip-old.on{background:var(--red);color:#fff;border-color:var(--red);}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+.general-btn-old{width:100%;min-height:44px;border:1.5px solid var(--red);border-radius:9px;background:#fff;color:var(--red);font-size:14px;font-weight:600;cursor:pointer;}
+
+/* ── AFTER: persistent strip + immediate add ── */
+.quickstrip{background:#FFF3E0;border:1.5px solid #FFB300;border-radius:10px;padding:10px 12px;margin-bottom:8px;}
+.quickstrip-head{font-size:12px;font-weight:700;color:#E65100;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.quickstrip-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip-quick{min-height:44px;padding:0 14px;border:1.5px solid #FFB300;border-radius:22px;background:#fff;cursor:pointer;font-size:13px;color:#374151;transition:all .12s;}
+.chip-quick:hover{background:#FFB300;color:#222;}
+.chip-quick:active{background:#E65100;color:#fff;border-color:#E65100;}
+.btn-add-new{min-height:44px;padding:0 18px;border:2px solid var(--red);border-radius:9px;background:var(--red);color:#fff;font-size:14px;font-weight:700;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-add-new:active{background:var(--red2);}
+
+/* ── CH card (simulated result) ── */
+.ch-card{background:#E8F5E9;border:1.5px solid #66BB6A;border-radius:9px;padding:10px 12px;margin-top:8px;display:flex;align-items:center;gap:8px;animation:popIn .2s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.ch-card-icon{font-size:18px;}
+.ch-card-name{font-size:13px;font-weight:700;color:#1B5E20;}
+.ch-card-sub{font-size:11px;color:#388E3C;}
+.ch-del{margin-left:auto;color:#E53935;background:none;border:none;font-size:18px;cursor:pointer;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;}
+
+/* ── Mosquito section ── */
+.mosq-box{background:#E3F2FD;border:1.5px solid #90CAF9;border-radius:10px;padding:12px;margin-top:8px;}
+.mosq-head{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px;}
+.mosq-select{height:44px;width:100%;border:1px solid #90CAF9;border-radius:8px;font-size:13px;padding:0 10px;background:#fff;margin-bottom:10px;}
+
+/* ── BEFORE mosq: raw inputs ── */
+.mosq-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px;}
+.mosq-label{font-size:12px;color:#555;white-space:nowrap;}
+.mosq-num{width:60px;height:40px;border:1px solid #B0BEC5;border-radius:6px;text-align:center;font-size:14px;}
+.mosq-placeholder{font-size:11px;color:#999;}
+
+/* ── AFTER mosq: chip bar ── */
+.panel-chips-bar{margin-bottom:10px;}
+.panel-chips-bar .bar-head{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.panel-chips-bar .bar-hint{font-size:11px;color:#888;font-weight:400;}
+.panel-chip-wrap{display:flex;gap:6px;flex-wrap:wrap;}
+.panel-chip{min-height:44px;min-width:44px;padding:0 14px;border:2px solid #90CAF9;border-radius:10px;background:#fff;cursor:pointer;font-size:15px;font-weight:700;color:var(--blue);transition:all .12s;position:relative;}
+.panel-chip.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.panel-chip:hover:not(.on){background:#E3F2FD;}
+.panel-chip .chip-auto-tag{display:block;font-size:9px;font-weight:400;color:#90CAF9;line-height:1.2;}
+.panel-chip.on .chip-auto-tag{color:rgba(255,255,255,.7);}
+
+.fallback-input{display:none;align-items:center;gap:6px;margin-top:6px;padding:8px;background:#FFF3E0;border-radius:8px;font-size:12px;color:#E65100;}
+.fallback-input.show{display:flex;}
+
+.detail-toggle{font-size:12px;color:var(--blue);cursor:pointer;text-decoration:underline;margin-top:6px;display:block;}
+.custom-size-block{display:none;margin-top:8px;padding:8px;background:#fff;border:1px dashed #90CAF9;border-radius:8px;}
+.custom-size-block.show{display:block;}
+.custom-size-label{font-size:12px;color:#555;margin-bottom:6px;}
+.custom-size-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+/* ── price display ── */
+.price-box{background:#E8F5E9;border:1.5px solid #4CAF50;border-radius:8px;padding:8px 12px;margin-top:10px;font-size:13px;font-weight:700;color:#1B5E20;display:none;}
+.price-box.show{display:block;}
+.price-change{animation:priceFlash .4s ease;}
+@keyframes priceFlash{0%{background:#C8E6C9}50%{background:#A5D6A7}100%{background:#E8F5E9}}
+
+/* ── comparison layout ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:600px){.compare-grid{grid-template-columns:1fr;}}
+
+/* ── UX annotation ── */
+.ux-note{font-size:11px;color:#1565C0;background:#E3F2FD;border-radius:6px;padding:4px 8px;margin-top:6px;line-height:1.5;}
+.ux-problem{font-size:11px;color:#B71C1C;background:#FFEBEE;border-radius:6px;padding:4px 8px;margin-top:6px;line-height:1.5;}
+.ux-fix{font-size:11px;color:#1B5E20;background:#E8F5E9;border-radius:6px;padding:4px 8px;margin-top:6px;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>DRAFT UX — เพิ่มส่วน + มุ้งบาน <span class="demo-badge">DEMO</span></h1>
+  <p>2 เรื่อง · ราคาในดราฟนี้เป็นสาธิตเท่านั้น ไม่ใช่ราคาจริง · 2026-06-11</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="showTab('t1',this)">เรื่อง 1: + เพิ่มส่วน</button>
+  <button class="tab" onclick="showTab('t2',this)">เรื่อง 2: มุ้งจำนวนบาน</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 1: + เพิ่มส่วน
+════════════════════════════════════════════ -->
+<div id="t1">
+
+  <div class="section">
+    <div class="section-head">เรื่อง 1: กด "+ เพิ่มส่วน" แล้วรู้สึกอะไร?</div>
+    <div class="ux-problem">ปัญหา: กดปุ่ม "เพิ่มส่วน" แล้ว panel โผล่ ต้องกดชิป/ปุ่มต่ออีกที → รู้สึกว่า "กดแล้วไม่เพิ่ม" · toggle ด้วย กดซ้ำ=หาย ยิ่งงง</div>
+    <div class="ux-fix">แนวทาง: (ก) "เพิ่มส่วน" = เพิ่มงานบานทั่วไปทันที + ชิปด่วนเห็นตลอด (persistent strip) กดชิป=เพิ่มเฉพาะรายการนั้น · ไม่มี toggle ไม่มี panel ซ่อน</div>
+  </div>
+
+  <div class="compare-grid">
+    <!-- BEFORE -->
+    <div class="section">
+      <div class="section-head"><span class="label-tag tag-before">BEFORE</span> ระบบเดิม</div>
+      <div class="setbox">
+        <div class="set-head">
+          <span class="set-badge">ชุด</span>
+          <div class="set-name-fake">ห้องนอน 1</div>
+        </div>
+        <div id="before-parts"></div>
+        <div style="margin-top:8px;">
+          <button class="btn-add-old" onclick="beforeToggle(this)">+ เพิ่มส่วน</button>
+        </div>
+        <div id="before-panel" style="display:none;" class="addsec-panel-old">
+          <div style="font-size:12px;font-weight:700;color:#E65100;margin-bottom:7px;">⚡ ของใช้บ่อย — แตะเพิ่มได้เลย</div>
+          <div class="chips-wrap">
+            <button class="chip-old" onclick="beforeAddChip(this,'กระจกติดตาย')">กระจกติดตาย</button>
+            <button class="chip-old" onclick="beforeAddChip(this,'ลูกฟูก 1 ทาง')">ลูกฟูก 1 ทาง</button>
+            <button class="chip-old" onclick="beforeAddChip(this,'คอมโพสิต 3 มม.')">คอมโพสิต 3 มม.</button>
+            <button class="chip-old" onclick="beforeAddChip(this,'ISOWALL')">ISOWALL</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin:8px 0;color:#9CA3AF;font-size:11px;"><span style="flex:1;height:1px;background:#E5E7EB;"></span>หรือ<span style="flex:1;height:1px;background:#E5E7EB;"></span></div>
+          <button class="general-btn-old" onclick="beforeAddGeneral()">🚪 งานบานทั่วไป (เลือกกลุ่ม → แบบ)</button>
+        </div>
+      </div>
+      <div class="ux-problem">friction: กด "เพิ่ม" → โผล่เมนู → กดอีกทีถึงเพิ่ม (2 tap) · toggle สับสน · ชิปหายทุกครั้งหลังเลือก</div>
+    </div>
+
+    <!-- AFTER -->
+    <div class="section">
+      <div class="section-head"><span class="label-tag tag-after">AFTER</span> ดีไซน์ใหม่</div>
+      <div class="setbox">
+        <div class="set-head">
+          <span class="set-badge">ชุด</span>
+          <div class="set-name-fake">ห้องนอน 1</div>
+        </div>
+
+        <!-- Persistent quick strip — เห็นตลอด -->
+        <div class="quickstrip">
+          <div class="quickstrip-head">
+            ⚡ เพิ่มด่วน
+            <span style="font-weight:400;font-size:11px;color:#8D6E63;">กดชิปเพิ่มทันที</span>
+          </div>
+          <div class="quickstrip-chips">
+            <button class="chip-quick" onclick="afterAddChip('กระจกติดตาย','ติดตาย')">กระจกติดตาย</button>
+            <button class="chip-quick" onclick="afterAddChip('ลูกฟูก 1 ทาง','ลูกฟูกทึบ')">ลูกฟูก 1 ทาง</button>
+            <button class="chip-quick" onclick="afterAddChip('คอมโพสิต 3 มม.','ลูกฟูกทึบ')">คอมโพสิต 3 มม.</button>
+            <button class="chip-quick" onclick="afterAddChip('ISOWALL','ฝ้า-ผนัง')">ISOWALL</button>
+            <button class="chip-quick" onclick="afterAddChip('ผนังเบาภายนอก','ฝ้า-ผนัง')">ผนังเบาภายนอก</button>
+          </div>
+        </div>
+
+        <!-- Parts area -->
+        <div id="after-parts"></div>
+
+        <!-- ปุ่มหลัก: กดแล้วเพิ่มทันที (ไม่มี toggle) -->
+        <button class="btn-add-new" onclick="afterAddGeneral()">
+          <span style="font-size:20px;">＋</span> เพิ่มส่วน (งานบานทั่วไป)
+        </button>
+      </div>
+      <div class="ux-fix">1 tap = เพิ่มทันที · ชิปด่วนเห็นตลอด ไม่หาย · ปุ่ม "เพิ่มส่วน" ทำตามชื่อ · ไม่มี toggle</div>
+    </div>
+  </div>
+
+  <!-- step-by-step flow -->
+  <div class="section">
+    <div class="section-head">Flow เปรียบเทียบ (tap count)</div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="background:#FFCDD2;">
+          <th style="padding:8px;text-align:left;border:1px solid #E5E7EB;">เป้าหมาย</th>
+          <th style="padding:8px;text-align:center;border:1px solid #E5E7EB;">BEFORE (tap)</th>
+          <th style="padding:8px;text-align:center;border:1px solid #E5E7EB;">AFTER (tap)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px;border:1px solid #E5E7EB;">เพิ่มงานบานทั่วไป</td>
+          <td style="padding:8px;text-align:center;border:1px solid #E5E7EB;color:#B71C1C;font-weight:700;">2 tap (เพิ่ม → ปุ่มทั่วไป)</td>
+          <td style="padding:8px;text-align:center;border:1px solid #E5E7EB;color:#1B5E20;font-weight:700;">1 tap</td>
+        </tr>
+        <tr style="background:#F9F9F9;">
+          <td style="padding:8px;border:1px solid #E5E7EB;">เพิ่มกระจกติดตาย (ของบ่อย)</td>
+          <td style="padding:8px;text-align:center;border:1px solid #E5E7EB;color:#B71C1C;font-weight:700;">2 tap (เพิ่ม → ชิป)</td>
+          <td style="padding:8px;text-align:center;border:1px solid #E5E7EB;color:#1B5E20;font-weight:700;">1 tap (ชิปเห็นตลอด)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px;border:1px solid #E5E7EB;">เพิ่มครั้งที่ 2 (ของบ่อยตัวเดิม)</td>
+          <td style="padding:8px;text-align:center;border:1px solid #E5E7EB;color:#B71C1C;font-weight:700;">3 tap (toggle เปิด → ชิป)</td>
+          <td style="padding:8px;text-align:center;border:1px solid #E5E7EB;color:#1B5E20;font-weight:700;">1 tap</td>
+        </tr>
+        <tr style="background:#F9F9F9;">
+          <td style="padding:8px;border:1px solid #E5E7EB;">กด "เพิ่ม" ซ้ำโดยไม่ตั้งใจ</td>
+          <td style="padding:8px;text-align:center;border:1px solid #E5E7EB;color:#B71C1C;">panel หาย (toggle) = งง</td>
+          <td style="padding:8px;text-align:center;border:1px solid #E5E7EB;color:#1B5E20;">เพิ่มอีก 1 การ์ด = คาดเดาได้</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /t1 -->
+
+<!-- ═══════════════════════════════════════════
+     TAB 2: มุ้งจำนวนบาน
+════════════════════════════════════════════ -->
+<div id="t2" style="display:none;">
+
+  <div class="section">
+    <div class="section-head">เรื่อง 2: กรอกมุ้ง — เลือกจำนวนบานง่ายกว่าพิมพ์ตัวเลข</div>
+    <div class="ux-problem">ปัญหา: `.o-mosqpanels` เป็น number input เล็ก ต้องพิมพ์ตัวเลข · เซลล์ไม่รู้ว่าพิมพ์เท่าไร เพราะไม่รู้ว่าบานมีกี่บาน</div>
+    <div class="ux-fix">แนวทาง: เพิ่มชิปจำนวนบาน (1,2,…,N โดย N=i-panels) ไว้ก่อน number input · กดชิป=set .o-mosqpanels + fire change · N&gt;5 → ซ่อนชิป fallback stepper · ช่องขนาด (กว้าง×ยาว) ยังอยู่ พับ default</div>
+  </div>
+
+  <!-- simulator: เลือกจำนวนบานประตู -->
+  <div class="section">
+    <div class="section-head" style="font-size:14px;">ทดลอง: เลือกจำนวนบานประตู (i-panels)</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-size:13px;">บานเลื่อน ยูโร — จำนวนบาน:</span>
+      <div style="display:flex;gap:6px;">
+        <button class="panel-chip" id="ip2" onclick="setIPanels(2)">2<span class="chip-auto-tag">บาน</span></button>
+        <button class="panel-chip on" id="ip4" onclick="setIPanels(4)">4<span class="chip-auto-tag">บาน</span></button>
+        <button class="panel-chip" id="ip6" onclick="setIPanels(6)">6<span class="chip-auto-tag">บาน</span></button>
+        <button class="panel-chip" id="ip8" onclick="setIPanels(8)">8<span class="chip-auto-tag">บาน</span></button>
+      </div>
+      <span id="ip-display" style="font-size:12px;color:#888;">i-panels = 4</span>
+    </div>
+  </div>
+
+  <div class="compare-grid">
+    <!-- BEFORE: raw inputs -->
+    <div class="section">
+      <div class="section-head"><span class="label-tag tag-before">BEFORE</span> ระบบเดิม</div>
+      <div class="mosq-box">
+        <div class="mosq-head">มุ้ง (ราคาคิดตามพื้นที่บาน)</div>
+        <select class="mosq-select">
+          <option>ไม่ใส่</option>
+          <option selected>มุ้งจีบ SD พื้นฐาน (2,500/ตร.ม. min 3,500)</option>
+          <option>มุ้งเฟรมเล็ก (คิดตามขนาดบาน)</option>
+        </select>
+        <div>
+          <div class="mosq-label" style="margin-bottom:6px;">ขนาดมุ้ง [เว้นว่าง=auto จากบาน]</div>
+          <div class="mosq-row">
+            <span class="mosq-label">กว้าง</span>
+            <input class="mosq-num" type="number" placeholder="ม.">
+            <span class="mosq-label">× ยาว</span>
+            <input class="mosq-num" type="number" placeholder="ม.">
+            <span class="mosq-label">· บาน</span>
+            <input class="mosq-num" type="number" placeholder="auto" id="before-mosq-panels">
+          </div>
+          <div class="note">บาน = เว้นว่าง→auto คำนวณจากช่องเปิด · กรอกเองได้</div>
+        </div>
+      </div>
+      <div class="ux-problem">friction: เซลล์ไม่รู้ว่าพิมพ์ "บาน" เท่าไร · ต้องจำว่าบานประตูมีกี่บาน · กล่อง 3 ช่องเรียงกัน อ่านยาก</div>
+    </div>
+
+    <!-- AFTER: chip bar -->
+    <div class="section">
+      <div class="section-head"><span class="label-tag tag-after">AFTER</span> ดีไซน์ใหม่</div>
+      <div class="mosq-box">
+        <div class="mosq-head">มุ้ง (ราคาคิดตามพื้นที่บาน)</div>
+        <select class="mosq-select" id="after-mosq-sel" onchange="afterMosqChange(this)">
+          <option value="">ไม่ใส่</option>
+          <option value="mj_sd" selected>มุ้งจีบ SD พื้นฐาน (2,500/ตร.ม. min 3,500)</option>
+          <option value="imp21">มุ้งเฟรมเล็ก (คิดตามขนาดบาน)</option>
+        </select>
+
+        <div id="after-mosq-detail" style="display:none;">
+          <!-- ชิปจำนวนบาน (วิธีหลัก) -->
+          <div class="panel-chips-bar" id="mosq-chip-bar">
+            <div class="bar-head">
+              จำนวนบานมุ้ง
+              <span class="bar-hint">— แตะเลือก · กระทบราคา</span>
+            </div>
+            <div class="panel-chip-wrap" id="mosq-panel-chips">
+              <!-- build by JS -->
+            </div>
+          </div>
+
+          <!-- fallback: N>5 → stepper -->
+          <div class="fallback-input" id="mosq-fallback">
+            <span>จำนวนบาน (กรอก):</span>
+            <input type="number" id="mosq-fallback-num" min="1" step="1" value="4"
+              style="width:60px;height:40px;border:1px solid #90CAF9;border-radius:6px;text-align:center;font-size:16px;"
+              oninput="afterUpdateMosq()">
+            <span style="font-size:11px;color:#888;">(บานมาก → กรอกเอง)</span>
+          </div>
+
+          <!-- ขนาดมุ้ง — พับ default (สำหรับบานไม่เท่ากัน) -->
+          <span class="detail-toggle" id="size-toggle" onclick="toggleCustomSize()">▶ กรอกขนาดมุ้งเอง (กรณีแต่ละบานไม่เท่ากัน)</span>
+          <div class="custom-size-block" id="custom-size-block">
+            <div class="custom-size-label" style="color:#0369A1;font-weight:700;margin-bottom:4px;">[เว้นว่าง = auto คำนวณจากบาน]</div>
+            <div class="custom-size-row">
+              <span style="font-size:12px;">กว้าง</span>
+              <input type="number" class="mosq-num" placeholder="ม." id="after-mosqw" oninput="afterUpdateMosq()">
+              <span style="font-size:12px;">× ยาว</span>
+              <input type="number" class="mosq-num" placeholder="ม." id="after-mosqh" oninput="afterUpdateMosq()">
+            </div>
+          </div>
+
+          <!-- hidden sync target (syncs to .o-mosqpanels) -->
+          <input type="hidden" id="after-mosqpanels-hidden" value="">
+
+          <!-- ราคาประเมิน (DEMO) -->
+          <div class="price-box" id="mosq-price-box">
+            <div id="mosq-price-text"></div>
+            <div style="font-size:10px;font-weight:400;color:#2E7D32;margin-top:2px;">DEMO — ราคาประมาณเท่านั้น ไม่ใช่ราคาจริง</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ux-fix">1 tap เลือกบาน · ชิปบอกตัวเลขเทียบกับบานประตู · ขนาดยังอยู่ (พับ) · N&gt;5 fallback stepper · กระทบราคาทันที</div>
+    </div>
+  </div>
+
+  <!-- detail states -->
+  <div class="section">
+    <div class="section-head">State ทุกกรณี (interactive)</div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="background:#E3F2FD;">
+          <th style="padding:8px;text-align:left;border:1px solid #E5E7EB;">กรณี</th>
+          <th style="padding:8px;text-align:left;border:1px solid #E5E7EB;">UI</th>
+          <th style="padding:8px;text-align:left;border:1px solid #E5E7EB;">.o-mosqpanels ที่ set</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px;border:1px solid #E5E7EB;">เลือกชิป "2 บาน"</td>
+          <td style="padding:8px;border:1px solid #E5E7EB;">chip.on = 2</td>
+          <td style="padding:8px;border:1px solid #E5E7EB;font-family:monospace;">value = "2"</td>
+        </tr>
+        <tr style="background:#F9F9F9;">
+          <td style="padding:8px;border:1px solid #E5E7EB;">ไม่เลือกชิปเลย (auto)</td>
+          <td style="padding:8px;border:1px solid #E5E7EB;">ไม่มีชิป on</td>
+          <td style="padding:8px;border:1px solid #E5E7EB;font-family:monospace;">value = "" (auto)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px;border:1px solid #E5E7EB;">N (&gt;5) → fallback stepper</td>
+          <td style="padding:8px;border:1px solid #E5E7EB;">ซ่อนชิป แสดง input number</td>
+          <td style="padding:8px;border:1px solid #E5E7EB;font-family:monospace;">value = input.value</td>
+        </tr>
+        <tr style="background:#F9F9F9;">
+          <td style="padding:8px;border:1px solid #E5E7EB;">กรอกขนาดเอง (พับ)</td>
+          <td style="padding:8px;border:1px solid #E5E7EB;">กด "▶ กรอกขนาด…" → คลาย</td>
+          <td style="padding:8px;border:1px solid #E5E7EB;">ยังคงค่าที่เลือกไว้</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /t2 -->
+
+<script>
+// ── TAB SWITCH ──
+function showTab(id,btn){
+  ['t1','t2'].forEach(function(t){ document.getElementById(t).style.display='none'; });
+  document.getElementById(id).style.display='';
+  document.querySelectorAll('.tab').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+}
+
+// ══════════════════════════════════════════
+//  TAB 1 — BEFORE logic
+// ══════════════════════════════════════════
+var beforeOpen = false;
+function beforeToggle(btn){
+  var panel = document.getElementById('before-panel');
+  beforeOpen = !beforeOpen;
+  panel.style.display = beforeOpen ? '' : 'none';
+  btn.textContent = beforeOpen ? '✕ ปิด (toggle)' : '+ เพิ่มส่วน';
+}
+function beforeAddChip(btn, name){
+  var parts = document.getElementById('before-parts');
+  parts.appendChild(makeChCard(name,'กลุ่ม auto',true));
+  document.getElementById('before-panel').style.display='none';
+  beforeOpen=false;
+  document.querySelector('.btn-add-old').textContent='+ เพิ่มส่วน';
+}
+function beforeAddGeneral(){
+  var parts = document.getElementById('before-parts');
+  parts.appendChild(makeChCard('งานบานทั่วไป','เลือกกลุ่ม…',true));
+  document.getElementById('before-panel').style.display='none';
+  beforeOpen=false;
+  document.querySelector('.btn-add-old').textContent='+ เพิ่มส่วน';
+}
+
+// ══════════════════════════════════════════
+//  TAB 1 — AFTER logic
+// ══════════════════════════════════════════
+function afterAddChip(name, cat){
+  var parts = document.getElementById('after-parts');
+  parts.appendChild(makeChCard(name, cat, false));
+}
+function afterAddGeneral(){
+  var parts = document.getElementById('after-parts');
+  parts.appendChild(makeChCard('งานบานทั่วไป','เลือกกลุ่ม…',false));
+}
+
+function makeChCard(name, sub, isBefore){
+  var div = document.createElement('div');
+  div.className = 'ch-card';
+  div.innerHTML = '<span class="ch-card-icon">🪟</span>'
+    +'<div><div class="ch-card-name">'+name+'</div>'
+    +'<div class="ch-card-sub">'+sub+' · กรอกขนาด/ออปชั่น…</div></div>'
+    +'<button class="ch-del" onclick="this.closest(\'.ch-card\').remove()">✕</button>';
+  return div;
+}
+
+// ══════════════════════════════════════════
+//  TAB 2 — Mosquito panel chips
+// ══════════════════════════════════════════
+var currentIPanels = 4;
+var selectedMosqPanels = null; // null = auto, number = set
+
+function setIPanels(n){
+  currentIPanels = n;
+  document.getElementById('ip-display').textContent = 'i-panels = '+n;
+  ['ip2','ip4','ip6','ip8'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el){ el.classList.toggle('on', parseInt(el.textContent)===n); }
+  });
+  rebuildMosqChips();
+}
+
+function afterMosqChange(sel){
+  var detail = document.getElementById('after-mosq-detail');
+  detail.style.display = sel.value ? '' : 'none';
+  if(sel.value) { rebuildMosqChips(); afterUpdateMosq(); }
+}
+
+function rebuildMosqChips(){
+  var wrap = document.getElementById('mosq-panel-chips');
+  var bar = document.getElementById('mosq-chip-bar');
+  var fallback = document.getElementById('mosq-fallback');
+  wrap.innerHTML = '';
+
+  if(currentIPanels > 5){
+    // fallback: stepper
+    bar.style.display = 'none';
+    fallback.classList.add('show');
+    return;
+  }
+  bar.style.display = '';
+  fallback.classList.remove('show');
+
+  // build chips 1…N + "auto" button
+  var autoBtn = makeChip('auto','auto (คำนวณอัตโนมัติ)');
+  autoBtn.querySelector('.chip-auto-tag').textContent = 'auto';
+  autoBtn.querySelector('.chip-num').textContent = '';
+  autoBtn.style.fontSize='11px';
+  autoBtn.style.padding='0 10px';
+  autoBtn.onclick = function(){
+    selectedMosqPanels = null;
+    wrap.querySelectorAll('.panel-chip').forEach(function(c){ c.classList.remove('on'); });
+    this.classList.add('on');
+    document.getElementById('after-mosqpanels-hidden').value = '';
+    afterUpdateMosq();
+  };
+  wrap.appendChild(autoBtn);
+
+  for(var i=1;i<=currentIPanels;i++){
+    (function(num){
+      var c = makeChip(num, num+' บาน');
+      if(selectedMosqPanels===num) c.classList.add('on');
+      c.onclick = function(){
+        selectedMosqPanels = num;
+        wrap.querySelectorAll('.panel-chip').forEach(function(x){ x.classList.remove('on'); });
+        this.classList.add('on');
+        document.getElementById('after-mosqpanels-hidden').value = num;
+        afterUpdateMosq();
+      };
+      wrap.appendChild(c);
+    })(i);
+  }
+}
+
+function makeChip(val, label){
+  var btn = document.createElement('button');
+  btn.type='button';
+  btn.className='panel-chip';
+  btn.dataset.val = val;
+  btn.innerHTML = '<span class="chip-num">'+val+'</span><span class="chip-auto-tag">'+label+'</span>';
+  return btn;
+}
+
+function toggleCustomSize(){
+  var block = document.getElementById('custom-size-block');
+  var toggle = document.getElementById('size-toggle');
+  var open = block.classList.toggle('show');
+  toggle.textContent = open ? '▼ กรอกขนาดมุ้งเอง (กรณีแต่ละบานไม่เท่ากัน)' : '▶ กรอกขนาดมุ้งเอง (กรณีแต่ละบานไม่เท่ากัน)';
+}
+
+function afterUpdateMosq(){
+  var priceBox = document.getElementById('mosq-price-box');
+  var priceText = document.getElementById('mosq-price-text');
+
+  // ดึงค่า
+  var panels = null;
+  if(currentIPanels > 5){
+    panels = parseInt(document.getElementById('mosq-fallback-num').value)||1;
+  } else {
+    panels = selectedMosqPanels; // null = auto
+  }
+
+  var mosqW = parseFloat(document.getElementById('after-mosqw').value)||0;
+  var mosqH = parseFloat(document.getElementById('after-mosqh').value)||0;
+
+  // DEMO calculation (ไม่ใช่ราคาจริง)
+  var n = panels !== null ? panels : 2; // demo: auto assume 2
+  var w = mosqW > 0 ? mosqW : 0.9;
+  var h = mosqH > 0 ? mosqH : 2.0;
+  var area = w * h * n;
+  var rate = 2500;
+  var minPerPanel = 3500;
+  var price = Math.max(area * rate, minPerPanel * n);
+  price = Math.ceil(price/100)*100;
+
+  var panelLabel = panels !== null ? (panels+' บาน (เลือก)') : (n+' บาน (auto)');
+  var areaLabel = (w.toFixed(1)+'×'+h.toFixed(1)+'='+area.toFixed(2))+' ตร.ม.';
+  priceText.innerHTML = 'มุ้ง '+panelLabel+' · '+areaLabel+' · ราคา DEMO ≈ <b>'+price.toLocaleString()+' บาท</b>';
+  priceBox.classList.add('show');
+  priceBox.classList.remove('price-change');
+  void priceBox.offsetWidth;
+  priceBox.classList.add('price-change');
+}
+
+// ── INIT ──
+rebuildMosqChips();
+</script>
+</body>
+</html>
