@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ดราฟ G6 Page Review — After (DEMO)</title>
+<style>
+:root{
+  --red:#B3151D;--red2:#8a0f14;
+  --line:#e3d3d3;--muted:#777;--bg:#faf7f7;
+  --gold:#F0C040;--goldBg:#FFF7E6;
+  --blue:#1E5AA8;--blueBg:#EAF3FF;
+  --green:#15803D;--greenBg:#dcfce7;
+  --ink:#1a1a1a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);-webkit-text-size-adjust:100%;}
+.wrap{max-width:430px;margin:0 auto;padding:12px;}
+
+/* === Demo top bar === */
+.demo-bar{background:#ff6b00;color:#fff;font-size:11px;font-weight:700;padding:6px 12px;text-align:center;letter-spacing:.3px;}
+.page-title{font-size:17px;font-weight:800;color:var(--red);margin:10px 0 2px;}
+.page-sub{font-size:12px;color:var(--muted);margin:0 0 10px;line-height:1.5;}
+
+/* === Segment switcher === */
+.seg{display:flex;gap:6px;margin:0 0 14px;}
+.seg button{flex:1;min-height:40px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:13px;cursor:pointer;color:var(--muted);font-family:inherit;}
+.seg button.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+
+/* === Card === */
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;}
+.card-title{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:10px;}
+
+/* === [1] Global color row (ทั้งใบ) === */
+.global-row{
+  display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;
+  background:#EAF3FF;border:1.5px solid #9DBCE0;border-radius:10px;
+  padding:10px 12px;margin-bottom:12px;
+}
+.global-row>div{flex:1;min-width:140px;}
+.global-row label{font-size:11px;color:var(--blue);font-weight:700;display:block;margin-bottom:4px;}
+.global-row select{width:100%;height:40px;border:1.5px solid #9DBCE0;border-radius:8px;font-size:14px;background:#fff;}
+.global-row .scope-hint{flex:0 0 auto;font-size:11px;color:var(--blue);line-height:1.5;padding-bottom:2px;background:#dbeafe;border:1px solid #93c5fd;border-radius:6px;padding:5px 8px;align-self:flex-end;}
+
+/* === Setbox === */
+.setbox{border:2px solid rgba(179,21,29,.25);border-radius:12px;padding:10px;margin-bottom:14px;background:#FFF9F9;}
+.set-head{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.set-badge{background:var(--red);color:#fff;border-radius:6px;padding:3px 10px;font-size:13px;font-weight:700;white-space:nowrap;}
+.set-name-inp{flex:1;height:38px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-size:14px;background:#fff;}
+.set-del{height:34px;border:1px solid #ddd;border-radius:8px;background:#fff;color:var(--red);cursor:pointer;padding:0 12px;font-size:13px;white-space:nowrap;font-family:inherit;}
+
+/* === [2] GH master color row (ทั้งห้อง) — ปัญหา 1 แก้แล้ว === */
+/*
+  AFTER: ยุบ label "ทั้งห้อง" เป็นแค่ suffix เล็กๆ + ซ่อนถ้าค่าตรงกับ global
+  แสดง override indicator "แตกต่างจากทั้งใบ" ถ้าค่าต่างจาก global
+  สีแถบ = ส้มอ่อน (ต่างจากฟ้า global) เพื่อให้ hierarchy ชัด
+*/
+.gh-master{
+  display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;
+  background:#FFF3E0;border:1.5px dashed #FFA000;border-radius:8px;
+  padding:8px 10px;margin-bottom:8px;
+}
+.gh-master.hidden{display:none;}
+.gh-master>div{flex:1;min-width:130px;}
+.gh-master label{font-size:11px;color:#7C4A03;font-weight:700;display:block;margin-bottom:4px;}
+.gh-master select{width:100%;height:36px;border:1px solid #FFA000;border-radius:7px;font-size:14px;background:#fff;}
+.gh-master .override-badge{font-size:10px;background:#FFA000;color:#fff;border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:700;}
+.gh-master .expand-btn{font-size:11px;color:#7C4A03;cursor:pointer;background:none;border:none;font-family:inherit;padding:0;text-decoration:underline;align-self:flex-end;}
+.gh-master-collapsed{
+  display:flex;align-items:center;gap:8px;
+  background:#FFF8E1;border:1.5px dashed #FFC107;border-radius:8px;
+  padding:6px 10px;margin-bottom:8px;font-size:12px;color:#7C4A03;cursor:pointer;
+}
+.gh-master-collapsed.hidden{display:none;}
+.gh-master-collapsed .color-chip{font-weight:700;background:#fff;border:1px solid #FFC107;border-radius:4px;padding:1px 7px;font-size:12px;}
+.gh-master-collapsed button{margin-left:auto;background:none;border:none;font-size:11px;color:#7C4A03;cursor:pointer;text-decoration:underline;font-family:inherit;}
+
+/* === [3] set-btns (ระดับชุด) === */
+.set-btns{display:flex;gap:8px;margin-bottom:8px;}
+.btn-add-side{flex:1;min-height:44px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;border:2px solid var(--red);background:var(--red);color:#fff;font-family:inherit;}
+.btn-add-roof{flex:1;min-height:44px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;border:2px solid var(--green);background:#fff;color:var(--green);font-family:inherit;}
+
+/* === [4] Side card (.ch) — การ์ดด้าน === */
+.ch{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:8px;background:#fff;}
+/* collapsed state */
+.ch.collapsed .ch-body{display:none;}
+.ch.collapsed .ch-head{border-bottom:none;}
+.ch-head{
+  display:flex;align-items:center;gap:8px;padding:9px 12px;
+  background:#fdf5f5;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;
+}
+.side-badge{background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;flex:none;}
+.ch-type-label{font-size:13px;font-weight:700;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ch-caret{font-size:11px;color:#9DBCE0;flex:none;}
+.ch-del{width:32px;height:32px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--red);font-size:18px;cursor:pointer;line-height:1;flex:none;font-family:inherit;}
+
+.ch-body{padding:10px 12px;}
+
+/* Form fields */
+.fld{margin:0 0 11px;}
+.fld:last-child{margin:0;}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 5px;font-weight:700;}
+input.ctrl,select.ctrl{width:100%;height:40px;border:1.5px solid var(--line);border-radius:8px;font-size:14px;background:#fff;color:var(--ink);padding:0 9px;font-family:inherit;}
+.row{display:flex;gap:8px;}
+.row>div{flex:1;}
+
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{min-height:44px;padding:0 13px;border:1.5px solid #d6cccc;border-radius:10px;background:#fff;font-size:14px;cursor:pointer;color:#222;display:inline-flex;align-items:center;font-family:inherit;}
+.chip.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+.chip.sm{min-height:38px;font-size:13px;padding:0 10px;}
+.hint{font-size:11px;color:#999;margin:4px 0 0;}
+
+/* Stepper */
+.step{display:flex;align-items:center;}
+.step-btn{width:46px;height:46px;border:1.5px solid var(--line);background:#fff;font-size:22px;cursor:pointer;color:var(--red);border-radius:10px;flex:none;font-family:inherit;}
+.step-inp{width:62px;height:46px;text-align:center;font-size:17px;font-weight:700;border:1.5px solid var(--line);border-left:none;border-right:none;background:#fff;font-family:inherit;}
+
+/* Inline block (ออปชั่นสำคัญดันขึ้นฟอร์มหลัก) */
+.inline-block{background:#EAF3FF;border:1px solid #9DBCE0;border-radius:8px;padding:9px 11px;margin:0 0 11px;}
+.inline-block-lbl{font-size:11px;color:var(--blue);font-weight:700;margin-bottom:7px;}
+
+/* Opts panel — ปัญหา 2 แก้แล้ว: 1 ชั้นเดียว */
+/*
+  AFTER: ปุ่ม "⚙ ตัวเลือกเพิ่มเติม" กดเปิด panel 1 ชั้น
+         หมวดภายใน กดเปิดได้ แต่ไม่ซ้อน <details> ซ้ำ
+         หมวด 🚪 ชนิด/การเปิด เปิดให้ตั้งแต่ต้น (open default)
+*/
+.opt-toggle-btn{
+  width:100%;min-height:44px;padding:10px 14px;
+  border:1.5px solid var(--line);border-radius:10px;
+  background:#fffafa;cursor:pointer;font-size:13px;
+  color:var(--red);font-weight:700;text-align:left;
+  display:flex;align-items:center;gap:8px;font-family:inherit;
+}
+.opt-toggle-btn .arrow{margin-left:auto;font-size:15px;transition:transform .15s;}
+.opt-toggle-btn.open .arrow{transform:rotate(180deg);}
+
+.opt-panel{display:none;border:1.5px solid #eedede;border-radius:10px;margin:6px 0;overflow:hidden;}
+.opt-panel.show{display:block;}
+
+.opt-cat-head{
+  display:flex;align-items:center;min-height:44px;padding:0 12px;
+  cursor:pointer;user-select:none;font-weight:700;font-size:13px;color:var(--red);
+  border-bottom:1px solid #eedede;background:#fffafa;
+}
+.opt-cat-head .arrow{margin-left:auto;font-size:13px;color:var(--muted);transition:transform .15s;}
+.opt-cat-head.open .arrow{transform:rotate(180deg);}
+.opt-cat-head:last-of-type{border-bottom:none;}
+.opt-cat-body{padding:10px 12px;background:#fff;display:none;border-bottom:1px solid #eedede;}
+.opt-cat-body.show{display:block;}
+.opt-cat-body:last-of-type{border-bottom:none;}
+
+.opt-row{margin:0 0 10px;}
+.opt-row:last-child{margin:0;}
+.opt-label{font-size:12px;color:var(--muted);font-weight:700;margin:0 0 5px;display:block;}
+
+/* มือจับ box */
+.handle-box{background:#FFF8E1;border:1px solid var(--gold);border-radius:10px;padding:10px 12px;}
+.handle-box-head{font-size:11px;font-weight:700;color:#E65100;margin-bottom:8px;}
+.hsub{display:none;margin-top:10px;padding-top:10px;border-top:1px solid #FFD54F;}
+.hsub.show{display:block;}
+
+/* มุ้ง box */
+.mosq-box{background:#E3F2FD;border:1px solid #90CAF9;border-radius:10px;padding:10px 12px;}
+.mosq-box-head{font-size:11px;font-weight:700;color:#1565C0;margin-bottom:8px;}
+.mosq-detail{display:none;margin-top:10px;padding-top:10px;border-top:1px solid #90CAF9;}
+.mosq-detail.show{display:block;}
+
+/* tag badges */
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700;}
+.tag.before{background:#fde7e7;color:#a32d2d;}
+.tag.after{background:#e3f4e6;color:#1f7a33;}
+.tag.note{background:#FFF3E0;color:#E65100;}
+
+/* Review banner */
+.review-box{background:#fff;border:2px solid var(--red);border-radius:10px;padding:10px 12px;margin-bottom:12px;}
+.review-box h3{font-size:13px;font-weight:800;color:var(--red);margin-bottom:6px;}
+.review-box p{font-size:12px;line-height:1.6;color:#333;}
+.review-box .issue{margin-bottom:6px;padding-left:12px;border-left:3px solid;}
+.review-box .issue.red{border-color:var(--red);}
+.review-box .issue.orange{border-color:#F59E0B;}
+.review-box .fix{font-size:11px;color:var(--green);margin-top:2px;font-weight:700;}
+
+/* Before panel (เดิม) */
+.before-wrap{display:none;}
+.before-wrap.show{display:block;}
+.after-wrap{display:block;}
+.after-wrap.hide{display:none;}
+
+/* Collapsed summary bar */
+.ch-sum{font-size:12px;color:var(--blue);font-weight:600;}
+
+/* Price preview (DEMO) */
+.price-demo{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px 12px;font-size:13px;color:var(--green);font-weight:700;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<div class="demo-bar">DEMO — ราคา/ข้อมูลในดราฟนี้เป็นตัวอย่างเท่านั้น (ไม่ใช่ระบบจริง)</div>
+
+<div class="wrap">
+
+  <div class="page-title">หน้ารายการ — After (แก้แล้ว)</div>
+  <p class="page-sub">โฟกัส: กั้นห้องกระจก กลุ่ม 6 · แก้ปัญหา 1 (สีซ้ำ 2 ชั้น) + ปัญหา 2 (ออปชั่นพับ 3-4 ชั้น)</p>
+
+  <!-- Segment switcher -->
+  <div class="seg">
+    <button id="bAfter" class="on" onclick="setMode('after')">After (แก้แล้ว)</button>
+    <button id="bBefore" onclick="setMode('before')">Before (เดิม)</button>
+  </div>
+
+  <!-- ===== BEFORE ===== -->
+  <div class="before-wrap" id="beforeWrap">
+    <div class="review-box">
+      <h3>Before — ปัญหาที่เห็น</h3>
+      <div class="issue red">
+        <p><strong>ปัญหา 1:</strong> กล่องฟ้า "สีอลูมิเนียม (ทั้งใบ)" + กล่องเหลือง "สีอลู (ทั้งห้อง)" โชว์ค่าเดียวกัน — ไม่รู้อันไหนคุมอะไร</p>
+        <p class="fix">แก้: ให้ "ทั้งห้อง" ซ่อนถ้าค่าตรง global · โชว์เฉพาะเมื่อต้องการ override</p>
+      </div>
+      <div class="issue red">
+        <p><strong>ปัญหา 2:</strong> ออปชั่นบาน: พับการ์ด (.ch.collapsed) + ข้างใน details "⚙ อุปกรณ์เสริม" ปิด + หมวดย่อยปิด = ขุด 3-4 ชั้น</p>
+        <p class="fix">แก้: การ์ดกั้นห้องไม่พับ default · ออปชั่นสำคัญดันขึ้นฟอร์มหลัก · 1 กดเปิด panel</p>
+      </div>
+    </div>
+
+    <!-- Before: global row -->
+    <div style="background:#EAF3FF;border:1.5px solid #9DBCE0;border-radius:10px;padding:10px 12px;margin-bottom:10px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1;min-width:140px;">
+          <label style="font-size:12px;color:#3B5EA6;font-weight:700;display:block;margin-bottom:4px;">สีอลูมิเนียม (ทั้งใบ) <span class="tag before">ทั้งใบ</span></label>
+          <select style="width:100%;height:40px;border:1px solid #C7D7F0;border-radius:8px;font-size:14px;background:#fff;">
+            <option>สีอบขาว</option><option>Champagne</option><option>บรอนซ์</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:140px;">
+          <label style="font-size:12px;color:#3B5EA6;font-weight:700;display:block;margin-bottom:4px;">กระจก (ทั้งใบ) <span class="tag before">ทั้งใบ</span></label>
+          <select style="width:100%;height:40px;border:1px solid #C7D7F0;border-radius:8px;font-size:14px;background:#fff;">
+            <option>กระจกเขียว 6 มม.</option><option>ใส 6 มม.</option>
+          </select>
+        </div>
+        <div style="flex:0 0 auto;font-size:11px;color:#3B5EA6;line-height:1.5;padding-bottom:2px;">เปลี่ยนที่นี่ = sync ทุกรายการ<br>แก้รายบาน = เปิดออปชั่นรายการ</div>
+      </div>
+    </div>
+
+    <!-- Before: setbox -->
+    <div class="setbox">
+      <div class="set-head">
+        <span class="set-badge">ชุด 1</span>
+        <input class="set-name-inp" value="กั้นห้องกระจก (ห้องนอน)">
+        <button class="set-del">ลบชุด</button>
+      </div>
+
+      <!-- ปัญหา 1: กล่องเหลือง ทั้งห้อง — ค่าตรงกับ global ↑ สับสน -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;background:#FFF7E6;border:1px solid #F0C040;border-radius:8px;padding:8px 10px;margin-bottom:8px;">
+        <div style="flex:1;min-width:140px;">
+          <label style="font-size:12px;color:#92400e;font-weight:700;display:block;margin-bottom:4px;">สีอลู (ทั้งห้อง)</label>
+          <select style="width:100%;height:36px;border:1px solid #F0C040;border-radius:7px;font-size:14px;background:#fff;">
+            <option>สีอบขาว</option><option>Champagne</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:140px;">
+          <label style="font-size:12px;color:#92400e;font-weight:700;display:block;margin-bottom:4px;">กระจก (ทั้งห้อง)</label>
+          <select style="width:100%;height:36px;border:1px solid #F0C040;border-radius:7px;font-size:14px;background:#fff;">
+            <option>กระจกเขียว 6 มม.</option><option>ใส 6 มม.</option>
+          </select>
+        </div>
+      </div>
+      <!-- ปัญหา 1: แสดงความซ้ำซ้อน -->
+      <div style="font-size:11px;color:#a32d2d;background:#fde7e7;border-radius:6px;padding:5px 9px;margin-bottom:8px;">
+        ด้านบน = "สีอบขาว / กระจกเขียว 6 มม." · ด้านล่าง = "สีอบขาว / กระจกเขียว 6 มม." — ค่าเดียวกัน แต่โชว์ 2 ที่ สับสน
+      </div>
+
+      <!-- ปัญหา 2: การ์ดพับ default -->
+      <div class="ch collapsed" style="cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:7px 12px;margin-bottom:6px;background:#FAFBFD;" onclick="alert('ต้องกดขยายก่อน — ชั้น 1')">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="side-badge">ด้าน A</span>
+          <span class="ch-sum">· บานเลื่อน ยูโร 3.0×2.4 ม.</span>
+          <span class="ch-caret" style="margin-left:auto;">▶</span>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#a32d2d;background:#fde7e7;border-radius:6px;padding:5px 9px;margin-bottom:8px;">
+        กดขยาย (ชั้น 1) → กด "⚙ อุปกรณ์เสริม" (ชั้น 2) → กดหมวด (ชั้น 3) → เห็นออปชั่น = 3-4 กด
+      </div>
+    </div>
+  </div>
+  <!-- END BEFORE -->
+
+  <!-- ===== AFTER ===== -->
+  <div class="after-wrap" id="afterWrap">
+
+    <!-- Review annotation box -->
+    <div class="review-box">
+      <h3>After — UX แก้แล้ว (กดเล่นได้จริง)</h3>
+      <div class="issue" style="border-color:var(--green);">
+        <p><strong>ปัญหา 1 แก้:</strong> "ทั้งห้อง" ซ่อนเมื่อค่าตรง global · โชว์ย่อเป็น 1 บรรทัด กดขยายถ้าต้องแก้ · มี "แตกต่างจากทั้งใบ" badge ถ้า override</p>
+      </div>
+      <div class="issue" style="border-color:var(--green);margin-top:6px;">
+        <p><strong>ปัญหา 2 แก้:</strong> การ์ดไม่พับ · ชนิดการเปิด+ราง = inline ฟอร์มหลัก · ออปชั่น 1 กดเปิด panel · หมวด 🚪 เปิดให้อัตโนมัติ</p>
+      </div>
+    </div>
+
+    <!-- [A] Global color row (ทั้งใบ) -->
+    <div class="card" style="padding:10px 14px;margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px;letter-spacing:.3px;">รายการ</div>
+      <div class="global-row" id="globalRow">
+        <div>
+          <label>สีอลูมิเนียม (ทั้งใบ)</label>
+          <select id="gColor" onchange="onGlobalChange()">
+            <option value="white">สีอบขาว</option>
+            <option value="champ">Champagne</option>
+            <option value="bronze">บรอนซ์</option>
+            <option value="gray">เทาซาฮาร่า</option>
+          </select>
+        </div>
+        <div>
+          <label>กระจก (ทั้งใบ)</label>
+          <select id="gGlass" onchange="onGlobalChange()">
+            <option value="green6">กระจกเขียว 6 มม.</option>
+            <option value="clear6">ใส 6 มม.</option>
+            <option value="clear8">เทมเปอร์ใส 8 มม.</option>
+            <option value="green8">เทมเปอร์เขียว 8 มม.</option>
+          </select>
+        </div>
+        <div class="scope-hint">เปลี่ยนที่นี่<br>= sync ทุกรายการ<br><span style="color:#1565C0;font-weight:700;">↓ แก้เฉพาะห้อง = กล่องส้มข้างล่าง</span></div>
+      </div>
+    </div>
+
+    <!-- [B] Setbox กั้นห้องกระจก -->
+    <div class="setbox" id="mainSetbox">
+
+      <div class="set-head">
+        <span class="set-badge">ชุด 1</span>
+        <input class="set-name-inp" value="กั้นห้องกระจก (ห้องนอน)" id="setName">
+        <button class="set-del" onclick="alert('ลบชุด?')">ลบชุด</button>
+      </div>
+
+      <!-- [B.1] ปุ่มระดับชุด — ก่อน gh-master เพื่อเห็นง่าย -->
+      <div class="set-btns">
+        <button class="btn-add-side" onclick="addSideCard()">+ เพิ่มบาน</button>
+        <button class="btn-add-roof" onclick="addRoofCard()">+ เพิ่มหลังคา</button>
+      </div>
+
+      <!--
+        [B.2] GH master color (ทั้งห้อง) — แก้ปัญหา 1
+        Pattern: ซ่อนเมื่อค่าตรง global → โชว์ย่อ 1 บรรทัด
+        กดเปิดได้ถ้าต้องการ override เฉพาะห้องนี้
+      -->
+      <!-- Collapsed state (ค่าตรง global → โชว์สรุปเท่านั้น) -->
+      <div class="gh-master-collapsed" id="ghMasterCollapsed" onclick="expandGhMaster()">
+        <span>สี/กระจกห้องนี้: ตามทั้งใบ</span>
+        <span class="color-chip" id="ghColorSummary">สีอบขาว</span>
+        <span class="color-chip" id="ghGlassSummary">กระจกเขียว 6 มม.</span>
+        <button onclick="event.stopPropagation();expandGhMaster()">แก้เฉพาะห้องนี้ ▾</button>
+      </div>
+
+      <!-- Expanded state (กดแก้ override) -->
+      <div class="gh-master hidden" id="ghMasterExpanded">
+        <div>
+          <label>สีอลู (เฉพาะห้องนี้) <span class="override-badge" id="colorOverrideBadge" style="display:none;">แตกต่างจากทั้งใบ</span></label>
+          <select id="ghColor" onchange="onGhChange()">
+            <option value="white">สีอบขาว</option>
+            <option value="champ">Champagne</option>
+            <option value="bronze">บรอนซ์</option>
+            <option value="gray">เทาซาฮาร่า</option>
+          </select>
+        </div>
+        <div>
+          <label>กระจก (เฉพาะห้องนี้) <span class="override-badge" id="glassOverrideBadge" style="display:none;">แตกต่างจากทั้งใบ</span></label>
+          <select id="ghGlass" onchange="onGhChange()">
+            <option value="green6">กระจกเขียว 6 มม.</option>
+            <option value="clear6">ใส 6 มม.</option>
+            <option value="clear8">เทมเปอร์ใส 8 มม.</option>
+            <option value="green8">เทมเปอร์เขียว 8 มม.</option>
+          </select>
+        </div>
+        <button class="expand-btn" onclick="collapseGhMaster()">▴ ย่อ (ถ้าไม่ต้องการแก้)</button>
+      </div>
+
+      <!-- [B.3] set-parts: การ์ดบาน -->
+      <div id="setParts">
+
+        <!-- การ์ดด้าน A — แก้ปัญหา 2: ไม่พับ default -->
+        <div class="ch" id="cardA" data-side="A">
+          <div class="ch-head" onclick="toggleCard('cardA')">
+            <span class="side-badge">ด้าน A</span>
+            <span class="ch-type-label" id="labelA">บานเลื่อน ยูโร</span>
+            <span class="ch-caret" id="caretA">▼</span>
+            <button class="ch-del" onclick="event.stopPropagation();removeCard('cardA')">×</button>
+          </div>
+          <div class="ch-body" id="bodyA">
+
+            <!-- ชิปชนิดบาน (ดราฟ G6-formux) -->
+            <div class="fld">
+              <label class="lbl">ชนิดบาน</label>
+              <div class="chips" id="typeChipsA">
+                <button class="chip on" onclick="pickType(this,'A','บานเลื่อน')">บานเลื่อน</button>
+                <button class="chip" onclick="pickType(this,'A','บานเปิด')">บานเปิด</button>
+                <button class="chip" onclick="pickType(this,'A','บานเฟี้ยม')">บานเฟี้ยม</button>
+                <button class="chip" onclick="pickType(this,'A','กระจกติดตาย')">กระจกติดตาย</button>
+                <button class="chip" onclick="pickType(this,'A','ระแนงบังตา')">ระแนงบังตา</button>
+              </div>
+            </div>
+
+            <!-- รุ่น (dropdown ≥6 ตัวเลือก) -->
+            <div class="fld" id="modelFldA">
+              <label class="lbl">รุ่น</label>
+              <select class="ctrl" id="modelA">
+                <option>บานเลื่อน ยูโร SMS</option>
+                <option>บานเลื่อน สลับ SMS</option>
+                <option>บานเลื่อน ยูโร HiQ</option>
+              </select>
+            </div>
+
+            <!-- [ออปชั่นสำคัญ inline] ชนิดการเปิด + ราง — ดันขึ้นฟอร์มหลัก (แก้ปัญหา 2) -->
+            <div class="inline-block" id="slideInlineA">
+              <div class="inline-block-lbl">บานเลื่อน — ตัวเลือกสำคัญ</div>
+              <div class="fld" style="margin-bottom:8px;">
+                <label class="lbl">ชนิดการเปิด</label>
+                <div class="chips">
+                  <button class="chip sm on" onclick="pickChip(this,'opentypeA')">บานเลื่อน</button>
+                  <button class="chip sm" onclick="pickChip(this,'opentypeA')">สลับ</button>
+                  <button class="chip sm" onclick="pickChip(this,'opentypeA')">เปิดคู่กลาง</button>
+                  <button class="chip sm" onclick="pickChip(this,'opentypeA')">ลากจูง</button>
+                </div>
+              </div>
+              <div class="fld" style="margin:0;">
+                <label class="lbl">ราง</label>
+                <div class="chips">
+                  <button class="chip sm on" onclick="pickChip(this,'railA')">กันน้ำ (มาตรฐาน)</button>
+                  <button class="chip sm" onclick="pickChip(this,'railA')">เตี้ย 7 มม.</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ขนาด -->
+            <div class="row fld">
+              <div><label class="lbl">กว้าง (ม.)</label><input type="number" class="ctrl" value="3.0" step="0.1" min="0.1"></div>
+              <div><label class="lbl">สูง (ม.)</label><input type="number" class="ctrl" value="2.4" step="0.1" min="0.1"></div>
+            </div>
+
+            <!-- จำนวนบาน (stepper) -->
+            <div class="fld">
+              <label class="lbl">จำนวนบาน</label>
+              <div class="step">
+                <button class="step-btn" onclick="stepVal('panelsA',-1)">−</button>
+                <input class="step-inp" id="panelsA" type="number" value="4" min="1">
+                <button class="step-btn" onclick="stepVal('panelsA',1)">+</button>
+              </div>
+            </div>
+
+            <!-- ล็อค (บานประตู) -->
+            <div class="fld">
+              <label class="lbl">ชุดล็อค</label>
+              <div class="chips">
+                <button class="chip sm on" onclick="pickChip(this,'lockA')">มีกุญแจ</button>
+                <button class="chip sm" onclick="pickChip(this,'lockA')">ไม่มีกุญแจ</button>
+              </div>
+            </div>
+
+            <!-- [ออปชั่นเพิ่มเติม] 1 ชั้นเดียว — แก้ปัญหา 2 -->
+            <button class="opt-toggle-btn" id="optBtnA" onclick="toggleOpts('optPanelA','optBtnA')">
+              ⚙ ตัวเลือกเพิ่มเติม (มือจับ / มุ้ง / คาดตาราง / อื่นๆ)
+              <span class="arrow">▾</span>
+            </button>
+            <div class="opt-panel" id="optPanelA">
+
+              <!-- หมวด 🚪: เปิดให้ตั้งแต่ต้น -->
+              <div class="opt-cat-head open" id="catH_doorA" onclick="toggleCat(this,'catB_doorA')">
+                🚪 ชนิด / การเปิด (รายละเอียดเพิ่ม) <span class="arrow">▴</span>
+              </div>
+              <div class="opt-cat-body show" id="catB_doorA">
+                <div class="opt-row">
+                  <span class="opt-label">ธรณี (เฉพาะประตู)</span>
+                  <div class="chips">
+                    <button class="chip sm on" onclick="pickChip(this,'thA')">ไม่มี</button>
+                    <button class="chip sm" onclick="pickChip(this,'thA')">มีธรณี</button>
+                    <button class="chip sm" onclick="pickChip(this,'thA')">หลังเต่า</button>
+                    <button class="chip sm" onclick="pickChip(this,'thA')">ฝังรางยู</button>
+                  </div>
+                </div>
+                <div class="opt-row">
+                  <span class="opt-label">ติดตายกี่บาน</span>
+                  <div class="chips">
+                    <button class="chip sm on" onclick="pickChip(this,'fixA')">0 (ไม่มี)</button>
+                    <button class="chip sm" onclick="pickChip(this,'fixA')">1</button>
+                    <button class="chip sm" onclick="pickChip(this,'fixA')">2</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- หมวด 🔧 มือจับ -->
+              <div class="opt-cat-head" id="catH_handleA" onclick="toggleCat(this,'catB_handleA')">
+                🔧 มือจับ / ล็อค <span class="arrow">▾</span>
+              </div>
+              <div class="opt-cat-body" id="catB_handleA">
+                <div class="opt-row">
+                  <div class="handle-box">
+                    <div class="handle-box-head">ติ๊กแบรนด์ที่ใช้ — ยังไม่ติ๊ก = ซ่อนรายละเอียด</div>
+                    <div class="chips">
+                      <button class="chip sm" data-hbrand="cmech" onclick="toggleHandle(this,'A')">Cmech</button>
+                      <button class="chip sm" data-hbrand="digi" onclick="toggleHandle(this,'A')">ดิจิตอล</button>
+                      <button class="chip sm" data-hbrand="stainless" onclick="toggleHandle(this,'A')">สแตนอร่าม</button>
+                      <button class="chip sm" data-hbrand="other" onclick="toggleHandle(this,'A')">รุ่นอื่น ✎</button>
+                    </div>
+                    <div class="hsub" id="hsub-cmech-A">
+                      <span class="opt-label">Cmech แบบ</span>
+                      <div class="chips">
+                        <button class="chip sm on" onclick="pickChip(this,'cmechA')">ฝัง</button>
+                        <button class="chip sm" onclick="pickChip(this,'cmechA')">เมโทร</button>
+                      </div>
+                    </div>
+                    <div class="hsub" id="hsub-digi-A">
+                      <span class="opt-label">รุ่นดิจิตอล</span>
+                      <select class="ctrl" style="height:40px;margin-top:4px;">
+                        <option value="">ไม่ใส่</option>
+                        <option>S1 ก้านโยก +10,000</option>
+                        <option>S3 +18,000</option>
+                        <option>L600 +24,000</option>
+                        <option>JR Prime +24,900</option>
+                      </select>
+                    </div>
+                    <div class="hsub" id="hsub-stainless-A">
+                      <span class="opt-label">ขนาดสแตนอร่าม</span>
+                      <select class="ctrl" style="height:40px;margin-top:4px;">
+                        <option value="">ไม่ใส่</option>
+                        <option>30.5 ซม. +1,500</option>
+                        <option>60 ซม. +2,000</option>
+                        <option>100 ซม. +3,000</option>
+                      </select>
+                    </div>
+                    <div class="hsub" id="hsub-other-A">
+                      <div class="row" style="gap:6px;">
+                        <div style="flex:2;"><input type="text" class="ctrl" placeholder="ชื่อรุ่น เช่น HD182"></div>
+                        <div style="flex:1;"><input type="number" class="ctrl" placeholder="บาท" step="100"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- หมวด 🪟 มุ้ง -->
+              <div class="opt-cat-head" id="catH_mosqA" onclick="toggleCat(this,'catB_mosqA')">
+                🪟 มุ้ง <span class="arrow">▾</span>
+              </div>
+              <div class="opt-cat-body" id="catB_mosqA">
+                <div class="opt-row">
+                  <div class="mosq-box">
+                    <div class="mosq-box-head">เลือกชนิดมุ้ง — "ไม่ใส่" = ซ่อนรายละเอียด</div>
+                    <select class="ctrl" style="height:44px;" onchange="mosqToggle(this,'mosqDetailA')">
+                      <option value="">ไม่ใส่</option>
+                      <option value="1">มุ้งเฟรมเล็ก (พับเก็บ)</option>
+                      <option value="1">มุ้งเฟรมใหญ่</option>
+                      <option value="1">มุ้งม้วน</option>
+                      <option value="1">มุ้งจีบนิรภัย</option>
+                    </select>
+                    <div class="mosq-detail" id="mosqDetailA">
+                      <div class="opt-row">
+                        <span class="opt-label">จำนวนบานมุ้ง</span>
+                        <div class="chips">
+                          <button class="chip sm on" onclick="pickChip(this,'mosqpA')">Auto (=บาน)</button>
+                          <button class="chip sm" onclick="pickChip(this,'mosqpA')">1</button>
+                          <button class="chip sm" onclick="pickChip(this,'mosqpA')">2</button>
+                          <button class="chip sm" onclick="pickChip(this,'mosqpA')">4</button>
+                        </div>
+                      </div>
+                      <div class="opt-row">
+                        <span class="opt-label">ผ้ามุ้ง</span>
+                        <select class="ctrl" style="height:40px;">
+                          <option>ไฟเบอร์เทา (default)</option>
+                          <option>ไฟเบอร์ดำ</option>
+                          <option>กันแมว/หมา +800</option>
+                          <option>สแตนนิรภัย +3,500</option>
+                        </select>
+                      </div>
+                      <div class="opt-row">
+                        <span class="opt-label">สีกรอบมุ้ง</span>
+                        <div class="chips">
+                          <button class="chip sm on" onclick="pickChip(this,'mosqcolorA')">ตามสีบาน</button>
+                          <button class="chip sm" onclick="pickChip(this,'mosqcolorA')">เทาซาฮาร่า</button>
+                          <button class="chip sm" onclick="pickChip(this,'mosqcolorA')">KL พิเศษ</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- หมวด 📐 คาดตาราง -->
+              <div class="opt-cat-head" id="catH_gridA" onclick="toggleCat(this,'catB_gridA')">
+                📐 คาดตาราง <span class="arrow">▾</span>
+              </div>
+              <div class="opt-cat-body" id="catB_gridA">
+                <div class="opt-row">
+                  <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+                    <input type="checkbox" style="width:20px;height:20px;" id="gridCheckA" onchange="gridToggle(this,'gridSubA')">
+                    <span>มีคาดตาราง (คิดตามสูตร)</span>
+                  </label>
+                </div>
+                <div id="gridSubA" style="display:none;padding-top:8px;">
+                  <div style="display:flex;gap:8px;align-items:center;font-size:13px;flex-wrap:wrap;">
+                    <label>เส้นนอน <input type="number" value="0" min="0" style="width:52px;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 6px;margin-left:4px;"></label>
+                    <label>เส้นตั้ง <input type="number" value="0" min="0" style="width:52px;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 6px;margin-left:4px;"></label>
+                    <label>ราคา/ม. <input type="number" value="200" min="0" style="width:62px;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 6px;margin-left:4px;"></label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- หมวด ➕ อื่นๆ -->
+              <div class="opt-cat-head" id="catH_otherA" onclick="toggleCat(this,'catB_otherA')">
+                ➕ อื่นๆ (ครอบวงกบ / แผ่นทึบ / หมายเหตุ) <span class="arrow">▾</span>
+              </div>
+              <div class="opt-cat-body" id="catB_otherA">
+                <div class="opt-row">
+                  <span class="opt-label">ครอบวงกบอลู</span>
+                  <div class="chips">
+                    <button class="chip sm on" onclick="pickChip(this,'fcA')">ไม่มี</button>
+                    <button class="chip sm" onclick="pickChip(this,'fcA')">3 ด้าน</button>
+                    <button class="chip sm" onclick="pickChip(this,'fcA')">4 ด้าน</button>
+                  </div>
+                </div>
+                <div class="opt-row">
+                  <span class="opt-label">แผ่นทึบล่าง</span>
+                  <div class="chips">
+                    <button class="chip sm on" onclick="pickChip(this,'solidA')">ไม่มี</button>
+                    <button class="chip sm" onclick="pickChip(this,'solidA')">อลูลูกฟูก +3,500/ตร.ม.</button>
+                    <button class="chip sm" onclick="pickChip(this,'solidA')">คอมโพสิท +3,300/ตร.ม.</button>
+                  </div>
+                </div>
+                <div class="opt-row">
+                  <span class="opt-label">หมายเหตุ</span>
+                  <input type="text" class="ctrl" placeholder="ระบุถ้ามี">
+                </div>
+              </div>
+
+            </div><!-- end opt-panel -->
+
+            <div class="price-demo">ราคาประเมิน (DEMO): ฿ XX,XXX</div>
+
+          </div><!-- end ch-body -->
+        </div><!-- end card A -->
+
+        <!-- พื้นที่สำหรับ card ที่เพิ่มมา -->
+        <div id="extraCards"></div>
+
+      </div><!-- end set-parts -->
+
+    </div><!-- end setbox -->
+
+    <!-- ปุ่มเพิ่มชุด (ระดับใบ) -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <button style="flex:1;min-height:44px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;border:1.5px solid var(--muted);background:#fff;color:var(--muted);font-family:inherit;" onclick="alert('+ เพิ่มชุดรายการอื่น')">+ เพิ่มชุด</button>
+      <button style="flex:1;min-height:44px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;border:2px solid var(--red);background:#fff;color:var(--red);font-family:inherit;" onclick="alert('+ กั้นห้องกระจกชุดใหม่')">+ กั้นห้องกระจก</button>
+    </div>
+
+    <!-- ยอดรวม (DEMO) -->
+    <div class="card" style="background:#fff7f7;border-color:var(--red);">
+      <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px;">ยอดรวมทั้งใบ (DEMO)</div>
+      <div style="font-size:24px;font-weight:800;color:var(--red);">฿ XX,XXX,XXX</div>
+      <p class="hint" style="margin-top:6px;">ตัวเลขในดราฟนี้เป็นตัวอย่างเท่านั้น — ไม่ใช่ราคาจริง</p>
+    </div>
+
+  </div><!-- end after-wrap -->
+
+</div><!-- end wrap -->
+
+<script>
+// ===== Mode switcher =====
+function setMode(m){
+  document.getElementById('bAfter').classList.toggle('on', m==='after');
+  document.getElementById('bBefore').classList.toggle('on', m==='before');
+  document.getElementById('afterWrap').classList.toggle('hide', m!=='after');
+  document.getElementById('beforeWrap').classList.toggle('show', m!=='after');
+}
+
+// ===== Global color sync (ปัญหา 1) =====
+var COLOR_LABELS={white:'สีอบขาว',champ:'Champagne',bronze:'บรอนซ์',gray:'เทาซาฮาร่า'};
+var GLASS_LABELS={green6:'กระจกเขียว 6 มม.',clear6:'ใส 6 มม.',clear8:'เทมเปอร์ใส 8 มม.',green8:'เทมเปอร์เขียว 8 มม.'};
+
+function onGlobalChange(){
+  var gc=document.getElementById('gColor').value;
+  var gg=document.getElementById('gGlass').value;
+  // sync gh-color dropdown ด้วย (ถ้า expanded)
+  var ghC=document.getElementById('ghColor');
+  var ghG=document.getElementById('ghGlass');
+  ghC.value=gc; ghG.value=gg;
+  updateGhSummary();
+  checkGhOverride();
+}
+
+function updateGhSummary(){
+  var gc=document.getElementById('gColor').value;
+  var gg=document.getElementById('gGlass').value;
+  var ghC=document.getElementById('ghColor').value;
+  var ghG=document.getElementById('ghGlass').value;
+  var sameColor=(ghC===gc), sameGlass=(ghG===gg);
+  var collapsed=document.getElementById('ghMasterCollapsed');
+  var cs=document.getElementById('ghColorSummary');
+  var gs=document.getElementById('ghGlassSummary');
+  cs.textContent=COLOR_LABELS[ghC]||ghC;
+  gs.textContent=GLASS_LABELS[ghG]||ghG;
+  // ถ้าค่าตรงทั้งคู่ → ซ่อนตัวขยาย (เหลือแค่ collapsed)
+  if(sameColor&&sameGlass){
+    collapsed.querySelector('span:first-child').textContent='สี/กระจกห้องนี้: ตามทั้งใบ';
+  } else {
+    collapsed.querySelector('span:first-child').textContent='สี/กระจกห้องนี้: override';
+  }
+}
+
+function checkGhOverride(){
+  var gc=document.getElementById('gColor').value;
+  var gg=document.getElementById('gGlass').value;
+  var ghC=document.getElementById('ghColor').value;
+  var ghG=document.getElementById('ghGlass').value;
+  document.getElementById('colorOverrideBadge').style.display=(ghC!==gc)?'inline':'none';
+  document.getElementById('glassOverrideBadge').style.display=(ghG!==gg)?'inline':'none';
+}
+
+function onGhChange(){
+  updateGhSummary();
+  checkGhOverride();
+}
+
+function expandGhMaster(){
+  document.getElementById('ghMasterCollapsed').classList.add('hidden');
+  document.getElementById('ghMasterExpanded').classList.remove('hidden');
+}
+
+function collapseGhMaster(){
+  // sync ก่อนพับ
+  updateGhSummary();
+  document.getElementById('ghMasterExpanded').classList.add('hidden');
+  document.getElementById('ghMasterCollapsed').classList.remove('hidden');
+}
+
+// init
+window.addEventListener('DOMContentLoaded',function(){
+  onGlobalChange();
+  updateGhSummary();
+});
+
+// ===== Card toggle (ปัญหา 2: การ์ดไม่พับ default) =====
+function toggleCard(id){
+  var ch=document.getElementById(id);
+  if(!ch)return;
+  var body=ch.querySelector('.ch-body');
+  var caret=ch.querySelector('.ch-caret');
+  var collapsed=ch.classList.contains('collapsed');
+  ch.classList.toggle('collapsed',!collapsed);
+  if(body) body.style.display=collapsed?'':'none';
+  if(caret) caret.textContent=collapsed?'▼':'▶';
+}
+
+function removeCard(id){
+  var el=document.getElementById(id);
+  if(el) el.remove();
+}
+
+// ===== Chips =====
+function pickChip(btn,group){
+  var parent=btn.parentElement;
+  parent.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});
+  btn.classList.add('on');
+}
+
+function pickType(btn,side,typeName){
+  var parent=btn.parentElement;
+  parent.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});
+  btn.classList.add('on');
+  var lbl=document.getElementById('label'+side);
+  if(lbl) lbl.textContent=typeName;
+  // โชว์/ซ่อน inline slide block
+  var sblock=document.getElementById('slideInline'+side);
+  if(sblock) sblock.style.display=(typeName==='บานเลื่อน'||typeName==='บานเฟี้ยม')?'block':'none';
+}
+
+// ===== Handle toggle =====
+function toggleHandle(btn,side){
+  btn.classList.toggle('on');
+  var brand=btn.dataset.hbrand;
+  var sub=document.getElementById('hsub-'+brand+'-'+side);
+  if(sub) sub.classList.toggle('show',btn.classList.contains('on'));
+}
+
+// ===== Opt panel (ปัญหา 2: 1 ชั้น) =====
+function toggleOpts(panelId,btnId){
+  var panel=document.getElementById(panelId);
+  var btn=document.getElementById(btnId);
+  if(!panel)return;
+  var isOpen=panel.classList.contains('show');
+  panel.classList.toggle('show',!isOpen);
+  if(btn) btn.classList.toggle('open',!isOpen);
+}
+
+function toggleCat(head,bodyId){
+  var body=document.getElementById(bodyId);
+  if(!body)return;
+  var isOpen=body.classList.contains('show');
+  body.classList.toggle('show',!isOpen);
+  head.classList.toggle('open',!isOpen);
+}
+
+// ===== Mosq toggle =====
+function mosqToggle(sel,detailId){
+  var det=document.getElementById(detailId);
+  if(det) det.classList.toggle('show',!!sel.value);
+}
+
+// ===== Grid toggle =====
+function gridToggle(cb,subId){
+  var sub=document.getElementById(subId);
+  if(sub) sub.style.display=cb.checked?'block':'none';
+}
+
+// ===== Stepper =====
+function stepVal(id,delta){
+  var inp=document.getElementById(id);
+  if(!inp)return;
+  var v=parseInt(inp.value)||0;
+  inp.value=Math.max(1,v+delta);
+}
+
+// ===== Add side card =====
+var sideSeq=['A','B','C','D','E','F'];
+var usedSides=['A'];
+
+function addSideCard(){
+  var next=sideSeq.find(function(s){return !usedSides.includes(s);});
+  if(!next){alert('ครบ 6 ด้านแล้ว');return;}
+  usedSides.push(next);
+  var container=document.getElementById('extraCards');
+  var html='<div class="ch" id="card'+next+'" data-side="'+next+'">'
+    +'<div class="ch-head" onclick="toggleCard(\'card'+next+'\')">'
+    +'<span class="side-badge">ด้าน '+next+'</span>'
+    +'<span class="ch-type-label" id="label'+next+'">บานเลื่อน ยูโร</span>'
+    +'<span class="ch-caret" id="caret'+next+'">▼</span>'
+    +'<button class="ch-del" onclick="event.stopPropagation();this.closest(\'.ch\').remove()">×</button>'
+    +'</div>'
+    +'<div class="ch-body">'
+    +'<div class="fld"><label class="lbl">ชนิดบาน</label>'
+    +'<div class="chips">'
+    +'<button class="chip on" onclick="pickChip(this,\'type'+next+'\')">บานเลื่อน</button>'
+    +'<button class="chip" onclick="pickChip(this,\'type'+next+'\')">บานเปิด</button>'
+    +'<button class="chip" onclick="pickChip(this,\'type'+next+'\')">บานเฟี้ยม</button>'
+    +'<button class="chip" onclick="pickChip(this,\'type'+next+'\')">กระจกติดตาย</button>'
+    +'</div></div>'
+    +'<div class="row fld">'
+    +'<div><label class="lbl">กว้าง (ม.)</label><input type="number" class="ctrl" value="2.0" step="0.1" min="0.1"></div>'
+    +'<div><label class="lbl">สูง (ม.)</label><input type="number" class="ctrl" value="2.4" step="0.1" min="0.1"></div>'
+    +'</div>'
+    +'<div class="fld"><label class="lbl">จำนวนบาน</label>'
+    +'<div class="step">'
+    +'<button class="step-btn" onclick="stepVal(\'panels'+next+'\',-1)">−</button>'
+    +'<input class="step-inp" id="panels'+next+'" type="number" value="2" min="1">'
+    +'<button class="step-btn" onclick="stepVal(\'panels'+next+'\',1)">+</button>'
+    +'</div></div>'
+    +'<div class="price-demo">ราคาประเมิน (DEMO): ฿ XX,XXX</div>'
+    +'</div></div>';
+  container.insertAdjacentHTML('beforeend',html);
+}
+
+function addRoofCard(){
+  var container=document.getElementById('extraCards');
+  var html='<div class="ch" id="cardRoof" style="border-color:#86efac;">'
+    +'<div class="ch-head" style="background:#f0fdf4;border-color:#86efac;" onclick="toggleCard(\'cardRoof\')">'
+    +'<span class="side-badge" style="background:var(--green);">หลังคา</span>'
+    +'<span class="ch-type-label">หลังคา (กลุ่ม 3)</span>'
+    +'<span class="ch-caret">▼</span>'
+    +'<button class="ch-del" onclick="event.stopPropagation();this.closest(\'.ch\').remove()">×</button>'
+    +'</div>'
+    +'<div class="ch-body">'
+    +'<div class="fld"><label class="lbl">ชนิดวัสดุมุง</label>'
+    +'<select class="ctrl"><option>กระจก Laminated</option><option>Polycarbonate ใส</option><option>เมทัลชีท</option></select></div>'
+    +'<div class="row fld">'
+    +'<div><label class="lbl">กว้าง (ม.)</label><input type="number" class="ctrl" value="4.0" step="0.1"></div>'
+    +'<div><label class="lbl">ยาว (ม.)</label><input type="number" class="ctrl" value="5.0" step="0.1"></div>'
+    +'</div>'
+    +'<div class="price-demo" style="color:var(--green)">ราคาประเมิน (DEMO): ฿ XX,XXX</div>'
+    +'</div></div>';
+  container.insertAdjacentHTML('beforeend',html);
+}
+</script>
+</body>
+</html>
