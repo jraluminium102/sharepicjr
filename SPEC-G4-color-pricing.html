@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>SPEC G4 — ค่าสีโครงตู้อลู (แก้ logic ราคา · ส่ง dev แชท B)</title>
+<style>
+  body{ font-family:'Segoe UI',Tahoma,sans-serif; color:#1F2937; max-width:940px; margin:0 auto; padding:24px; line-height:1.6; }
+  h1{ color:#B3151D; font-size:22px; margin-bottom:2px; }
+  h2{ color:#B3151D; font-size:16px; margin-top:26px; border-bottom:2px solid #FCA5A5; padding-bottom:4px; }
+  h3{ font-size:14px; margin:14px 0 6px; }
+  .sub{ color:#6B7280; font-size:13px; margin-bottom:6px; }
+  code{ background:#F3F4F6; border:1px solid #E5E7EB; border-radius:4px; padding:1px 5px; font-family:Consolas,monospace; font-size:12.5px; color:#B3151D; }
+  table{ border-collapse:collapse; width:100%; margin:10px 0; font-size:13px; }
+  th,td{ border:1px solid #D1D5DB; padding:6px 9px; text-align:left; vertical-align:top; }
+  th{ background:#FEE2E2; color:#7F1D1D; }
+  tr:nth-child(even) td{ background:#FAFAFA; }
+  pre{ background:#0F172A; color:#E2E8F0; padding:13px 15px; border-radius:8px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre .c{ color:#94A3B8; }
+  .box{ background:#FFF7ED; border:1px solid #FDBA74; border-radius:8px; padding:10px 14px; margin:12px 0; font-size:13px; }
+  .warn{ background:#FEF2F2; border:1px solid #FCA5A5; border-radius:8px; padding:10px 14px; margin:12px 0; font-size:13px; }
+  .ok{ background:#ECFDF5; border:1px solid #6EE7B7; border-radius:8px; padding:10px 14px; margin:12px 0; font-size:13px; }
+  .todo{ background:#FEFCE8; border:1px solid #FDE047; border-radius:8px; padding:10px 14px; margin:12px 0; font-size:13px; }
+  ul,ol{ margin:6px 0; padding-left:22px; } li{ margin:3px 0; }
+  .tag{ display:inline-block; font-size:11px; font-weight:700; padding:1px 7px; border-radius:5px; }
+  .t-rn90{ background:#DBEAFE; color:#1E40AF; } .t-cp{ background:#FCE7F3; color:#9D174D; } .t-no{ background:#E5E7EB; color:#374151; } .t-keep{ background:#D1FAE5; color:#065F46; }
+</style>
+</head>
+<body>
+
+<h1>SPEC G4 — ค่าสีโครงตู้อลู (แก้ logic ราคา)</h1>
+<p class="sub">ส่ง dev แชท B แก้ <code>public/calculator/index.html</code> · 12 มิ.ย. 2026 · เป็นงาน <b>แตะ logic ราคา</b> (ไม่ใช่แค่ UI)</p>
+<p class="sub">ที่มา: ไฟล์ต้นฉบับ <b>R3.9_v11 ข้อ 41 (ฝาตู้) + ข้อ 49 (ตู้อลู คิด 4 ด้าน)</b> · ผ่านการตรวจโดยนักบัญชี</p>
+
+<div class="warn">
+<b>🔴 ปัญหาที่แก้:</b> โครงตู้ (ผนัง/พื้น/ชั้น) คิด 4,000/ตร.ม. คงที่ <u>ไม่บวกค่าสีเลย</u> ไม่ว่าเลือกสีอะไร →
+ตู้สีพิเศษทั้งใบ ราคาขาด ~6,000–20,000/ใบ. บานหน้า/ฝาตู้ <b>มีค่าสีแล้ว</b> (FT flat ข้อ 41) — งานนี้เติมค่าสีให้ "โครง"
+</div>
+
+<h2>1. มติพี่นัท — ค่าสีตามวัสดุแต่ละด้าน</h2>
+<table>
+<tr><th>ส่วนตู้</th><th>พื้นที่</th><th>วัสดุ</th><th>สูตรค่าสี</th></tr>
+<tr><td>บานหน้า / ฝาตู้</td><td>กว้าง×สูง/บาน</td><td>FT</td><td><span class="tag t-keep">คงเดิม</span> FT_COLOR flat (+1,500…3,500/บาน · ข้อ 41 รวมสีชุบแล้ว) — <b>ไม่แตะ</b></td></tr>
+<tr><td>ผนัง (เลือกวัสดุได้)</td><td>2×ลึก×สูง (+กว้าง×สูง ถ้าติ๊กผนังหลัง)</td><td><b>อลูทึบ</b></td><td><span class="tag t-rn90">rn90 fin</span> (ลูกฟูก 2 ทาง)</td></tr>
+<tr><td>ผนัง (เลือกวัสดุได้)</td><td>เท่าข้างบน</td><td><b>กระจก</b></td><td><span class="tag t-cp">colorPrice ตัด min</span> (ทั้งพื้นที่ผนัง)</td></tr>
+<tr><td>พื้น</td><td>กว้าง×ลึก</td><td>อลูทึบ</td><td><span class="tag t-rn90">rn90 fin</span></td></tr>
+<tr><td>ชั้นอลู</td><td>กว้าง×ลึก × จำนวนชั้นอลู</td><td>อลูทึบ</td><td><span class="tag t-rn90">rn90 fin</span></td></tr>
+<tr><td>ชั้นกระจก</td><td>—</td><td>กระจก</td><td><span class="tag t-no">ไม่คิดค่าสี</span></td></tr>
+</table>
+
+<div class="box">
+<b>ค่าคงที่จากต้นฉบับ R3.9:</b><br>
+• <b>rn90 fin</b> (ค่าสีอลูทึบ ลูกฟูก 2 ทาง · ข้อ F.4 · per ตร.ม. · <u>ไม่มี min</u>): สีเทาซาฮารา <b>400</b> / ลายไม้สต๊อก <b>1,500</b> / อบสีพิเศษ <b>1,600</b> / ลายไม้อบพิเศษ <b>2,200</b><br>
+• <b>colorPrice</b> (ค่าสีกระจก/งานบาน · บ.918) ใช้ <code>rates</code> ต่อสีของ <code>COLORS[ci]</code> เดิม → <b>แยกสีอัตโนมัติ</b> · งานนี้ใช้แบบ <u>ตัด min</u>
+</div>
+
+<h2>2. UX — เพิ่ม control "วัสดุผนัง" (ในกล่องรายละเอียดตู้)</h2>
+<p>ตู้รองรับ 2 แบบผนัง → เพิ่มชิปเลือกวัสดุผนัง (default = อลูทึบ ตามข้อ 49) ในฟอร์ม <code>p.cabinet</code>:</p>
+<pre><span class="c">// เพิ่มในบล็อก if(p.cabinet){...} — รวมในกล่อง "รายละเอียดตู้"</span>
+h+='&lt;label class="opt" style="width:100%;"&gt;วัสดุผนังตู้'
+ +'&lt;div class="chip-group chip-sm"&gt;'
+ +'&lt;button type="button" class="chip on" data-val="alu" onclick="chSetChip(this,\'o-cabwallmat\')"&gt;อลูทึบ&lt;/button&gt;'
+ +'&lt;button type="button" class="chip" data-val="glass" onclick="chSetChip(this,\'o-cabwallmat\')"&gt;กระจก&lt;/button&gt;'
+ +'&lt;/div&gt;'
+ +'&lt;select class="o-cabwallmat" style="display:none;"&gt;&lt;option value="alu" selected&gt;อลูทึบ&lt;/option&gt;&lt;option value="glass"&gt;กระจก&lt;/option&gt;&lt;/select&gt;'
+ +'&lt;/label&gt;';</pre>
+<p class="sub">readItem: เพิ่ม <code>optSel.cabwallmat = (d.querySelector('.o-cabwallmat')||{}).value || 'alu';</code> (อยู่บล็อก readItem cabinet)</p>
+
+<h2>3. สูตรโค้ด — helper + แก้ calcUnit cabinet</h2>
+
+<h3>3.1 helper ใหม่ — ค่าสีอลูทึบ (rn90) + ค่าสีกระจก (no-min)</h3>
+<pre><span class="c">// ค่าสีอลูทึบ — map สี (ci 0-12) → 1 ใน 4 ระดับ rn90 (ค่า default ตามชื่อสี · ⚠ เช็คซ้ำ)</span>
+function rn90FinRate(ci){
+  if(ci===2||ci===3) return 400;            <span class="c">// ซาฮารา เทา/ดำ</span>
+  if(ci&gt;=5&&ci&lt;=7) return 1500;             <span class="c">// ลายไม้สต๊อก</span>
+  if(ci===8||ci===9||ci===11) return 2200;  <span class="c">// ลายไม้อบพิเศษ (Fuji/ระบุรหัส)</span>
+  if(ci===4||ci===10||ci===12) return 1600; <span class="c">// Aztec / อบพิเศษ / สีชุบ → อบสีพิเศษ</span>
+  return 0;                                  <span class="c">// idx 0,1 ขาว/ดำ = ไม่คิด</span>
+}
+<span class="c">// ค่าสีกระจก — เหมือน colorPrice แต่ตัด min (มติพี่นัท: กันตู้เล็กโดน min พุ่ง)</span>
+function colorRateNoMin(ci,a,series){
+  const c=COLORS[ci]; if(!c)return 0;
+  let rates=c.rates;
+  if(c.altFor && series && c.altFor.indexOf(series)&gt;=0){ rates=c.altRates; }
+  if(!rates) return 0;          <span class="c">// ขาว/ดำ = 0 · ⚠ สีชุบ idx12 rates=null ก็คืน 0 → ดู TODO</span>
+  return a*rateOf(a,rates);     <span class="c">// ตัด Math.max(min,...)</span>
+}</pre>
+
+<h3>3.2 แก้ calcUnit cabinet (เพิ่ม term ค่าสีโครง)</h3>
+<p>ในบล็อก <code>if(p.cabinet){...}</code> หลังคำนวณ <code>wall/fl/shc</code> เดิม เพิ่มค่าสีโครงก่อน <code>_sell</code>:</p>
+<pre><span class="c">// ── ค่าสีโครงตู้ (ใหม่) ── ci = สีหลัก (.i-color) · series = p.series||''</span>
+const wmat=(optSel&&optSel.cabwallmat)||'alu';
+const aWall = 2*D*H + (_bw ? W*H : 0);            <span class="c">// พื้นที่ผนัง (ข้าง 2 + หลังถ้าติ๊ก)</span>
+const aFloor = W*D;                               <span class="c">// พื้น (อลูทึบเสมอ)</span>
+const nShelfAlu = (sg==='glass') ? 0 : nsh;       <span class="c">// ชั้นกระจกไม่คิด</span>
+const aShelfAlu = W*D*nShelfAlu;
+<span class="c">// ผนัง: ตามวัสดุ · พื้น+ชั้นอลู: rn90 เสมอ</span>
+const cWall  = (wmat==='glass') ? colorRateNoMin(ci,aWall,p.series||'') : aWall*rn90FinRate(ci);
+const cFloor = aFloor*rn90FinRate(ci);
+const cShelf = aShelfAlu*rn90FinRate(ci);
+const colorStruct = Math.round(cWall+cFloor+cShelf);
+<span class="c">// เดิม: const _sell=roundUp(front+wall+fl+shc);</span>
+const _sell=roundUp(front+wall+fl+shc+colorStruct);
+<span class="c">// + ต่อท้าย msgs: ถ้า colorStruct&gt;0 ดันบรรทัด 'ค่าสีโครง ... = '+fmt(colorStruct)</span></pre>
+<div class="box">หมายเหตุ: <code>ci</code> = พารามิเตอร์สีหลักที่ calcUnit รับอยู่แล้ว (signature บ.1025) · <code>_bw</code>, <code>sg</code>, <code>nsh</code>, <code>D</code>, <code>W</code>, <code>H</code> มีในบล็อก cabinet อยู่แล้ว</div>
+
+<h2>4. ตัวอย่างคำนวณ (นักบัญชียืนยัน)</h2>
+<h3>เคส A — ตู้ผนัง<u>อลูทึบ</u> 2 บาน 1.2×2.4 ลึก 0.6 · 5 ชั้นอลู · ติ๊กผนังหลัง · สีอบพิเศษ (idx10)</h3>
+<ul>
+  <li>ผนัง = 2×0.6×2.4 + 1.2×2.4 = 5.76 ตร.ม. → rn90 อบพิเศษ 1,600 → <b>9,216</b></li>
+  <li>พื้น 0.72 + ชั้นอลู 0.72×5=3.6 = 4.32 ตร.ม. → ×1,600 → <b>6,912</b></li>
+  <li>ค่าสีโครงรวม ≈ <b>+16,128</b> → before 62,000 → <b>after ~78,000</b></li>
+</ul>
+<h3>เคส A′ — เหมือนเดิมแต่ผนัง<u>กระจก</u></h3>
+<ul>
+  <li>ผนังกระจก 5.76 ตร.ม. → colorPrice ตัด min (อบพิเศษ rate 2,200) → 5.76×2,200 = <b>12,672</b></li>
+  <li>พื้น+ชั้นอลู 4.32 ตร.ม. → rn90 1,600 → <b>6,912</b></li>
+  <li>ค่าสีโครงรวม ≈ <b>+19,584</b> → <b>after ~82,000</b></li>
+</ul>
+
+<div class="todo">
+<b>🟡 TODO — สีชุบ (idx12) เฉพาะ "ผนังกระจก":</b> <code>COLORS[12].rates=null</code> → <code>colorRateNoMin</code> คืน 0 (ไม่คิด) ซึ่งผิด ·
+ต้องมี rate/ตร.ม. ของสีชุบสำหรับผนังกระจก ที่ระบบยังไม่มี.
+<b>ชั่วคราว:</b> ให้ idx12 ใช้ rate เท่า idx11 (ลายไม้อบพิเศษ) ไปก่อน + ใส่ warning "สีชุบผนังกระจก รอเคาะราคา" ·
+<b>รอพี่นัทให้ rate สีชุบต่อ ตร.ม.</b> (เคยเอ่ย 1,000/1,500/2,000 — ต้องยืนยันว่าวัดจากพื้นที่ผนังหรือขนาดบาน)
+<br>(สีชุบของ <b>อลูทึบ</b> ไม่ติดปัญหานี้ — map → 1,600 ใน rn90FinRate แล้ว · สีชุบ <b>บานหน้า</b> ก็คงเดิม FT flat)
+</div>
+
+<h2>5. จุดในโค้ด</h2>
+<ul>
+  <li><code>colorPrice</code> บ.~918 → เพิ่ม <code>colorRateNoMin</code> + <code>rn90FinRate</code> ใกล้กัน</li>
+  <li><code>calcUnit</code> cabinet block (<code>if(p.cabinet)</code> บ.~1024-1044) → เพิ่ม term ค่าสีโครง + แก้ <code>_sell</code></li>
+  <li>buildItemOpts cabinet (<code>if(p.cabinet)</code> บ.~2621) → เพิ่มชิปวัสดุผนัง <code>o-cabwallmat</code></li>
+  <li>readItem cabinet (บ.~2857) → อ่าน <code>optSel.cabwallmat</code></li>
+  <li>itemDetail/genQuote (บ.~3494) → เพิ่มบรรทัด "ค่าสีโครง" + ระบุวัสดุผนัง (อลูทึบ/กระจก) ในใบ</li>
+</ul>
+
+<h2>6. Definition of Done</h2>
+<ul>
+  <li>ตู้สีขาว/ดำ (idx 0,1): ค่าสีโครง = 0 (ราคาเท่าเดิม · ห้ามเพี้ยน)</li>
+  <li>ตู้สีพิเศษ: ค่าสีโครงเพิ่มตามตัวอย่าง (เคส A ~+16k / A′ ~+19.5k)</li>
+  <li>ตู้เล็กผนังกระจก (เช่น 1.6 ตร.ม.): <b>ไม่</b>โดน min พุ่งเป็นหมื่น (เพราะ colorRateNoMin ตัด min)</li>
+  <li>สลับชิปวัสดุผนัง อลู↔กระจก → ราคาเปลี่ยน · ชั้นกระจกไม่บวกค่าสี</li>
+  <li><code>node test/quote-fidelity.mjs</code> PASS</li>
+  <li><b>regression</b>: สินค้าอื่นที่ใช้ <code>colorPrice</code> (บาน) ราคาไม่เปลี่ยน (helper เดิมยังมี min ครบ — <code>colorRateNoMin</code> เป็นฟังก์ชันใหม่แยก)</li>
+  <li>ใบเสนอราคาขึ้นบรรทัดค่าสีโครง + ระบุวัสดุผนัง</li>
+</ul>
+
+<div class="warn">
+<b>เตือน dev:</b> อย่าแก้ <code>colorPrice</code> เดิม (บานอื่นใช้) — สร้าง <code>colorRateNoMin</code> ใหม่แยก ·
+<code>rn90FinRate</code> mapping สี→4 ระดับ เป็น <b>default ตามชื่อ ต้องให้พี่นัทเช็คซ้ำ</b> (โดยเฉพาะ Aztec idx4, สีชุบ idx12) ·
+บานหน้า/ฝาตู้ <b>ห้ามแตะ</b> (ค่าสี FT มีครบแล้วตามข้อ 41)
+</div>
+
+</body>
+</html>
