@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ดราฟ G6 ออปชั่นบาน — ครบ 71 ตัว (DEMO)</title>
+<style>
+:root{
+  --red:#B3151D;--red2:#8a0f14;
+  --line:#e3d3d3;--muted:#888;--bg:#faf7f7;
+  --blue:#1E5AA8;--blueBg:#EAF3FF;--blueLine:#9DBCE0;
+  --gold:#F0C040;--goldBg:#FFF7E6;--goldLine:#FFA000;
+  --green:#15803D;--greenBg:#dcfce7;
+  --mosq:#1565C0;--mosqBg:#E3F2FD;--mosqLine:#90CAF9;
+  --amber:#92400e;--amberBg:#FFF3E0;--amberLine:#FDBA74;
+  --purple:#6D28D9;--purpleBg:#EDE9FE;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:#1a1a1a;-webkit-text-size-adjust:100%;font-size:15px;}
+.demo-bar{background:#ff6b00;color:#fff;font-size:11px;font-weight:700;padding:6px 12px;text-align:center;letter-spacing:.3px;position:sticky;top:0;z-index:99;}
+.wrap{max-width:430px;margin:0 auto;padding:12px 12px 60px;}
+h1{font-size:18px;font-weight:800;color:var(--red);margin:8px 0 3px;}
+.sub{font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.6;}
+
+/* === Product Switcher === */
+.prod-switcher{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:12px;}
+.prod-switcher-label{font-size:11px;font-weight:700;color:var(--red);margin-bottom:7px;}
+.prod-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.pchip{min-height:36px;padding:0 12px;border:1.5px solid var(--line);border-radius:8px;background:#fff;font-size:13px;cursor:pointer;color:#444;font-family:inherit;}
+.pchip.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+
+/* === Card === */
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;}
+
+/* === GH master row (สีห้อง) === */
+.gh-master{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;background:var(--goldBg);border:1.5px dashed var(--goldLine);border-radius:8px;padding:8px 10px;margin-bottom:10px;}
+.gh-master>div{flex:1;min-width:130px;}
+.gh-master label{font-size:11px;color:var(--amber);font-weight:700;display:block;margin-bottom:3px;}
+.gh-master select{width:100%;height:36px;border:1px solid var(--goldLine);border-radius:7px;font-size:14px;background:#fff;}
+
+/* === Side Card === */
+.side-card{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;}
+.side-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fdf5f5;border-bottom:1px solid var(--line);}
+.side-badge{background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;flex:none;}
+.side-name{flex:1;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:14px;}
+.side-body{padding:12px;}
+
+/* === Blue box (ชนิดการเปิด) === */
+.blue-box{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--blueBg);border:1px solid var(--blueLine);border-radius:8px;padding:8px 11px;margin-bottom:10px;}
+.blue-box-label{font-size:12px;color:var(--blue);font-weight:700;flex:0 0 auto;}
+
+/* === Form fields === */
+.fld{margin-bottom:11px;}
+.lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:700;}
+.lbl.red{color:var(--red);}
+select.ctrl,input.ctrl{width:100%;height:40px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff;color:#111;padding:0 8px;}
+input.ctrl-sm{height:36px;width:72px;border:1px solid var(--line);border-radius:8px;font-size:14px;text-align:center;padding:0 6px;}
+.row2{display:flex;gap:8px;}
+.row2>div{flex:1;}
+
+/* === Chips === */
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{min-height:44px;padding:0 13px;border:1.5px solid #d6cccc;border-radius:10px;background:#fff;font-size:14px;cursor:pointer;color:#222;display:inline-flex;align-items:center;font-family:inherit;transition:background .1s;}
+.chip.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+.chip.sm{min-height:38px;font-size:13px;padding:0 10px;}
+.chip.multi.on{background:#1565C0;border-color:#1565C0;color:#fff;}
+
+/* === Stepper === */
+.step{display:flex;align-items:center;gap:0;}
+.step-btn{width:44px;height:44px;border:1.5px solid var(--line);background:#fff;font-size:20px;cursor:pointer;color:var(--red);border-radius:9px;flex:none;font-family:inherit;}
+.step-val{width:58px;height:44px;text-align:center;font-size:17px;font-weight:700;border:1.5px solid var(--line);border-left:none;border-right:none;background:#fff;}
+
+/* === Opt groups (details พับ) === */
+.opt-grp{margin-bottom:8px;}
+.opt-grp details{border:1px solid var(--line);border-radius:9px;overflow:hidden;}
+.opt-grp details[open]{border-color:var(--red);background:#fffafa;}
+.opt-grp summary{display:flex;align-items:center;min-height:44px;padding:0 12px;cursor:pointer;font-weight:700;font-size:13px;color:var(--red);list-style:none;user-select:none;background:#fffafa;}
+.opt-grp summary::after{content:'▾';margin-left:auto;font-size:14px;color:var(--muted);}
+.opt-grp details[open] summary::after{content:'▴';}
+.opt-grp .grp-body{padding:10px 12px;border-top:1px solid var(--line);}
+
+/* === Opt rows === */
+.opt-row{margin-bottom:10px;}
+.opt-row:last-child{margin-bottom:0;}
+.opt-label{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;display:block;}
+
+/* === Toggle+len === */
+.toggle-len{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.toggle-cb{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;cursor:pointer;}
+.toggle-cb input{width:20px;height:20px;cursor:pointer;}
+
+/* === Mosq box === */
+.mosq-box{background:var(--mosqBg);border:1px solid var(--mosqLine);border-radius:10px;padding:10px 12px;}
+.mosq-title{font-size:12px;font-weight:700;color:var(--mosq);margin-bottom:8px;}
+
+/* === Shower box === */
+.shower-box{background:#F0FDF4;border:1px solid #86EFAC;border-radius:10px;padding:10px 12px;}
+.shower-title{font-size:12px;font-weight:700;color:#15803D;margin-bottom:8px;}
+
+/* === Handle box === */
+.handle-box{background:var(--goldBg);border:1px solid var(--gold);border-radius:10px;padding:10px 12px;}
+.handle-title{font-size:11px;font-weight:700;color:var(--amber);margin-bottom:8px;}
+.handle-sub{display:none;margin-top:10px;border-top:1px solid #FFD54F;padding-top:10px;}
+.handle-sub.show{display:block;}
+
+/* === Grid mark box === */
+.grid-box{background:#F5F3FF;border:1px solid #C4B5FD;border-radius:10px;padding:10px 12px;}
+.grid-detail{display:none;margin-top:8px;flex-wrap:wrap;gap:8px;}
+.grid-detail.show{display:flex;}
+
+/* === Struct box === */
+.struct-box{background:#F1F5F9;border:1px solid #CBD5E1;border-radius:10px;padding:10px 12px;}
+.struct-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #E2E8F0;flex-wrap:wrap;}
+.struct-row:last-child{border-bottom:none;}
+
+/* === Solid lower box === */
+.solid-box{background:#FFF7ED;border:1px solid var(--amberLine);border-radius:10px;padding:10px 12px;}
+.solid-detail{display:none;margin-top:8px;}
+.solid-detail.show{display:block;}
+
+/* === Motor box === */
+.motor-box{background:#FDF4FF;border:1px solid #E879F9;border-radius:10px;padding:10px 12px;}
+
+/* === Remark/extra box === */
+.extra-box{background:#F8FAFC;border:1px solid #CBD5E1;border-radius:10px;padding:10px 12px;}
+
+/* === Conditional badge === */
+.cond-badge{font-size:10px;background:#F3F4F6;color:#6B7280;border-radius:4px;padding:2px 6px;font-weight:700;margin-left:6px;}
+.cond-badge.show-badge{background:#DCFCE7;color:#15803D;}
+.cond-badge.hide-badge{background:#FEE2E2;color:#991B1B;}
+
+/* === hint === */
+.hint{font-size:11px;color:#aaa;margin:3px 0 0;line-height:1.5;}
+.auto-badge{font-size:10px;background:#D1FAE5;color:#065F46;border-radius:4px;padding:1px 6px;font-weight:700;margin-left:4px;}
+
+/* === Price preview === */
+.price-bar{background:var(--red);color:#fff;border-radius:10px;padding:10px 14px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;}
+.price-bar .price-val{font-size:22px;font-weight:800;}
+
+/* === cond-section (โผล่ตามสินค้า) === */
+.cond-section{display:none;}
+.cond-section.show{display:block;}
+</style>
+</head>
+<body>
+<div class="demo-bar">DEMO — ราคาในหน้านี้เป็นตัวอย่างเท่านั้น · ไม่ใช่ราคาจริง</div>
+<div class="wrap">
+  <h1>กั้นห้องกระจก — ออปชั่นบาน ครบ 71 ตัว</h1>
+  <p class="sub">ดราฟ UX redesign · โครงกลุ่มใหม่ 9 หมวด · กดสลับสินค้าเพื่อดูออปชั่น conditional · ธีมแดง #B3151D</p>
+
+  <!-- Product switcher -->
+  <div class="prod-switcher">
+    <div class="prod-switcher-label">เปลี่ยนสินค้าเพื่อดูออปชั่น conditional</div>
+    <div class="prod-chips" id="prodChips">
+      <button class="pchip on" data-prod="sliding_euro" onclick="switchProd(this)">บานเลื่อน</button>
+      <button class="pchip" data-prod="casement_euro" onclick="switchProd(this)">บานเปิด</button>
+      <button class="pchip" data-prod="awning" onclick="switchProd(this)">บานกระทุ้ง</button>
+      <button class="pchip" data-prod="folding" onclick="switchProd(this)">บานเฟี้ยม</button>
+      <button class="pchip" data-prod="shower" onclick="switchProd(this)">Shower</button>
+      <button class="pchip" data-prod="curved_single" onclick="switchProd(this)">ดัดโค้ง</button>
+      <button class="pchip" data-prod="grid_line" onclick="switchProd(this)">เส้นคาด</button>
+    </div>
+  </div>
+
+  <!-- GH Master Color (ระดับห้อง) -->
+  <div class="gh-master">
+    <div>
+      <label>สีอลูมิเนียม (ทั้งห้อง)</label>
+      <select><option>ขาวด้าน (default)</option><option>ดำด้าน</option><option>เทาซาฮาร่า</option><option>KL ลายไม้</option></select>
+    </div>
+    <div>
+      <label>กระจก (ทั้งห้อง)</label>
+      <select><option>เทมเปอร์ใส 6มม.</option><option>เทมเปอร์ใส 8มม.</option><option>ลามิเนต</option></select>
+    </div>
+  </div>
+
+  <!-- Side Card -->
+  <div class="side-card">
+    <div class="side-head">
+      <span class="side-badge">ด้าน A</span>
+      <input class="side-name" type="text" value="ด้าน A" placeholder="ชื่อด้าน">
+      <button style="height:34px;padding:0 12px;border:1px solid #ddd;border-radius:7px;background:#fff;color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;">ลบ</button>
+    </div>
+    <div class="side-body">
+
+      <!-- === หมวด 1: ชนิด/การเปิด/ราง/ธรณี (open ค่าเริ่มต้น) === -->
+      <div class="opt-grp">
+        <details open id="grp1">
+          <summary>ชนิด / การเปิด / ราง / ธรณี <span id="grp1-count" class="cond-badge show-badge">11 ออปชั่น</span></summary>
+          <div class="grp-body">
+
+            <!-- o-opentype: ชนิดการเปิด (ชิป 5 ตัว) — เฉพาะบานเลื่อน/เลื่อนภายใน -->
+            <div class="opt-row cond-section" id="sec-opentype" data-prods="sliding_euro">
+              <span class="opt-label">ชนิดการเปิด <span class="cond-badge">บานเลื่อน/เลื่อนใน</span></span>
+              <div class="blue-box">
+                <span class="blue-box-label">บานเลื่อน</span>
+                <div>
+                  <div class="chips">
+                    <button class="chip sm" onclick="pickOne(this,'o-opentype')">บานเลื่อน</button>
+                    <button class="chip sm on" onclick="pickOne(this,'o-opentype')">บานเลื่อนสลับ</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-opentype')">เปิดคู่กลาง</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-opentype')">ลากจูง</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-opentype')">ซ่อนราง</button>
+                  </div>
+                  <select class="o-opentype" style="display:none;"><option>บานเลื่อน</option><option selected>บานเลื่อนสลับ</option><option>เปิดคู่กลาง</option><option>ลากจูง</option><option>ซ่อนราง</option></select>
+                </div>
+              </div>
+            </div>
+
+            <!-- o-fixed: ติดตาย (จำนวน) — เฉพาะบานเลื่อน -->
+            <div class="opt-row cond-section" id="sec-fixed" data-prods="sliding_euro">
+              <span class="opt-label">ติดตาย / เปิดได้ <span class="cond-badge">บานเลื่อน</span></span>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span style="font-size:13px;">ติดตาย</span>
+                <div class="step">
+                  <button class="step-btn" onclick="stepVal('o-fixed',-1)">−</button>
+                  <input class="step-val o-fixed" type="number" value="0" min="0">
+                  <button class="step-btn" onclick="stepVal('o-fixed',1)">+</button>
+                </div>
+                <span style="font-size:13px;">บาน · เปิด <b id="opencount" style="color:var(--green)">4</b> บาน</span>
+              </div>
+            </div>
+
+            <!-- o-bottomrail: ราง (ชิป 2 ตัว) — เฉพาะบานเลื่อนรางล่าง -->
+            <div class="opt-row cond-section" id="sec-bottomrail" data-prods="sliding_euro">
+              <span class="opt-label">ราง <span class="cond-badge">บานเลื่อนรางล่าง</span></span>
+              <div class="chips">
+                <button class="chip sm on" onclick="pickOne(this,'o-bottomrail')">รางกันน้ำ</button>
+                <button class="chip sm" onclick="pickOne(this,'o-bottomrail')">รางเตี้ย 7 มม.</button>
+              </div>
+              <select class="o-bottomrail" style="display:none;"><option selected>กันน้ำ</option><option>เตี้ย</option></select>
+            </div>
+
+            <!-- o-track: โชว์/ซ่อนราง — เฉพาะเลื่อนภายใน (รางบน) -->
+            <div class="opt-row cond-section" id="sec-track" data-prods="">
+              <span class="opt-label">ราง <span class="cond-badge">เลื่อนภายใน (รางบน)</span></span>
+              <div class="chips">
+                <button class="chip sm on" onclick="pickOne(this,'o-track')">โชว์ราง</button>
+                <button class="chip sm" onclick="pickOne(this,'o-track')">ซ่อนราง +5,000</button>
+              </div>
+              <select class="o-track" style="display:none;"><option>โชว์ราง</option><option>ซ่อนราง</option></select>
+            </div>
+
+            <!-- o-thresh: ธรณี บานเปิด (ชิป 2) -->
+            <div class="opt-row cond-section" id="sec-thresh" data-prods="casement_euro">
+              <span class="opt-label">ธรณี <span class="cond-badge">บานเปิด</span></span>
+              <div class="chips">
+                <button class="chip sm on" onclick="pickOne(this,'o-thresh')">กันน้ำ (std)</button>
+                <button class="chip sm" onclick="pickOne(this,'o-thresh')">หลังเต่า +1,000</button>
+              </div>
+              <select class="o-thresh" style="display:none;"><option>std</option><option>turtle</option></select>
+            </div>
+
+            <!-- o-threshf: ธรณี บานเฟี้ยม (ชิป 2) -->
+            <div class="opt-row cond-section" id="sec-threshf" data-prods="folding">
+              <span class="opt-label">ธรณี <span class="cond-badge">บานเฟี้ยม</span></span>
+              <div class="chips">
+                <button class="chip sm on" onclick="pickOne(this,'o-threshf')">กันน้ำภายนอก</button>
+                <button class="chip sm" onclick="pickOne(this,'o-threshf')">หลังเต่าภายใน</button>
+              </div>
+              <select class="o-threshf" style="display:none;"><option>outer</option><option>inner</option></select>
+            </div>
+
+            <!-- o-awn_mode: แบบเปิด (ชิป 3) — เฉพาะบานกระทุ้ง -->
+            <div class="opt-row cond-section" id="sec-awn_mode" data-prods="awning">
+              <span class="opt-label">แบบเปิด <span class="cond-badge">บานกระทุ้ง</span></span>
+              <div class="chips">
+                <button class="chip sm on" onclick="pickOne(this,'o-awn_mode')">เปิดล่าง (Std)</button>
+                <button class="chip sm" onclick="pickOne(this,'o-awn_mode')">เปิดข้าง (Std)</button>
+                <button class="chip sm" onclick="pickOne(this,'o-awn_mode')">Tilt &amp; Turn</button>
+              </div>
+              <select class="o-awn_mode" style="display:none;"><option>bottom</option><option>side</option><option>tilt</option></select>
+            </div>
+
+            <!-- o-frametype: ประเภทประตูบานเปลือย (ชิป 2) — เฉพาะ frameless_door -->
+            <div class="opt-row cond-section" id="sec-frametype" data-prods="">
+              <span class="opt-label">ประเภทบานเปลือย <span class="cond-badge">frameless_door</span></span>
+              <div class="chips">
+                <button class="chip sm on" onclick="pickOne(this,'o-frametype')">สวิง (บานเปิด)</button>
+                <button class="chip sm" onclick="pickOne(this,'o-frametype')">เลื่อน</button>
+              </div>
+              <select class="o-frametype" style="display:none;"><option>swing</option><option>sliding</option></select>
+            </div>
+
+            <!-- o-solidlight: ช่องแสง — เฉพาะ solid_door -->
+            <div class="opt-row cond-section" id="sec-solidlight" data-prods="">
+              <span class="opt-label">ช่องแสง (กระจก) <span class="cond-badge">solid_door</span></span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input class="ctrl-sm o-solidlight" type="number" min="0" step="0.1" value="0" placeholder="ตร.ม.">
+                <span style="font-size:13px;color:var(--muted);">ตร.ม. (0 = ทึบล้วน)</span>
+              </div>
+            </div>
+
+            <!-- o-fcsides + o-fcm: ครอบวงกบ (ชิป 3 + ช่องกรอก) -->
+            <div class="opt-row">
+              <span class="opt-label">ครอบวงกบอลู</span>
+              <div class="chips" style="margin-bottom:6px;">
+                <button class="chip sm on" onclick="pickOne(this,'o-fcsides')">ไม่มี</button>
+                <button class="chip sm" onclick="pickOne(this,'o-fcsides')">3 ด้าน</button>
+                <button class="chip sm" onclick="pickOne(this,'o-fcsides')">4 ด้าน</button>
+              </div>
+              <select class="o-fcsides" style="display:none;"><option>0</option><option>3</option><option>4</option></select>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                <span style="font-size:12px;color:var(--muted);">หรือระบุ(ม.)</span>
+                <input class="ctrl-sm o-fcm" type="number" min="0" step="0.1" value="0">
+              </div>
+            </div>
+
+          </div><!-- /grp-body -->
+        </details>
+      </div><!-- /grp1 -->
+
+      <!-- === หมวด 2: มือจับ / ล็อค / โช๊ค === -->
+      <div class="opt-grp">
+        <details id="grp2">
+          <summary>มือจับ / ล็อค / โช๊ค <span class="cond-badge">10 ออปชั่น</span></summary>
+          <div class="grp-body">
+            <div class="handle-box">
+              <div class="handle-title">ติ๊กแบรนด์ที่ใช้ (ติ๊กได้หลายอัน · ราคาบวกสะสม)</div>
+
+              <!-- Cmech — บานเลื่อน/บานเปิด -->
+              <div class="opt-row cond-section" id="sec-cmech" data-prods="sliding_euro,casement_euro">
+                <div class="chips">
+                  <button class="chip sm multi" onclick="multiToggle(this,'hsub-cmech')" id="btn-cmech">Cmech <span class="cond-badge">เลื่อน/เปิด</span></button>
+                </div>
+                <div class="handle-sub" id="hsub-cmech">
+                  <div class="chips" style="margin-bottom:7px;">
+                    <button class="chip sm on" onclick="pickOne(this,'o-cmech')">ฝัง</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-cmech')">เมโทร</button>
+                  </div>
+                  <select class="o-cmech" style="display:none;"><option>embed</option><option>metro</option></select>
+                  <div class="fld">
+                    <span class="opt-label">สีมือจับ <span class="auto-badge">dropdown ≥7</span></span>
+                    <select class="o-cmechcolor ctrl" style="height:40px;">
+                      <option>สีดำ</option><option>สีขาว</option><option>Silver (ชุบ)</option>
+                      <option>Champagne (ชุบ)</option><option>Gold (ชุบ)</option><option>Bronze (ชุบ)</option><option>Copper (ชุบ)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ดิจิตอล / สแตนอร่าม — digihandle -->
+              <div class="opt-row cond-section" id="sec-digi" data-prods="">
+                <div class="chips">
+                  <button class="chip sm multi" onclick="multiToggle(this,'hsub-digi')">ดิจิตอล <span class="cond-badge">digihandle</span></button>
+                  <button class="chip sm multi" onclick="multiToggle(this,'hsub-stainless')">สแตนอร่าม <span class="cond-badge">digihandle</span></button>
+                  <button class="chip sm multi" onclick="multiToggle(this,'hsub-other')">รุ่นอื่น ✎ <span class="cond-badge">digihandle</span></button>
+                </div>
+                <div class="handle-sub" id="hsub-digi">
+                  <span class="opt-label">มือจับดิจิตอล <span class="auto-badge">dropdown ≥12</span></span>
+                  <select class="o-digi ctrl" style="height:44px;">
+                    <option value="">ไม่ใส่</option>
+                    <option>YALE YDM-3168 +15,000</option><option>Samsung SHP-DP728 +18,000</option>
+                    <option>Philips DDL702 +9,500</option><option>รุ่นอื่น...</option>
+                  </select>
+                </div>
+                <div class="handle-sub" id="hsub-stainless">
+                  <span class="opt-label">มือจับสแตนอร่าม <span class="auto-badge">dropdown ≥7</span></span>
+                  <select class="o-stainless ctrl" style="height:44px;">
+                    <option value="">ไม่ใส่</option>
+                    <option>รุ่น 304 ด้ามยาว +1,800</option><option>รุ่น 316 กันน้ำ +2,400</option><option>รุ่นอื่น...</option>
+                  </select>
+                </div>
+                <div class="handle-sub" id="hsub-other">
+                  <span class="opt-label">กรอกเอง</span>
+                  <div style="display:flex;gap:7px;flex-wrap:wrap;">
+                    <input class="o-handlename" type="text" placeholder="ชื่อรุ่น" style="flex:1;height:40px;border:1px solid var(--line);border-radius:8px;padding:0 8px;font-size:14px;">
+                    <input class="o-handleprice" type="number" min="0" step="100" placeholder="ราคา บาท" style="width:110px;height:40px;border:1px solid var(--line);border-radius:8px;padding:0 8px;font-size:14px;">
+                  </div>
+                </div>
+              </div>
+
+              <!-- X-series — xseries/slimlux -->
+              <div class="opt-row cond-section" id="sec-xhandle" data-prods="">
+                <div class="chips">
+                  <button class="chip sm multi" onclick="multiToggle(this,'hsub-xseries')">X-series (ฟรี) <span class="cond-badge">xseries/slimlux</span></button>
+                </div>
+                <div class="handle-sub" id="hsub-xseries">
+                  <select class="o-xhandle ctrl" style="height:40px;">
+                    <option>ไม่ใส่</option><option>X-J</option><option>XO</option><option>XT</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Cmech หลบมุ้ง — บานกระทุ้ง -->
+              <div class="opt-row cond-section" id="sec-cmechawn" data-prods="awning">
+                <div class="chips">
+                  <button class="chip sm multi" onclick="multiToggle(this,'hsub-cmechawn')">Cmech หลบมุ้ง <span class="cond-badge">บานกระทุ้ง</span></button>
+                </div>
+                <div class="handle-sub" id="hsub-cmechawn">
+                  <span class="opt-label">สี Cmech หลบมุ้ง <span class="auto-badge">dropdown ≥8</span></span>
+                  <select class="o-cmechawn ctrl" style="height:40px;">
+                    <option value="">ไม่ใส่</option>
+                    <option>สีดำ +600</option><option>สีขาว +600</option><option>Silver ชุบ +840</option>
+                    <option>Champagne ชุบ +840</option><option>Gold ชุบ +840</option><option>Bronze ชุบ +840</option><option>Copper ชุบ +840</option>
+                  </select>
+                </div>
+              </div>
+
+            </div><!-- /handle-box -->
+
+            <!-- ชุดล็อค (ชิป 2) — บานเลื่อน / PC Door -->
+            <div class="opt-row cond-section" id="sec-slidelock" data-prods="sliding_euro">
+              <span class="opt-label" style="margin-top:8px;display:block;">ชุดล็อค <span class="cond-badge">บานเลื่อน/PC Door</span></span>
+              <div class="chips">
+                <button class="chip sm on" onclick="pickOne(this,'o-slidelock')">มีกุญแจ</button>
+                <button class="chip sm" onclick="pickOne(this,'o-slidelock')">ไม่มีกุญแจ</button>
+              </div>
+              <select class="o-slidelock" style="display:none;"><option>มีกุญแจ</option><option>ไม่มีกุญแจ</option></select>
+            </div>
+
+            <!-- โช๊ค (ชิป 4) — บานเปิด -->
+            <div class="opt-row cond-section" id="sec-closer" data-prods="casement_euro">
+              <span class="opt-label" style="margin-top:8px;display:block;">[Up3] โช๊ค <span class="cond-badge">บานเปิด</span></span>
+              <div class="chips">
+                <button class="chip sm on" onclick="pickOne(this,'o-closer')">ไม่มี</button>
+                <button class="chip sm" onclick="pickOne(this,'o-closer')">แขนยื่น +5,000</button>
+                <button class="chip sm" onclick="pickOne(this,'o-closer')">รางเลื่อน +5,000</button>
+                <button class="chip sm" onclick="pickOne(this,'o-closer')">บานพับ +5,000</button>
+              </div>
+              <select class="o-closer" style="display:none;"><option>0</option><option>5000</option><option>5000</option><option>5000</option></select>
+            </div>
+
+          </div><!-- /grp-body -->
+        </details>
+      </div><!-- /grp2 -->
+
+      <!-- === หมวด 3: มุ้ง (conditional ตามสินค้า) === -->
+      <div class="opt-grp cond-section" id="grp3" data-prods="sliding_euro,casement_euro,awning,folding">
+        <details id="grp3-det">
+          <summary>มุ้ง <span class="cond-badge">บานเลื่อน/เปิด/กระทุ้ง/เฟี้ยม</span></summary>
+          <div class="grp-body">
+            <div class="mosq-box">
+              <div class="mosq-title">เลือกชนิดมุ้ง — "ไม่ใส่" = ซ่อนรายละเอียดทั้งหมด</div>
+
+              <!-- o-mosq: dropdown ≥13 -->
+              <div class="opt-row fld">
+                <span class="opt-label">ชนิดมุ้ง <span class="auto-badge">dropdown ≥13</span></span>
+                <select class="o-mosq ctrl" style="height:44px;" onchange="mosqToggle(this)">
+                  <option value="">ไม่ใส่</option>
+                  <option value="1">มุ้งเฟรมเล็ก (320/ตร.ม. min 1,800)</option>
+                  <option value="2">มุ้งเฟรมกล่อง (380/ตร.ม. min 2,000)</option>
+                  <option value="3">มุ้งพับ (480/ตร.ม. min 2,400)</option>
+                  <option value="4">มุ้งม้วน (560/ตร.ม. min 2,800)</option>
+                  <option value="5">มุ้งนิรภัย เฟรม</option>
+                </select>
+              </div>
+
+              <div id="mosq-detail" style="display:none;">
+                <!-- o-mosqpanels-stepper + o-mosqpanels -->
+                <div class="opt-row fld">
+                  <span class="opt-label">จำนวนบานมุ้ง <span style="font-size:11px;color:#1565C0;font-weight:700;">กระทบราคา</span></span>
+                  <div class="chips" style="margin-bottom:6px;" id="mosq-panel-chips">
+                    <button class="chip sm on" onclick="pickMosqPanel(this,1)">1</button>
+                    <button class="chip sm" onclick="pickMosqPanel(this,2)">2</button>
+                    <button class="chip sm" onclick="pickMosqPanel(this,3)">3</button>
+                    <button class="chip sm" onclick="pickMosqPanel(this,4)">4</button>
+                    <button class="chip sm" onclick="pickMosqPanel(this,'auto')">auto</button>
+                  </div>
+                  <input type="hidden" class="o-mosqpanels" value="1">
+                  <div style="display:none;" id="mosq-stepper-wrap">
+                    <div class="step">
+                      <button class="step-btn" onclick="stepVal('o-mosqpanels-stepper',-1)">−</button>
+                      <input class="step-val o-mosqpanels-stepper" type="number" min="1" value="1">
+                      <button class="step-btn" onclick="stepVal('o-mosqpanels-stepper',1)">+</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- o-mosqw / o-mosqh: ขนาดมุ้ง (พับใน details) -->
+                <details style="margin:6px 0;border:1px solid var(--mosqLine);border-radius:7px;">
+                  <summary style="padding:8px 10px;font-size:12px;color:var(--mosq);font-weight:700;cursor:pointer;list-style:none;">กรอกขนาดมุ้งเอง (กรณีแต่ละบานไม่เท่ากัน)</summary>
+                  <div style="padding:8px 10px;">
+                    <span style="font-size:11px;color:#0369A1;">[เว้นว่าง = auto จากบาน]</span>
+                    <div style="display:flex;gap:8px;margin-top:6px;">
+                      <div><span class="opt-label">กว้าง (ม.)</span><input class="ctrl-sm o-mosqw" type="number" min="0" step="0.1" placeholder="auto"></div>
+                      <div><span class="opt-label">สูง (ม.)</span><input class="ctrl-sm o-mosqh" type="number" min="0" step="0.1" placeholder="auto"></div>
+                    </div>
+                  </div>
+                </details>
+
+                <!-- o-mosqopenstyle: ลักษณะการเปิด (ชิป 4 · label-only) -->
+                <div class="opt-row" id="mosq-openstyle" style="display:none;">
+                  <span class="opt-label">ลักษณะการเปิด <span style="font-size:10px;background:#E0F2FE;color:#0369A1;padding:1px 6px;border-radius:4px;font-weight:700;">label-only</span></span>
+                  <div class="chips">
+                    <button class="chip sm on" onclick="pickOne(this,'o-mosqopenstyle')">เปิด</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-mosqopenstyle')">เลื่อน</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-mosqopenstyle')">กระทุ้ง</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-mosqopenstyle')">ยก</button>
+                  </div>
+                  <input type="hidden" class="o-mosqopenstyle" value="เปิด">
+                </div>
+
+                <!-- o-mosqfabric: ผ้ามุ้ง (ชิป 5) -->
+                <div class="opt-row fld">
+                  <span class="opt-label">ผ้ามุ้ง</span>
+                  <div class="chips">
+                    <button class="chip sm on" onclick="pickOne(this,'o-mosqfabric')">ไฟเบอร์เทา</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-mosqfabric')">ไฟเบอร์ดำ</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-mosqfabric')">กันแมว/หมา +800</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-mosqfabric')">สแตนกันหนู +1,200</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-mosqfabric')">นิรภัย 0.8มม.</button>
+                  </div>
+                  <select class="o-mosqfabric" style="display:none;"><option>fiber_gray</option><option>fiber_black</option><option>anti_pet</option><option>stainless</option><option>safety08</option></select>
+                </div>
+
+                <!-- o-mosqcolor: สีกรอบมุ้ง (ชิป 4) -->
+                <div class="opt-row">
+                  <span class="opt-label">สีกรอบมุ้ง</span>
+                  <div class="chips">
+                    <button class="chip sm on" onclick="pickOne(this,'o-mosqcolor')">ตามสีบาน</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-mosqcolor')">เทาซาฮาร่า</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-mosqcolor')">KL พิเศษ</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-mosqcolor')">KL ลายไม้</button>
+                  </div>
+                  <select class="o-mosqcolor" style="display:none;"><option></option><option>sahara</option><option>kl_special</option><option>kl_wood</option></select>
+                </div>
+
+              </div><!-- /mosq-detail -->
+            </div><!-- /mosq-box -->
+          </div>
+        </details>
+      </div><!-- /grp3 -->
+
+      <!-- === หมวด 4: คาดตาราง === -->
+      <div class="opt-grp">
+        <details id="grp4">
+          <summary>คาดตาราง <span class="cond-badge">บานเลื่อน/กระทุ้ง/เปิด/หมุน</span></summary>
+          <div class="grp-body">
+            <div class="grid-box">
+              <!-- o-gridmark: toggle หลัก -->
+              <div class="toggle-len opt-row">
+                <label class="toggle-cb">
+                  <input type="checkbox" class="o-gridmark" onchange="gridToggle(this)"> มีคาดตาราง (คิดตามสูตร)
+                </label>
+              </div>
+              <!-- o-gm-nh / o-gm-nv / o-gm-rate / o-gm-curve (พับเมื่อไม่ติ๊ก) -->
+              <div class="grid-detail" id="grid-detail">
+                <div class="opt-row">
+                  <span class="opt-label">เส้นนอน</span>
+                  <input class="ctrl-sm o-gm-nh" type="number" min="0" step="1" value="0">
+                </div>
+                <div class="opt-row">
+                  <span class="opt-label">เส้นตั้ง <span class="auto-badge">auto=จำนวนบาน</span></span>
+                  <input class="ctrl-sm o-gm-nv" type="number" min="0" step="1" value="4">
+                </div>
+                <div class="opt-row">
+                  <span class="opt-label">ราคา/ม.</span>
+                  <input class="ctrl-sm o-gm-rate" type="number" min="0" step="10" value="200">
+                </div>
+                <div class="opt-row">
+                  <span class="opt-label">เส้นโค้ง</span>
+                  <input class="ctrl-sm o-gm-curve" type="number" min="0" step="1" value="0">
+                </div>
+              </div>
+
+              <!-- o-fullgrid: ตารางเต็มบาน — เฉพาะบางสินค้า -->
+              <div class="opt-row cond-section" id="sec-fullgrid" data-prods="casement_euro" style="margin-top:8px;padding-top:8px;border-top:1px solid #C4B5FD;">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-fullgrid"> ตารางเต็มบาน +5,000 <span class="cond-badge">(กว้าง≤1.2/สูง≤3)</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- o-gridcolor: สีเส้น (ชิป 4) — เฉพาะสินค้า grid -->
+              <div class="opt-row cond-section" id="sec-gridcolor" data-prods="grid_line" style="margin-top:8px;padding-top:8px;border-top:1px solid #C4B5FD;">
+                <span class="opt-label">สีเส้น <span class="cond-badge">เส้นคาดเฉพาะ</span></span>
+                <div class="chips">
+                  <button class="chip sm on" onclick="pickOne(this,'o-gridcolor')">อบขาว/ดำ/ซาฮาร่า</button>
+                  <button class="chip sm" onclick="pickOne(this,'o-gridcolor')">ลายไม้สต๊อก</button>
+                  <button class="chip sm" onclick="pickOne(this,'o-gridcolor')">อบพิเศษ/Fuji</button>
+                  <button class="chip sm" onclick="pickOne(this,'o-gridcolor')">ลายไม้อบพิเศษ</button>
+                </div>
+                <select class="o-gridcolor" style="display:none;"><option>200</option><option>250</option><option>300</option><option>350</option></select>
+              </div>
+
+              <!-- o-nh / o-nv / o-nc: สำหรับ grid_line เท่านั้น -->
+              <div class="cond-section" id="sec-grid-nhvnc" data-prods="grid_line" style="margin-top:8px;padding-top:8px;border-top:1px solid #C4B5FD;">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <div class="opt-row"><span class="opt-label">เส้นแนวนอน <span class="cond-badge">เส้นคาด</span></span><input class="ctrl-sm o-nh" type="number" min="0" step="1" value="0"></div>
+                  <div class="opt-row"><span class="opt-label">เส้นแนวตั้ง <span class="cond-badge">เส้นคาด</span></span><input class="ctrl-sm o-nv" type="number" min="0" step="1" value="0"></div>
+                  <div class="opt-row"><span class="opt-label">เส้นโค้ง (3,000/เส้น) <span class="cond-badge">เส้นคาด</span></span><input class="ctrl-sm o-nc" type="number" min="0" step="1" value="0"></div>
+                </div>
+              </div>
+            </div><!-- /grid-box -->
+          </div>
+        </details>
+      </div><!-- /grp4 -->
+
+      <!-- === หมวด 5: โครงสร้าง / คาน / ราง / ซ่อน === -->
+      <div class="opt-grp">
+        <details id="grp5">
+          <summary>โครงสร้าง / คาน / ราง / ซ่อน <span class="cond-badge">8 ออปชั่น</span></summary>
+          <div class="grp-body">
+            <div class="struct-box">
+
+              <!-- o-beam_support + o-beam_support-len — เฉพาะบานเฟี้ยม/เลื่อนภายใน/PC Door -->
+              <div class="struct-row cond-section" id="sec-beam" data-prods="folding">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-beam_support" onchange="toggleLen(this,'beam-len')">
+                    เสริมคานซัพพอร์ท <span class="cond-badge">เฟี้ยม/เลื่อนใน/PC</span>
+                  </label>
+                  <span style="font-size:11px;color:var(--muted);">(≤3ม.=4,000 · เกิน +500/ม.)</span>
+                </div>
+                <div class="toggle-len" id="beam-len" style="display:none;margin-top:6px;">
+                  <span style="font-size:13px;">ยาว (ม.)</span>
+                  <input class="ctrl-sm o-beam_support-len" type="number" min="0" step="0.1" value="0">
+                </div>
+              </div>
+
+              <!-- o-hide_beam + o-hide_beam-len — เฉพาะบานเฟี้ยม/เลื่อนภายใน -->
+              <div class="struct-row cond-section" id="sec-hide-beam" data-prods="folding">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-hide_beam" onchange="toggleLen(this,'hidebeam-len')">
+                    ซ่อนคาน <span class="cond-badge">เฟี้ยม/เลื่อนใน</span>
+                  </label>
+                  <span style="font-size:11px;color:var(--muted);">(≤3ม.=4,000 · เกิน +500/ม.)</span>
+                </div>
+                <div class="toggle-len" id="hidebeam-len" style="display:none;margin-top:6px;">
+                  <span style="font-size:13px;">ยาว (ม.)</span>
+                  <input class="ctrl-sm o-hide_beam-len" type="number" min="0" step="0.1" value="0">
+                </div>
+              </div>
+
+              <!-- o-hide_track + o-hide_track-len — เฉพาะบานเฟี้ยม -->
+              <div class="struct-row cond-section" id="sec-hide-track" data-prods="folding">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-hide_track" onchange="toggleLen(this,'hidetrack-len')">
+                    ซ่อนราง <span class="cond-badge">บานเฟี้ยม</span>
+                  </label>
+                  <span style="font-size:11px;color:var(--muted);">(≤3ม.=4,000 · เกิน +500/ม.)</span>
+                </div>
+                <div class="toggle-len" id="hidetrack-len" style="display:none;margin-top:6px;">
+                  <span style="font-size:13px;">ยาว (ม.)</span>
+                  <input class="ctrl-sm o-hide_track-len" type="number" min="0" step="0.1" value="0">
+                </div>
+              </div>
+
+              <!-- o-u_track + o-u_track-len — เฉพาะบานเฟี้ยม/เลื่อนภายใน -->
+              <div class="struct-row cond-section" id="sec-utrack" data-prods="folding">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-u_track" onchange="toggleLen(this,'utrack-len')">
+                    ฝังรางยู (U-Track) <span class="cond-badge">เฟี้ยม/เลื่อนใน</span>
+                  </label>
+                  <span style="font-size:11px;color:var(--muted);">(≤2ม.=4,000 · เกิน +500/ม.)</span>
+                </div>
+                <div class="toggle-len" id="utrack-len" style="display:none;margin-top:6px;">
+                  <span style="font-size:13px;">ยาว (ม.)</span>
+                  <input class="ctrl-sm o-u_track-len" type="number" min="0" step="0.1" value="0">
+                </div>
+              </div>
+
+              <!-- o-uchannel — บานทั่วไป (ยกเว้น folding/เลื่อนภายใน/shower/บานเปลือย) -->
+              <div class="struct-row">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-uchannel">
+                    ฝังรางยู (ในพื้น)
+                  </label>
+                  <span style="font-size:11px;color:var(--muted);">— ติ๊กแล้วเลือกธรณีหลังเต่าไม่ได้</span>
+                </div>
+              </div>
+
+              <!-- o-soft_close — เลื่อนภายใน -->
+              <div class="struct-row cond-section" id="sec-softclose" data-prods="">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-soft_close">
+                    Soft Close (สลักหน่วงบาน) +4,000 <span class="cond-badge">เลื่อนภายใน</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- o-sling — เลื่อนภายใน -->
+              <div class="struct-row cond-section" id="sec-sling" data-prods="">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-sling">
+                    สลิงเปิดซ้อน(×บาน) +2,000 <span class="cond-badge">เลื่อนภายใน</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- o-dfm — ดรอปพื้น (บานทั่วไป) -->
+              <div class="struct-row">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <span style="font-size:13px;font-weight:600;">ดรอปพื้น (ม.)</span>
+                  <input class="ctrl-sm o-dfm" type="number" min="0" step="0.1" value="0">
+                  <span class="hint">0 = ไม่ดรอป</span>
+                </div>
+              </div>
+
+            </div><!-- /struct-box -->
+          </div>
+        </details>
+      </div><!-- /grp5 -->
+
+      <!-- === หมวด 6: แผ่นทึบล่าง / ลูกฟูก === -->
+      <div class="opt-grp cond-section" id="grp6" data-prods="sliding_euro,casement_euro,awning,folding">
+        <details id="grp6-det">
+          <summary>แผ่นทึบล่าง / ลูกฟูก <span class="cond-badge">บานเลื่อน/เปิด/กระทุ้ง/เฟี้ยม</span></summary>
+          <div class="grp-body">
+            <div class="solid-box">
+              <!-- o-solidlower: ชิป 3 -->
+              <div class="opt-row">
+                <span class="opt-label">แผ่นทึบล่าง</span>
+                <div class="chips">
+                  <button class="chip sm on" onclick="solidPick(this)">ไม่มี</button>
+                  <button class="chip sm" onclick="solidPick(this)" data-val="corrugated">อลูลูกฟูก (3,500/ตร.ม.)</button>
+                  <button class="chip sm" onclick="solidPick(this)" data-val="composite">คอมโพสิท (3,300/ตร.ม.)</button>
+                </div>
+                <select class="o-solidlower" style="display:none;"><option value="">ไม่มี</option><option value="corrugated">corrugated</option><option value="composite">composite</option></select>
+              </div>
+              <!-- o-sl-w / o-sl-h / o-sl-color: โผล่เมื่อเลือกมี -->
+              <div class="solid-detail" id="solid-detail">
+                <div class="opt-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                  <div><span class="opt-label">กว้าง (ม.)</span><input class="ctrl-sm o-sl-w" type="number" min="0" step="0.1" value="0"></div>
+                  <div><span class="opt-label">สูง (ม.)</span><input class="ctrl-sm o-sl-h" type="number" min="0" step="0.1" value="0"></div>
+                </div>
+                <!-- o-sl-color: ชิป 5 (เฉพาะลูกฟูก) -->
+                <div class="opt-row" id="sl-color-row" style="display:none;margin-top:8px;">
+                  <span class="opt-label">สีลูกฟูก</span>
+                  <div class="chips">
+                    <button class="chip sm on" onclick="pickOne(this,'o-sl-color')">ดำ/ขาว/ซาฮาร่า (+0)</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-sl-color')">ซาฮาร่า +400</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-sl-color')">ลายไม้สต๊อก +1,500</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-sl-color')">อบพิเศษ +1,600</button>
+                    <button class="chip sm" onclick="pickOne(this,'o-sl-color')">ลายไม้อบพิเศษ +2,200</button>
+                  </div>
+                  <select class="o-sl-color" style="display:none;"><option>0</option><option>400</option><option>1500</option><option>1600</option><option>2200</option></select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div><!-- /grp6 -->
+
+      <!-- === หมวด 7: Shower (conditional) === -->
+      <div class="opt-grp cond-section" id="grp7" data-prods="shower">
+        <details id="grp7-det" open>
+          <summary>Shower <span class="cond-badge show-badge">เฉพาะ shower</span></summary>
+          <div class="grp-body">
+            <div class="shower-box">
+              <div class="shower-title">ตั้งค่าห้องน้ำกระจก</div>
+
+              <!-- o-shtype: ชิป 3 -->
+              <div class="opt-row fld">
+                <span class="opt-label">รูปแบบ shower</span>
+                <div class="chips">
+                  <button class="chip sm on" onclick="pickOne(this,'o-shtype')">(ก) ประตู+กระจกติดตาย</button>
+                  <button class="chip sm" onclick="pickOne(this,'o-shtype')">(ข) กระจกติดตายเดี่ยว</button>
+                  <button class="chip sm" onclick="pickOne(this,'o-shtype')">(ค) ประตูเดี่ยว</button>
+                </div>
+                <select class="o-shtype" style="display:none;"><option>door_fixed</option><option>fixed_only</option><option>door_only</option></select>
+              </div>
+
+              <!-- o-shdoortype: ชิป 2 -->
+              <div class="opt-row fld">
+                <span class="opt-label">ประเภทประตู (ถ้ามี)</span>
+                <div class="chips">
+                  <button class="chip sm on" onclick="pickOne(this,'o-shdoortype')">บานเปิด (swing)</button>
+                  <button class="chip sm" onclick="pickOne(this,'o-shdoortype')">บานเลื่อน</button>
+                </div>
+                <select class="o-shdoortype" style="display:none;"><option>swing</option><option>sliding</option></select>
+              </div>
+
+              <!-- o-corner: checkbox -->
+              <div class="opt-row">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-corner"> เข้ามุม +3,000
+                  </label>
+                </div>
+              </div>
+
+              <!-- o-showerhw: ชิป 3 -->
+              <div class="opt-row fld">
+                <span class="opt-label">อุปกรณ์</span>
+                <div class="chips">
+                  <button class="chip sm on" onclick="pickOne(this,'o-showerhw')">เงิน (default)</button>
+                  <button class="chip sm" onclick="pickOne(this,'o-showerhw')">ดำ +4,000</button>
+                  <button class="chip sm" onclick="pickOne(this,'o-showerhw')">ทอง +6,000</button>
+                </div>
+                <select class="o-showerhw" style="display:none;"><option>silver</option><option>black</option><option>gold</option></select>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div><!-- /grp7 -->
+
+      <!-- === หมวด 8: มอเตอร์ / ดัดโค้ง / บานเปลือย === -->
+      <div class="opt-grp cond-section" id="grp8" data-prods="curved_single">
+        <details id="grp8-det" open>
+          <summary>มอเตอร์ / ดัดโค้ง <span class="cond-badge show-badge">เฉพาะดัดโค้ง</span></summary>
+          <div class="grp-body">
+            <div class="motor-box">
+              <!-- o-motor: ชิป 3 -->
+              <div class="opt-row fld">
+                <span class="opt-label">มอเตอร์</span>
+                <div class="chips">
+                  <button class="chip sm on" onclick="pickOne(this,'o-motor')">ไม่มี</button>
+                  <button class="chip sm" onclick="pickOne(this,'o-motor')">80กก. +18,000</button>
+                  <button class="chip sm" onclick="pickOne(this,'o-motor')">300กก. +28,000</button>
+                </div>
+                <select class="o-motor" style="display:none;"><option>0</option><option>80</option><option>300</option></select>
+              </div>
+
+              <!-- o-doortype: dropdown ≥6 (ระแนง ทำเป็นประตู) — เฉพาะสินค้า ranae -->
+              <div class="opt-row fld cond-section" id="sec-doortype" data-prods="curved_single">
+                <span class="opt-label">ทำเป็นประตู <span class="cond-badge">ระแนง/ดัดโค้ง</span></span>
+                <select class="o-doortype ctrl" style="height:40px;">
+                  <option value="">ไม่ทำ</option>
+                  <option>บานเลื่อน SMS</option><option>บานเลื่อน ยูโร</option>
+                  <option>บานเปิด</option><option>บานเฟี้ยม</option>
+                  <option>ดัดโค้งเดี่ยว</option>
+                </select>
+              </div>
+
+
+              <!-- o-doorprice: ราคาประตู (กรอกเอง) — เฉพาะสินค้า ranae -->
+              <div class="opt-row fld cond-section" id="sec-doorprice" data-prods="curved_single">
+                <span class="opt-label">ราคาประตู (กรอกเอง) <span class="cond-badge">ระแนง/ดัดโค้ง</span></span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <input class="ctrl-sm o-doorprice" type="number" min="0" step="500" value="0" placeholder="ว่าง=auto" style="width:110px;">
+                  <span style="font-size:12px;color:var(--muted);">บาท (กรอก &gt;0 ใช้แทน auto)</span>
+                </div>
+              </div>
+
+              <!-- o-finish: ผิว/สี ระแนง — dropdown ≥7 (สินค้า fin) -->
+              <div class="opt-row fld cond-section" id="sec-finish" data-prods="curved_single">
+                <span class="opt-label">ผิว/สี ระแนง <span class="auto-badge">dropdown ≥7</span> <span class="cond-badge">สินค้ามี .fin</span></span>
+                <select class="o-finish ctrl" style="height:40px;">
+                  <option value="0" data-n="สีอบขาว">สีอบขาว (default)</option>
+                  <option value="0" data-n="สีดำ">สีดำ</option>
+                  <option value="0" data-n="ไม่อบสี">ไม่อบสี</option>
+                  <option value="400">สีเทาซาฮาร่า +400/ตร.ม.</option>
+                  <option value="1500">สีลายไม้สต๊อก +1,500/ตร.ม.</option>
+                  <option value="1600">สีอบพิเศษ +1,600/ตร.ม.</option>
+                  <option value="2200">สีลายไม้อบพิเศษ +2,200/ตร.ม.</option>
+                </select>
+              </div>
+
+              <!-- o-hmode: วิธีตัดระแนง (hidden input · label-only) — เฉพาะ ranae -->
+              <div class="opt-row cond-section" id="sec-hmode" data-prods="curved_single">
+                <span class="opt-label">วิธีตัดระแนง <span class="cond-badge">ระแนงเดี่ยว</span> <span style="font-size:10px;background:#E0F2FE;color:#0369A1;padding:1px 6px;border-radius:4px;font-weight:700;">มีผลต่อราคา</span></span>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <div style="flex:1;min-width:140px;border:2px solid #2563EB;background:#EFF6FF;border-radius:8px;padding:7px 10px;cursor:pointer;" onclick="pickHmode(this,'round')">
+                    <div style="font-weight:700;font-size:11px;">ปัดไม่ต่อ (เนียน)</div>
+                    <div style="font-size:11px;color:#6B7280;">ไม่มีรอยต่อ · จ่ายเต็มเส้น</div>
+                  </div>
+                  <div style="flex:1;min-width:140px;border:2px solid #E5E7EB;background:#fff;border-radius:8px;padding:7px 10px;cursor:pointer;" onclick="pickHmode(this,'splice')">
+                    <div style="font-weight:700;font-size:11px;">ต่อสูงจริง (ประหยัด)</div>
+                    <div style="font-size:11px;color:#6B7280;">มีรอยต่อ</div>
+                  </div>
+                </div>
+                <input type="hidden" class="o-hmode" value="round">
+              </div>
+              <!-- o-framecolor: dropdown ≥6 (บานเปลือย) -->
+              <div class="opt-row fld cond-section" id="sec-framecolor" data-prods="">
+                <span class="opt-label">สีเฟรมอลูมิเนียม <span class="cond-badge">frameless_door</span></span>
+                <select class="o-framecolor ctrl" style="height:40px;">
+                  <option>ขาว (ด้าน/เงา)</option><option>ดำ (ด้าน/เงา)</option><option>บรอนซ์</option>
+                  <option>แชมเปญ</option><option>เทาซาฮาร่า</option><option>สีอบพิเศษ</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div><!-- /grp8 -->
+
+      <!-- === หมวด 9: Combo / งานเสริม / หมายเหตุ === -->
+      <div class="opt-grp">
+        <details id="grp9">
+          <summary>งานเสริม / หมายเหตุ <span class="cond-badge">6 ออปชั่น</span></summary>
+          <div class="grp-body">
+            <div class="extra-box">
+
+              <!-- o-combo_awn_inside — เฉพาะ casement_euro/solid -->
+              <div class="opt-row cond-section" id="sec-combo" data-prods="casement_euro">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-combo_awn_inside" onchange="toggleLen(this,'combo-price-row')">
+                    combo บานกระทุ้งเข้าใน + มุ้งจีบนิรภัยติดตาย <span class="cond-badge">casement euro/solid</span>
+                  </label>
+                </div>
+                <div id="combo-price-row" style="display:none;margin-top:6px;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:13px;">ราคา combo (กรอกเอง)</span>
+                    <input class="ctrl-sm o-combo_price" type="number" min="0" step="500" value="0" style="width:100px;">
+                    <span style="font-size:12px;color:var(--muted);">บาท</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- o-extrawork -->
+              <div class="opt-row fld">
+                <span class="opt-label">งานเสริม/วิศวกรรม</span>
+                <input class="o-extrawork ctrl" type="text" placeholder="ระบุถ้ามี (ไม่บวกราคาอัตโนมัติ)">
+              </div>
+
+              <!-- o-removeold -->
+              <div class="opt-row">
+                <div class="toggle-len">
+                  <label class="toggle-cb">
+                    <input type="checkbox" class="o-removeold"> รื้อของเดิม (รายการนี้)
+                  </label>
+                </div>
+              </div>
+
+              <!-- o-remark-add: dropdown ≥18 -->
+              <div class="opt-row fld">
+                <span class="opt-label">หมายเหตุ / OPTION ขึ้นในใบ <span class="auto-badge">dropdown ≥18</span></span>
+                <select class="o-remark-add ctrl" style="height:44px;">
+                  <option value="">— เว้นว่าง = ไม่ขึ้น —</option>
+                  <option>รวมวงกบ</option><option>ไม่รวมวงกบ</option>
+                  <option>รวมค่าแรงติดตั้ง</option><option>ไม่รวมค่าแรงติดตั้ง</option>
+                  <option>กรอกเอง...</option>
+                </select>
+              </div>
+
+              <!-- o-optdelta -->
+              <div class="opt-row fld">
+                <span class="opt-label">ปรับราคา (บาท) <span class="hint" style="display:inline;">บวก/ลบได้</span></span>
+                <input class="o-optdelta ctrl" type="number" step="100" value="0" placeholder="0 = ไม่ปรับ">
+              </div>
+
+            </div><!-- /extra-box -->
+          </div>
+        </details>
+      </div><!-- /grp9 -->
+
+      <!-- Price preview bar (DEMO) -->
+      <div class="price-bar">
+        <span style="font-size:13px;opacity:.8;">ราคาประเมิน (DEMO)</span>
+        <span class="price-val">฿ — — —</span>
+      </div>
+
+    </div><!-- /side-body -->
+  </div><!-- /side-card -->
+
+  <!-- Completeness QA note -->
+  <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:10px 12px;font-size:11px;color:#166534;margin-top:4px;">
+    <b>QA: ครบ 71 cls</b> — ดูตารางใน spec-G6-options-full.html · กดสลับสินค้าเพื่อดู conditional ปรากฏ/ซ่อน
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// === State ===
+var currentProd = 'sliding_euro';
+var PROD_FLAGS = {
+  sliding_euro:  {slide:true, mosq:true, gridmark:true, pane:true, isBottom:true},
+  casement_euro: {casement:true, mosq:true, gridmark:true, pane:true, thresh:true, full_grid:true, combo:true},
+  awning:        {awning:true, mosq:true, gridmark:true, pane:true},
+  folding:       {folding:true, mosq:true, pane:true, fold_struct:true},
+  shower:        {shower:true},
+  curved_single: {curved:true, motor:true, gridmark:true},
+  grid_line:     {grid:true, gridcolor:true},
+};
+
+// === Product switch ===
+function switchProd(btn){
+  document.querySelectorAll('.pchip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  currentProd = btn.dataset.prod;
+  applyProdVisibility();
+}
+
+function applyProdVisibility(){
+  var flags = PROD_FLAGS[currentProd] || {};
+
+  // show/hide cond-section by data-prods
+  document.querySelectorAll('.cond-section').forEach(function(el){
+    var prods = (el.dataset.prods || '').split(',').map(s=>s.trim()).filter(Boolean);
+    if(prods.length === 0){
+      // always show or managed separately
+      el.style.display = '';
+      return;
+    }
+    el.style.display = prods.includes(currentProd) ? '' : 'none';
+  });
+
+  // Mosq detail reset
+  var mosqSel = document.querySelector('.o-mosq');
+  if(mosqSel) mosqSel.value = '';
+  document.getElementById('mosq-detail').style.display = 'none';
+
+  // Update grp3 visibility (mosq group)
+  var grp3 = document.getElementById('grp3');
+  if(grp3){
+    var hasMosq = ['sliding_euro','casement_euro','awning','folding'].includes(currentProd);
+    grp3.style.display = hasMosq ? '' : 'none';
+  }
+
+  // Update grp6 visibility (solid lower)
+  var grp6 = document.getElementById('grp6');
+  if(grp6){
+    var hasSolid = ['sliding_euro','casement_euro','awning','folding'].includes(currentProd);
+    grp6.style.display = hasSolid ? '' : 'none';
+  }
+
+  // Update grp7 visibility (shower)
+  var grp7 = document.getElementById('grp7');
+  if(grp7) grp7.style.display = (currentProd==='shower') ? '' : 'none';
+
+  // Update grp8 visibility (motor/curved)
+  var grp8 = document.getElementById('grp8');
+  if(grp8) grp8.style.display = (currentProd==='curved_single') ? '' : 'none';
+
+  // grid-line special
+  var ghNhvc = document.getElementById('sec-grid-nhvnc');
+  if(ghNhvc) ghNhvc.style.display = (currentProd==='grid_line') ? '' : 'none';
+  var gcol = document.getElementById('sec-gridcolor');
+  if(gcol) gcol.style.display = (currentProd==='grid_line') ? '' : 'none';
+}
+
+// === Single-select chip ===
+function pickOne(btn, cls){
+  var parent = btn.closest('.chips');
+  if(!parent) return;
+  parent.querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  var sel = btn.closest('.opt-row, .fld, .grp-body, .mosq-box, .shower-box, .grid-box, .solid-box, .motor-box');
+  if(sel){
+    var hidden = sel.querySelector('.' + cls);
+    if(hidden && hidden.tagName==='SELECT'){
+      // map button text to value (simplified demo)
+      hidden.selectedIndex = Array.from(parent.querySelectorAll('.chip')).indexOf(btn);
+    }
+  }
+}
+
+// === Multi-toggle (handle brand) ===
+function multiToggle(btn, subId){
+  var isOn = btn.classList.contains('on');
+  btn.classList.toggle('on');
+  var sub = document.getElementById(subId);
+  if(sub) sub.classList.toggle('show', !isOn);
+}
+
+// === Stepper ===
+function stepVal(cls, delta){
+  var inp = document.querySelector('.'+cls);
+  if(!inp) return;
+  var v = parseInt(inp.value)||0;
+  inp.value = Math.max(parseInt(inp.min)||0, v+delta);
+  if(cls === 'o-fixed'){
+    var oc = document.getElementById('opencount');
+    if(oc) oc.textContent = Math.max(0, 4 - parseInt(inp.value));
+  }
+}
+
+// === Toggle + len field ===
+function toggleLen(cb, lenId){
+  var lenDiv = document.getElementById(lenId);
+  if(lenDiv) lenDiv.style.display = cb.checked ? 'flex' : 'none';
+}
+
+// === Mosq toggle ===
+function mosqToggle(sel){
+  var detail = document.getElementById('mosq-detail');
+  if(detail) detail.style.display = sel.value ? 'block' : 'none';
+  // Show openstyle for imp21/imp23 equivalent (demo: if value is 4 or 5)
+  var osRow = document.getElementById('mosq-openstyle');
+  if(osRow) osRow.style.display = (sel.value==='4'||sel.value==='5') ? 'block' : 'none';
+}
+
+// === Mosq panel chip ===
+function pickMosqPanel(btn, n){
+  document.querySelectorAll('#mosq-panel-chips .chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  var hidden = document.querySelector('.o-mosqpanels');
+  if(hidden) hidden.value = n;
+}
+
+// === Grid toggle ===
+function gridToggle(cb){
+  var det = document.getElementById('grid-detail');
+  if(det) det.classList.toggle('show', cb.checked);
+}
+
+// === Solid lower ===
+function solidPick(btn){
+  var parent = btn.closest('.chips');
+  parent.querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  var val = btn.dataset.val || '';
+  var det = document.getElementById('solid-detail');
+  if(det) det.classList.toggle('show', !!val);
+  var colorRow = document.getElementById('sl-color-row');
+  if(colorRow) colorRow.style.display = (val==='corrugated') ? 'block' : 'none';
+  var sel = document.querySelector('.o-solidlower');
+  if(sel) sel.value = val;
+}
+
+// === Hmode pick ===
+function pickHmode(card, mode){
+  var parent = card.parentNode;
+  parent.querySelectorAll(':scope > div[onclick]').forEach(c => {
+    c.style.border = '2px solid #E5E7EB';
+    c.style.background = '#fff';
+  });
+  card.style.border = '2px solid #2563EB';
+  card.style.background = '#EFF6FF';
+  var hid = parent.parentNode.querySelector('.o-hmode');
+  if(hid) hid.value = mode;
+}
+
+// === Init ===
+applyProdVisibility();
+</script>
+</body>
+</html>
