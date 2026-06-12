@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DEMO · IA Review — ออปชั่น JR Calculator</title>
+<style>
+:root{
+  --red:#B3151D;--red-lt:#fdf2f2;--red-bd:#f5c6c6;
+  --ink:#1a1a1a;--muted:#6B7280;--line:#E5E7EB;
+  --green:#15803D;--green-lt:#f0fdf4;--green-bd:#86efac;
+  --blue:#1d4ed8;--blue-lt:#eff6ff;--blue-bd:#93c5fd;
+  --yellow:#92400e;--yellow-lt:#fffbeb;--yellow-bd:#fcd34d;
+  --orange:#c2410c;--orange-lt:#fff7ed;--orange-bd:#fdba74;
+  --gray-lt:#F9FAFB;--gray-bd:#D1D5DB;
+  --radius:10px;--sm-radius:6px;
+  --font:'Sarabun',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);font-size:15px;color:var(--ink);background:#f5f5f5;padding:0 0 80px;}
+/* header */
+.page-header{background:var(--red);color:#fff;padding:14px 16px 10px;position:sticky;top:0;z-index:100;}
+.page-header h1{font-size:18px;font-weight:800;letter-spacing:.3px;}
+.page-header p{font-size:12px;opacity:.85;margin-top:2px;}
+.badge-demo{display:inline-block;background:#fff;color:var(--red);font-size:10px;font-weight:800;padding:1px 7px;border-radius:20px;vertical-align:middle;margin-left:6px;}
+/* tabs */
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--line);overflow-x:auto;position:sticky;top:58px;z-index:99;}
+.tab{flex:none;padding:10px 16px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;}
+.tab.on{color:var(--red);border-bottom-color:var(--red);}
+.panel{display:none;padding:12px 14px;}
+.panel.on{display:block;}
+/* review table */
+.rev-section{margin-bottom:16px;}
+.rev-section h2{font-size:13px;font-weight:800;color:#fff;background:var(--red);border-radius:var(--sm-radius) var(--sm-radius) 0 0;padding:7px 12px;}
+.rev-tbl{width:100%;border-collapse:collapse;background:#fff;border-radius:0 0 var(--sm-radius) var(--sm-radius);overflow:hidden;font-size:12.5px;}
+.rev-tbl th{background:#f3f3f3;padding:6px 8px;text-align:left;font-weight:700;border-bottom:1px solid var(--line);font-size:11px;}
+.rev-tbl td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.5;}
+.rev-tbl tr:last-child td{border-bottom:none;}
+.p1{background:#fef2f2;}.p2{background:#fffbeb;}.p3{background:#f0fdf4;}
+.badge-p1{background:#ef4444;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:10px;}
+.badge-p2{background:#f59e0b;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:10px;}
+.badge-p3{background:#22c55e;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:10px;}
+.old{color:var(--red);text-decoration:line-through;font-size:12px;}
+.new{color:var(--green);font-weight:700;}
+.arrow{color:var(--muted);}
+/* IA comparison */
+.ia-wrap{display:flex;gap:10px;flex-wrap:wrap;}
+.ia-col{flex:1;min-width:280px;background:#fff;border-radius:var(--radius);border:2px solid var(--line);overflow:hidden;}
+.ia-col.proposed{border-color:var(--green-bd);}
+.ia-col-head{padding:9px 12px;font-size:13px;font-weight:800;border-bottom:2px solid var(--line);}
+.ia-col.current .ia-col-head{background:var(--red-lt);color:var(--red);}
+.ia-col.proposed .ia-col-head{background:var(--green-lt);color:var(--green);}
+/* accordion groups */
+.ia-group{border-bottom:1px solid var(--line);}
+.ia-group-hd{display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer;font-weight:700;font-size:13px;min-height:44px;user-select:none;}
+.ia-group-hd .caret{transition:.2s;font-size:10px;margin-left:auto;color:var(--muted);}
+.ia-group-body{padding:0 12px 10px;}
+.ia-group.open .caret{transform:rotate(180deg);}
+.ia-group-body{display:none;}
+.ia-group.open .ia-group-body{display:block;}
+.ia-item{display:flex;align-items:flex-start;gap:6px;padding:4px 0;font-size:12.5px;border-bottom:1px dashed var(--line);}
+.ia-item:last-child{border-bottom:none;}
+.ia-item .dot{width:7px;height:7px;border-radius:50%;flex:none;margin-top:5px;}
+.dot-std{background:#9CA3AF;}
+.dot-mv{background:#3b82f6;}   /* ย้ายมา */
+.dot-add{background:#22c55e;}  /* เพิ่มใหม่ */
+.dot-del{background:#ef4444;}  /* ตัดออก */
+.dot-ren{background:#f59e0b;}  /* เปลี่ยนชื่อ */
+.tag{font-size:10px;font-weight:700;padding:1px 5px;border-radius:8px;white-space:nowrap;}
+.tag-mv{background:#dbeafe;color:#1d4ed8;}
+.tag-add{background:#dcfce7;color:#15803D;}
+.tag-del{background:#fee2e2;color:#b91c1c;}
+.tag-ren{background:#fef3c7;color:#92400e;}
+.tag-fold{background:#f3e8ff;color:#7e22ce;}
+/* legend */
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 12px;background:#fff;border-radius:var(--sm-radius);margin-bottom:10px;font-size:12px;border:1px solid var(--line);}
+.legend-item{display:flex;align-items:center;gap:4px;}
+/* summary cards */
+.sum-cards{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.sum-card{flex:1;min-width:80px;background:#fff;border-radius:var(--sm-radius);padding:8px 10px;text-align:center;border:1px solid var(--line);}
+.sum-card .num{font-size:24px;font-weight:800;line-height:1;}
+.sum-card .lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+.sum-card.p1c .num{color:#ef4444;}.sum-card.p2c .num{color:#f59e0b;}.sum-card.p3c .num{color:#22c55e;}
+/* priority top 5 */
+.top5{background:#fff;border-radius:var(--radius);border:1px solid var(--line);overflow:hidden;margin-bottom:14px;}
+.top5-hd{background:var(--red);color:#fff;padding:8px 12px;font-weight:800;font-size:13px;}
+.top5 ol{padding:10px 12px 10px 30px;display:flex;flex-direction:column;gap:8px;}
+.top5 li{font-size:13px;line-height:1.5;}
+.top5 li strong{color:var(--red);}
+/* decision box */
+.decide{background:var(--yellow-lt);border:1px solid var(--yellow-bd);border-radius:var(--radius);padding:10px 12px;margin-bottom:12px;}
+.decide h3{font-size:13px;font-weight:800;color:var(--yellow);margin-bottom:6px;}
+.decide ul{padding-left:16px;font-size:12.5px;line-height:1.7;}
+/* highlight chip inside table */
+.hl{background:#fef9c3;border-radius:4px;padding:1px 5px;font-size:12px;}
+</style>
+</head>
+<body>
+<div class="page-header">
+  <h1>IA Review — ออปชั่น JR Calculator <span class="badge-demo">DEMO</span></h1>
+  <p>ตรวจหัวข้อ/หมวด/ลำดับออปชั่นทั้งฟอร์ม · READ-ONLY · 2026-06-12</p>
+</div>
+
+<div class="tabs" id="tabbar">
+  <button class="tab on" onclick="switchTab('tab-review')">ตารางรีวิว</button>
+  <button class="tab" onclick="switchTab('tab-ia')">IA เปรียบเทียบ</button>
+  <button class="tab" onclick="switchTab('tab-top5')">จุดเด่น P1</button>
+  <button class="tab" onclick="switchTab('tab-ask')">ต้องถามพี่นัท</button>
+</div>
+
+<!-- ==================== TAB 1: ตารางรีวิว ==================== -->
+<div class="panel on" id="tab-review">
+
+<div class="sum-cards">
+  <div class="sum-card p1c"><div class="num">7</div><div class="lbl">P1 ด่วน</div></div>
+  <div class="sum-card p2c"><div class="num">9</div><div class="lbl">P2 ควรแก้</div></div>
+  <div class="sum-card p3c"><div class="num">5</div><div class="lbl">P3 ปรับเล็ก</div></div>
+</div>
+
+<!-- หัวข้อ / ชื่อหมวด -->
+<div class="rev-section">
+  <h2>1. ชื่อหมวด / label — สื่อความหรือยัง?</h2>
+  <table class="rev-tbl">
+    <tr><th>ออปชั่น (ปัจจุบัน)</th><th>ปัญหา</th><th>เสนอแก้</th><th>ระดับ</th></tr>
+    <tr class="p1">
+      <td><code>อุปกรณ์เสริม / ออปชั่น</code><br><small>summary ของ &lt;details&gt; หลัก</small></td>
+      <td>"อุปกรณ์เสริม" กำกวม — เซลล์ไม่รู้ว่าคือ สี/กระจก/มือจับ หรือสิ่งที่แตะได้ทุกวัน ไม่สื่อว่า "กรอกที่นี่เพื่อปรับราคา"</td>
+      <td><span class="new">⚙ ปรับแต่งรายการนี้</span><br><small>หรือ "รายละเอียด / ออปชั่น"</small></td>
+      <td><span class="badge-p1">P1</span></td>
+    </tr>
+    <tr class="p1">
+      <td><code>🚪 ชนิด / การเปิด</code><br><small>groupGHOpts bucket</small></td>
+      <td>keyword ใน bucket นี้กว้างเกินไป — รับทั้ง ธรณี/ราง/สีอบ/ลาย/โช๊ค/ชนิดชั้น(ตู้) → ของไม่เกี่ยวกับ "ชนิด/การเปิด" หลุดเข้า</td>
+      <td>แยกเป็น 2 หมวด: <span class="new">"🚪 ชนิด / การเปิด"</span> (ชนิดการเปิด/ธรณี/ราง) + <span class="new">"🎨 สี / ผิว"</span> (สีอบ/ลาย/ผิว) · ตัด keyword ที่ซ้อนออก</td>
+      <td><span class="badge-p1">P1</span></td>
+    </tr>
+    <tr class="p1">
+      <td><code>➕ อื่นๆ (ครอบวงกบ / ดรอปพื้น / หมายเหตุ)</code></td>
+      <td>ชื่อยาวเกินไปสำหรับ summary · "อื่นๆ" ซ่อนของที่ใช้บ่อย (ครอบวงกบ, แผ่นทึบล่าง, รื้อของเดิม) ไว้ด้วยกัน → เซลล์หาไม่เจอ</td>
+      <td><span class="new">"➕ งานเพิ่มเติม"</span> · ย้ายของที่ใช้บ่อยขึ้นหมวดก่อน</td>
+      <td><span class="badge-p1">P1</span></td>
+    </tr>
+    <tr class="p2">
+      <td><code>📐 คาดตาราง</code></td>
+      <td>"คาดตาราง" เป็นศัพท์ช่าง — ลูกค้าบางคนอาจไม่รู้ว่าคืออะไร แต่ใช้ใบลูกค้าด้วย → อยู่ในจุดที่ถูกอยู่แล้ว</td>
+      <td>คงชื่อไว้ แต่เพิ่ม sub-label: <span class="new">"📐 คาดตาราง (เส้นลวดลาย)"</span></td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p2">
+      <td><code>🔩 ของเสริมหลังคา</code></td>
+      <td>รับทั้ง เสาแผง/คานเหล็ก/ครอบท่อ/ปิดซ่อนราง/ซ่อนสโลป → หลากหลายเกินไปสำหรับชื่อเดียว</td>
+      <td><span class="new">"🔩 โครงสร้าง / ของเสริมหลังคา"</span></td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p3">
+      <td><code>📦 รายละเอียดตู้</code></td>
+      <td>ชื่อดี แต่ผสมทั้ง "ข้อมูลตู้" (ประเภท/ลึก) กับ "วัสดุ" (ชนิดชั้น/ผนัง) ไว้ด้วยกัน</td>
+      <td>คงชื่อไว้ได้ หรือแยกเป็น 📦 ตู้ · 🪞 วัสดุ ถ้ามีของมาก</td>
+      <td><span class="badge-p3">P3</span></td>
+    </tr>
+  </table>
+</div>
+
+<!-- จัดหมวดถูกที่ไหม -->
+<div class="rev-section">
+  <h2>2. อยู่ถูกหมวดไหม? (ของหลุดที่)</h2>
+  <table class="rev-tbl">
+    <tr><th>ออปชั่น</th><th>หมวดปัจจุบัน</th><th>ปัญหา</th><th>ควรอยู่ที่</th><th>ระดับ</th></tr>
+    <tr class="p1">
+      <td><code>วัสดุผนังตู้</code> (อลูทึบ/กระจก)</td>
+      <td>📦 รายละเอียดตู้</td>
+      <td>keyword "วัสดุ" หลุดเข้า 🚪 ชนิด/การเปิด ถ้า kw ปัจจุบันรับ "วัสดุ" — ต้องตรวจ bucket ใหม่ก่อน</td>
+      <td>📦 รายละเอียดตู้ (ถูกแล้ว ถ้า bucket ไม่หลุด)</td>
+      <td><span class="badge-p1">P1</span></td>
+    </tr>
+    <tr class="p1">
+      <td><code>สีกรอบมุ้ง</code> (o-mosqcolor)</td>
+      <td>🪟 มุ้ง</td>
+      <td>ถูกที่ แต่ใน mosq-wrap กล่องเดียวรวม ผ้ามุ้ง/สีกรอบ/จำนวนบาน → เลื่อนยากบนมือถือ label "สีกรอบมุ้ง" ถูกกลบด้วยชิป</td>
+      <td>ยังอยู่ใน 🪟 มุ้ง แต่ควรเลื่อน สีกรอบ+ผ้ามุ้ง ขึ้นใกล้ "เลือกชนิดมุ้ง"</td>
+      <td><span class="badge-p1">P1</span></td>
+    </tr>
+    <tr class="p2">
+      <td><code>ฝังรางยู</code> (o-uchannel)</td>
+      <td>ไม่มีหมวด — ลอยต่ำ ก่อนหมายเหตุ</td>
+      <td>รางยูเป็นส่วนของ "ชนิด/การเปิด" (กระทบธรณี) แต่ปัจจุบัน keyword ไม่ match → หลุดไปหมวดอื่น</td>
+      <td><span class="new">🚪 ชนิด / การเปิด</span> (เพิ่ม kw 'รางยู'/'ฝังราง')</td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p2">
+      <td><code>รื้อของเดิม</code> (o-removeold)</td>
+      <td>➕ อื่นๆ (หมวดสุดท้าย)</td>
+      <td>ใช้บ่อย แต่จมอยู่หมวดท้าย เซลล์ต้องจำว่าอยู่ที่ไหน</td>
+      <td>ย้ายขึ้น <span class="new">🚪 ชนิด / การเปิด</span> หรือสร้างหมวด "🔨 งานรื้อ / เสริม"</td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p2">
+      <td><code>งานเสริม/วิศวกรรม</code> (o-extrawork)</td>
+      <td>➕ อื่นๆ</td>
+      <td>ใช้บ่อยในงานพิเศษ แต่จมหมวดสุดท้ายพับอยู่</td>
+      <td>ยกขึ้นระดับ visible ถ้าว่างแสดง placeholder สั้น / หรือ stick ไว้บน ➕ อื่นๆ</td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p2">
+      <td><code>ฉนวนกันความร้อน</code> (o-insul)</td>
+      <td>ลอยใน .i-opts ก่อน groupGHOpts จัด → ไม่แน่ใจว่า bucket ไหน</td>
+      <td>keyword "ฉนวน" ไม่ match bucket ใด → หลุด "อื่นๆ" ซึ่งพับ default</td>
+      <td>เพิ่ม kw 'ฉนวน' เข้า <span class="new">🚪 ชนิด/การเปิด</span> หรือสร้าง "🏠 วัสดุ / ฉนวน"</td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p3">
+      <td><code>ดรอปพื้น</code> (o-dfm)</td>
+      <td>➕ อื่นๆ</td>
+      <td>ใช้น้อย — อยู่ท้ายพอรับได้ แต่ชื่อ "ดรอปพื้น" เป็นศัพท์ช่างล้วน</td>
+      <td>คงที่ แต่เปลี่ยนชื่อ: <span class="new">"ดรอปพื้น (ยกเส้นพื้น · ม.)"</span></td>
+      <td><span class="badge-p3">P3</span></td>
+    </tr>
+  </table>
+</div>
+
+<!-- ลำดับ / ไฮรารคี -->
+<div class="rev-section">
+  <h2>3. ลำดับ / ไฮรารคี — เรียงถูกไหม?</h2>
+  <table class="rev-tbl">
+    <tr><th>จุด</th><th>ปัญหา</th><th>เสนอแก้</th><th>ระดับ</th></tr>
+    <tr class="p1">
+      <td>กล่อง "มุ้ง" — ลำดับภายใน</td>
+      <td>ลำดับปัจจุบัน: เลือกชนิด → จำนวนบาน → (details ขนาด) → ผ้ามุ้ง → สีกรอบ<br>ปัญหา: ผ้ามุ้ง/สีกรอบ ซ่อนลึก 2 ชั้น (ต้องเปิด mosq-detail-group แล้วเลื่อน)</td>
+      <td>เรียง: ชนิดมุ้ง → ผ้ามุ้ง → สีกรอบ → จำนวนบาน → (พับ) ขนาดเอง<br><span class="new">ผ้ามุ้ง+สีกรอบขึ้นก่อน — ตัดสินใจหลักก่อนรายละเอียด</span></td>
+      <td><span class="badge-p1">P1</span></td>
+    </tr>
+    <tr class="p1">
+      <td>หมวด "⚙ อุปกรณ์เสริม" พับ default</td>
+      <td>สี/กระจก (ย้ายเข้า box บนสุดแล้ว) โอเค แต่ มือจับ/มุ้ง ยังอยู่ในพับ → เซลล์ต้องกด "อุปกรณ์เสริม" ทุกครั้ง ทั้งที่มือจับ/มุ้งใช้บ่อย</td>
+      <td>ขยาย box อัตโนมัติ (open=true) เมื่อสินค้ามี มือจับ หรือ มุ้ง เป็น default กล่องนี้ · หรือโชว์ "🔧 มือจับ" นอกกล่องพับสำหรับบาน</td>
+      <td><span class="badge-p1">P1</span></td>
+    </tr>
+    <tr class="p2">
+      <td>combo "บานกระทุ้งเข้าใน + มุ้งจีบ"</td>
+      <td>ปัจจุบันลอยใน .i-opts ก่อนกลุ่มมือจับ — keyword ไม่ match bucket ใดชัด → หลุด "อื่นๆ" ทั้งที่มีผลต่อราคา</td>
+      <td>เพิ่ม kw 'combo' เข้า <span class="new">🚪 ชนิด/การเปิด</span> หรือ 🔧 มือจับ/ล็อค</td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p2">
+      <td>สีวัสดุมุง (หลังคา) ลำดับ</td>
+      <td>โชว์ก่อน แต่ละรุ่นมี dropdown ต่างกัน: สีเมทัลชีท / สีชินโคไลท์ / สีวัสดุมุง → label ไม่ consistent (ตัวนำต่าง)</td>
+      <td>ใช้ label เดียว <span class="new">"สี"</span> นำทุกรุ่น (ข้อมูลรุ่นอยู่ใน dropdown แล้ว) ลด cognitive load</td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p3">
+      <td>ม่านซิป — กล่อง gh-box ลำดับ</td>
+      <td>กลุ่มลูกค้า (×retail/project) โผล่ก่อน รุ่น/ผ้า → คนกรอกต้องรู้ multiplier ก่อนรู้สินค้า</td>
+      <td>เรียงใหม่: รุ่น → ผ้า → ระบบควบคุม → กลุ่มลูกค้า<br><small>(กลุ่มลูกค้าเป็นข้อมูลสุดท้ายที่ปรับ)</small></td>
+      <td><span class="badge-p3">P3</span></td>
+    </tr>
+  </table>
+</div>
+
+<!-- อื่นๆ -->
+<div class="rev-section">
+  <h2>4. อื่นๆ — ช่องซ้ำ / label สับสน / UX</h2>
+  <table class="rev-tbl">
+    <tr><th>จุด</th><th>ปัญหา</th><th>เสนอแก้</th><th>ระดับ</th></tr>
+    <tr class="p1">
+      <td>หมวด-bucket ใน groupGHOpts<br><code>🚪 ชนิด/การเปิด</code> keyword</td>
+      <td>keyword list ยาว 22 คำ ปนกัน — 'สี ','ลาย','ความลึก','ราวจับ' อยู่ใน bucket "ชนิด/การเปิด" → ของไม่เกี่ยวกับการเปิดหลุดเข้า</td>
+      <td>แยก bucket เป็น 🚪 ชนิด/การเปิด + 🎨 สี/ผิว ใหม่ (ดู tab IA)</td>
+      <td><span class="badge-p1">P1</span></td>
+    </tr>
+    <tr class="p2">
+      <td><code>[Up3] โช๊ค (combo สแตน)</code></td>
+      <td>ชื่อมี "[Up3]" prefix (dev tag) หลุดโชว์ให้เซลล์เห็น — ศัพท์ dev ไม่ควรอยู่ใน label ผู้ใช้</td>
+      <td>ลบ [Up3] ออก: <span class="new">"โช๊ค (combo สแตน)"</span></td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p2">
+      <td><code>ค่าประตู (เลือกรุ่น)</code> vs <code>ราคาประตู (กรอกเอง)</code></td>
+      <td>สองช่องติดกันแต่ทำงานแยกกัน — เซลล์อาจกรอกทั้งคู่โดยไม่รู้ว่ากรอก >0 ช่องหลังจะ override ช่องแรก</td>
+      <td>รวมเป็น 1 ช่อง + logic: เลือกรุ่น → โชว์ราคา auto → link "แก้ราคา" (pattern เดิมของมอเตอร์หลังคา)</td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p2">
+      <td><code>สีเฟรมอลูมิเนียม</code> (frameless_door)</td>
+      <td>บานเปลือย (frameless) มีช่อง "สีเฟรม" ทั้งที่ชื่อสินค้าบอกว่า "ไม่มีเฟรม" — อาจสับสน</td>
+      <td>เปลี่ยนเป็น <span class="new">"สีขอบ/trim อลูมิเนียม"</span> หรือ "สีฟิตติ้ง"</td>
+      <td><span class="badge-p2">P2</span></td>
+    </tr>
+    <tr class="p3">
+      <td><code>มีคาดตาราง (คิดตามสูตร)</code></td>
+      <td>วงเล็บ "(คิดตามสูตร)" ไม่จำเป็น — เซลล์รู้ว่าระบบคิดราคาเอง · ยาวเกิน</td>
+      <td><span class="new">"มีคาดตาราง"</span> (ตัดวงเล็บ) · ราคา show ใน preview อยู่แล้ว</td>
+      <td><span class="badge-p3">P3</span></td>
+    </tr>
+    <tr class="p3">
+      <td><code>ช่องแสง (กระจก) พื้นที่ ... ตร.ม.</code></td>
+      <td>label ยาว 2 ชั้น — "ช่องแสง (กระจก)" + unit ซ้ำใน placeholder</td>
+      <td><span class="new">"ช่องแสงกระจก (ตร.ม.)"</span> · ตัด "เว้น 0 = ทึบล้วน" เป็น hint icon แทน</td>
+      <td><span class="badge-p3">P3</span></td>
+    </tr>
+  </table>
+</div>
+
+</div><!-- /tab-review -->
+
+<!-- ==================== TAB 2: IA เปรียบเทียบ ==================== -->
+<div class="panel" id="tab-ia">
+
+<div class="legend">
+  <span class="legend-item"><span class="dot dot-std" style="width:10px;height:10px;border-radius:50%;display:inline-block;"></span> คงเดิม</span>
+  <span class="legend-item"><span class="tag tag-mv">ย้าย</span> ย้ายหมวด</span>
+  <span class="legend-item"><span class="tag tag-ren">ชื่อ</span> เปลี่ยนชื่อ</span>
+  <span class="legend-item"><span class="tag tag-add">เพิ่ม</span> bucket ใหม่</span>
+  <span class="legend-item"><span class="tag tag-del">ตัด</span> รวมหรือตัด</span>
+  <span class="legend-item"><span class="tag tag-fold">พับ</span> พับ default</span>
+</div>
+
+<p style="font-size:12px;color:var(--muted);margin-bottom:10px;">กดหัวข้อสีแดง/เขียวเพื่อพับ/กาง · ซ้าย = ปัจจุบัน · ขวา = เสนอ</p>
+
+<div class="ia-wrap">
+
+<!-- ===== ปัจจุบัน ===== -->
+<div class="ia-col current">
+  <div class="ia-col-head">ปัจจุบัน (groupGHOpts buckets)</div>
+
+  <div class="ia-group open" onclick="toggleGroup(this)">
+    <div class="ia-group-hd">🚪 ชนิด / การเปิด (open) <span class="caret">▲</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>ชนิดการเปิด (บานเลื่อน)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>combo บานกระทุ้งเข้าใน</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ธรณี (บานเปิด/บานเฟี้ยม)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>โชว์ราง / ซ่อนราง</div>
+      <div class="ia-item"><span class="dot dot-std"></span>รูปแบบ shower</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ประเภทประตู (ถ้ามี)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ทิศระแนง / ลายระแนง</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ทำเป็นประตู (ระแนง)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>มอเตอร์ระแนง</div>
+      <div class="ia-item"><span class="dot dot-mv"></span><span style="color:#ef4444;">สีอบ / ผิว / ลาย</span> <span class="tag tag-mv">ย้าย</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span><span style="color:#ef4444;">สีฝาตู้ / วัสดุผนังตู้</span> <span class="tag tag-mv">ย้าย</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span><span style="color:#ef4444;">ราวจับ (ราวบน)</span> <span class="tag tag-mv">ย้าย</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span><span style="color:#ef4444;">ชนิดชั้น</span> <span class="tag tag-mv">ย้าย→📦</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span><span style="color:#ef4444;">ความลึก / จำนวนชั้น</span> <span class="tag tag-mv">ย้าย→📦</span></div>
+    </div>
+  </div>
+
+  <div class="ia-group" onclick="toggleGroup(this)">
+    <div class="ia-group-hd">🔧 มือจับ / ล็อค (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>มือจับ (multi-toggle)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>[Up3] โช๊ค (combo สแตน) <span class="tag tag-ren">ชื่อ</span></div>
+      <div class="ia-item"><span class="dot dot-std"></span>ชุดล็อค / กุญแจ</div>
+    </div>
+  </div>
+
+  <div class="ia-group" onclick="toggleGroup(this)">
+    <div class="ia-group-hd">🪟 มุ้ง (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>เลือกชนิดมุ้ง (dropdown)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>จำนวนบานมุ้ง (ชิป/stepper)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>(details) กรอกขนาดมุ้งเอง</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ผ้ามุ้ง</div>
+      <div class="ia-item"><span class="dot dot-std"></span>สีกรอบมุ้ง (ชิป)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ลักษณะการเปิด (label-only · ซ่อน)</div>
+    </div>
+  </div>
+
+  <div class="ia-group" onclick="toggleGroup(this)">
+    <div class="ia-group-hd">📐 คาดตาราง (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>มีคาดตาราง (checkbox)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>เส้นนอน / เส้นตั้ง / ราคา/ม.</div>
+      <div class="ia-item"><span class="dot dot-std"></span>เส้นโค้ง</div>
+    </div>
+  </div>
+
+  <div class="ia-group" onclick="toggleGroup(this)">
+    <div class="ia-group-hd">➕ อื่นๆ (ครอบวงกบ/ดรอปพื้น/หมายเหตุ) (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>ครอบวงกบอลู (ชิป)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ดรอปพื้น (ม.)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>แผ่นทึบล่าง (ชิป)</div>
+      <div class="ia-item"><span class="dot dot-mv"></span><span style="color:#ef4444;">ฝังรางยู</span> <small style="color:#ef4444;">(ควรอยู่ 🚪)</small></div>
+      <div class="ia-item"><span class="dot dot-mv"></span><span style="color:#ef4444;">รื้อของเดิม</span> <small style="color:#ef4444;">(ใช้บ่อย)</small></div>
+      <div class="ia-item"><span class="dot dot-mv"></span><span style="color:#ef4444;">งานเสริม/วิศวกรรม</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span><span style="color:#ef4444;">ฉนวนกันความร้อน</span></div>
+    </div>
+  </div>
+
+</div><!-- /current -->
+
+<!-- ===== เสนอ ===== -->
+<div class="ia-col proposed">
+  <div class="ia-col-head">เสนอ (IA ใหม่) — กด + กางดู</div>
+
+  <div class="ia-group open" onclick="toggleGroup(this)">
+    <div class="ia-group-hd" style="color:var(--green);">🚪 ชนิด / การเปิด (open) <span class="caret">▲</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>ชนิดการเปิด (บานเลื่อน)</div>
+      <div class="ia-item"><span class="dot dot-add"></span>combo บานกระทุ้งเข้าใน <span class="tag tag-add">เพิ่ม kw</span></div>
+      <div class="ia-item"><span class="dot dot-std"></span>ธรณี</div>
+      <div class="ia-item"><span class="dot dot-add"></span>ฝังรางยู <span class="tag tag-mv">ย้ายมา</span></div>
+      <div class="ia-item"><span class="dot dot-std"></span>โชว์ราง / ซ่อนราง</div>
+      <div class="ia-item"><span class="dot dot-std"></span>รูปแบบ shower / ประเภทประตู</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ทิศระแนง / ลายระแนง</div>
+      <div class="ia-item"><span class="dot dot-add"></span>ฉนวนกันความร้อน <span class="tag tag-mv">ย้ายมา</span></div>
+    </div>
+  </div>
+
+  <div class="ia-group open" onclick="toggleGroup(this)">
+    <div class="ia-group-hd" style="color:var(--green);">🎨 สี / ผิว <span class="tag tag-add">bucket ใหม่</span> (open) <span class="caret">▲</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-mv"></span>สีอบ / ผิว / ลาย (ระแนง/รั้ว) <span class="tag tag-mv">ย้ายมา</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span>สีวัสดุมุงหลังคา → "สี" <span class="tag tag-ren">ชื่อ</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span>สีเฟรมอลู → "สีขอบ/trim" <span class="tag tag-ren">ชื่อ</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span>สีฝาตู้ (future_tech) <span class="tag tag-mv">ย้ายมา</span></div>
+    </div>
+  </div>
+
+  <div class="ia-group" onclick="toggleGroup(this)">
+    <div class="ia-group-hd" style="color:var(--green);">🔧 มือจับ / ล็อค (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>มือจับ (multi-toggle)</div>
+      <div class="ia-item"><span class="dot dot-ren"></span>โช๊ค (combo สแตน) <span class="tag tag-ren">ตัด [Up3]</span></div>
+      <div class="ia-item"><span class="dot dot-std"></span>ชุดล็อค / กุญแจ</div>
+    </div>
+  </div>
+
+  <div class="ia-group" onclick="toggleGroup(this)">
+    <div class="ia-group-hd" style="color:var(--green);">🪟 มุ้ง (พับ) — ลำดับใหม่ <span class="caret">▼</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>เลือกชนิดมุ้ง</div>
+      <div class="ia-item"><span class="dot dot-mv"></span><b>ผ้ามุ้ง</b> <span class="tag tag-mv">ขึ้นก่อน</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span><b>สีกรอบมุ้ง</b> <span class="tag tag-mv">ขึ้นก่อน</span></div>
+      <div class="ia-item"><span class="dot dot-std"></span>จำนวนบานมุ้ง (ชิป/stepper)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>(พับ) กรอกขนาดเอง</div>
+      <div class="ia-item"><span class="dot dot-std"></span>(พับ) ลักษณะการเปิด</div>
+    </div>
+  </div>
+
+  <div class="ia-group" onclick="toggleGroup(this)">
+    <div class="ia-group-hd" style="color:var(--green);">📐 คาดตาราง (เส้นลวดลาย) (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-ren"></span>มีคาดตาราง <span class="tag tag-ren">ตัดวงเล็บ</span></div>
+      <div class="ia-item"><span class="dot dot-std"></span>เส้นนอน / เส้นตั้ง / ราคา/ม.</div>
+      <div class="ia-item"><span class="dot dot-std"></span>เส้นโค้ง</div>
+    </div>
+  </div>
+
+  <div class="ia-group open" onclick="toggleGroup(this)">
+    <div class="ia-group-hd" style="color:var(--green);">🔨 งานเพิ่มเติม (open) <span class="tag tag-ren">เปลี่ยนชื่อ</span> <span class="caret">▲</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-mv"></span>รื้อของเดิม <span class="tag tag-mv">ขึ้นมา</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span>งานเสริม/วิศวกรรม <span class="tag tag-mv">ขึ้นมา</span></div>
+      <div class="ia-item"><span class="dot dot-std"></span>ครอบวงกบอลู</div>
+      <div class="ia-item"><span class="dot dot-ren"></span>ดรอปพื้น (ยกเส้นพื้น · ม.) <span class="tag tag-ren">ชื่อ</span></div>
+      <div class="ia-item"><span class="dot dot-std"></span>แผ่นทึบล่าง</div>
+    </div>
+  </div>
+
+  <div class="ia-group" onclick="toggleGroup(this)">
+    <div class="ia-group-hd" style="color:var(--green);">📦 รายละเอียดตู้ (open เฉพาะตู้) <span class="caret">▼</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>ประเภทตู้ (ชิป)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>จำนวนบานหน้าตู้</div>
+      <div class="ia-item"><span class="dot dot-mv"></span>ชนิดชั้น <span class="tag tag-mv">คงที่ (ย้ายออกจาก 🚪)</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span>วัสดุผนังตู้ <span class="tag tag-mv">คงที่</span></div>
+      <div class="ia-item"><span class="dot dot-mv"></span>ลึก / จำนวนชั้น / ผนังหลัง <span class="tag tag-mv">คงที่</span></div>
+    </div>
+  </div>
+
+</div><!-- /proposed -->
+</div><!-- /ia-wrap -->
+
+<!-- หลังคา CATS -->
+<div style="margin-top:14px;">
+<p style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px;">หลังคา — bucket ปัจจุบัน vs เสนอ</p>
+<div class="ia-wrap">
+<div class="ia-col current">
+  <div class="ia-col-head">ปัจจุบัน</div>
+  <div class="ia-group open" onclick="toggleGroup(this)"><div class="ia-group-hd">🏠 วัสดุมุง · สี · โครง (open) <span class="caret">▲</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>สีวัสดุมุง (ชื่อต่างตามรุ่น)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>แป / โครงสร้าง</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ชนิดฟิล์ม / ความหนา (ลามิเนต)</div>
+    </div>
+  </div>
+  <div class="ia-group" onclick="toggleGroup(this)"><div class="ia-group-hd">⬅️➡️ หลังคาเลื่อน (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body"><div class="ia-item"><span class="dot dot-std"></span>ทำเป็นหลังคาเลื่อน + รายละเอียด</div></div>
+  </div>
+  <div class="ia-group open" onclick="toggleGroup(this)"><div class="ia-group-hd">🌧️ ปลายหลังคา · รางน้ำ (open) <span class="caret">▲</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>ปลายหลังคา → ระบบรางน้ำ (cascade)</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ชนิดราง / ท่อน้ำทิ้ง / ตะแกรง</div>
+    </div>
+  </div>
+  <div class="ia-group" onclick="toggleGroup(this)"><div class="ia-group-hd">🔩 ของเสริมหลังคา (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-std"></span>เสาแผง / คานเหล็กถัก</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ซ่อนสโลป / ปิดซ่อนราง / ครอบคาน</div>
+      <div class="ia-item"><span class="dot dot-std"></span>วัสดุปิดรอยต่อ / เพลท / เหล็กดึง</div>
+    </div>
+  </div>
+  <div class="ia-group" onclick="toggleGroup(this)"><div class="ia-group-hd">➕ ต่อปลายวัสดุที่ 2 (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body"><div class="ia-item"><span class="dot dot-std"></span>เลือกวัสดุ 2 + พื้นที่</div></div>
+  </div>
+</div>
+
+<div class="ia-col proposed">
+  <div class="ia-col-head">เสนอ (หลังคา)</div>
+  <div class="ia-group open" onclick="toggleGroup(this)"><div class="ia-group-hd" style="color:var(--green);">🏠 วัสดุมุง / โครง (open) <span class="caret">▲</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-ren"></span>"สี" (ลด prefix รุ่น) <span class="tag tag-ren">ชื่อ</span></div>
+      <div class="ia-item"><span class="dot dot-std"></span>แป / โครงสร้าง</div>
+      <div class="ia-item"><span class="dot dot-std"></span>ชนิดฟิล์ม / ความหนา</div>
+    </div>
+  </div>
+  <div class="ia-group" onclick="toggleGroup(this)"><div class="ia-group-hd" style="color:var(--green);">⬅️➡️ หลังคาเลื่อน (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body"><div class="ia-item"><span class="dot dot-std"></span>คงเดิม</div></div>
+  </div>
+  <div class="ia-group open" onclick="toggleGroup(this)"><div class="ia-group-hd" style="color:var(--green);">🌧️ ปลายหลังคา · รางน้ำ (open) <span class="caret">▲</span></div>
+    <div class="ia-group-body"><div class="ia-item"><span class="dot dot-std"></span>คงเดิม (ดีแล้ว)</div></div>
+  </div>
+  <div class="ia-group" onclick="toggleGroup(this)"><div class="ia-group-hd" style="color:var(--green);">🔩 โครงสร้าง / ของเสริม (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body">
+      <div class="ia-item"><span class="dot dot-ren"></span>เปลี่ยนชื่อ + คงเนื้อหา <span class="tag tag-ren">ชื่อ</span></div>
+    </div>
+  </div>
+  <div class="ia-group" onclick="toggleGroup(this)"><div class="ia-group-hd" style="color:var(--green);">➕ ต่อปลายวัสดุที่ 2 (พับ) <span class="caret">▼</span></div>
+    <div class="ia-group-body"><div class="ia-item"><span class="dot dot-std"></span>คงเดิม</div></div>
+  </div>
+</div>
+
+</div>
+</div>
+
+</div><!-- /tab-ia -->
+
+<!-- ==================== TAB 3: P1 จุดเด่น ==================== -->
+<div class="panel" id="tab-top5">
+
+<div class="top5">
+  <div class="top5-hd">5 จุดที่ควรทำก่อน (เรียงผลกระทบ)</div>
+  <ol>
+    <li><strong>แยก bucket 🚪 ชนิด/การเปิด ออกจาก 🎨 สี/ผิว</strong><br>
+      ปัจจุบัน keyword เดียว bucket เดียวรับทั้งเปิดประตูและเลือกสี — ของหลุดที่ ทำให้เซลล์หาไม่เจอ<br>
+      <span style="font-size:12px;color:var(--muted);">แก้ใน groupGHOpts CATS: ย้าย kw 'สี ','ลาย','ผิว/สี','อบสี','สีอบ','สีฝาตู้' ไปอยู่ bucket ใหม่ "🎨 สี / ผิว"</span>
+    </li>
+    <li><strong>เปลี่ยนชื่อ summary หลัก "อุปกรณ์เสริม / ออปชั่น" → "⚙ ปรับแต่งรายการนี้"</strong><br>
+      คนกรอกไม่รู้ว่าต้องกดตรงนี้เพื่อใส่มือจับ/มุ้ง — ชื่อใหม่บอก action ชัดกว่า<br>
+      <span style="font-size:12px;color:var(--muted);">แก้ใน addItem template: summary ของ .optbox</span>
+    </li>
+    <li><strong>เปิด .optbox อัตโนมัติสำหรับสินค้าที่มีมือจับ/มุ้ง</strong><br>
+      ตอนนี้ ob.open ขึ้นกับ p.ranae|p.cabinet|p.gate ฯลฯ แต่ไม่รวม p.mosquito|p.digihandle → มุ้ง/มือจับซ่อนพับ<br>
+      <span style="font-size:12px;color:var(--muted);">แก้บรรทัด ob.open: เพิ่ม <code>||p.mosquito||(_cmechOK||_xOK||_awnOK||p.digihandle)</code></span>
+    </li>
+    <li><strong>ปรับลำดับภายใน กล่องมุ้ง: ผ้ามุ้ง+สีกรอบ ขึ้นก่อนจำนวนบาน</strong><br>
+      ตัดสินใจสำคัญ (ชนิด → ผ้า → สี) ควรอยู่บนสุด · รายละเอียด (จำนวน/ขนาด) ตามหลัง<br>
+      <span style="font-size:12px;color:var(--muted);">แก้ใน buildItemOpts ส่วน p.mosquito: ย้าย h+=(ผ้า/สีกรอบ) ขึ้นก่อน mosq-panels-bar</span>
+    </li>
+    <li><strong>ลบ "[Up3]" prefix ออกจาก label โช๊ค</strong><br>
+      dev tag หลุดโชว์ให้เซลล์เห็น — ใช้เวลาแก้ไม่ถึง 1 นาที<br>
+      <span style="font-size:12px;color:var(--muted);">แก้บรรทัด p.closer: เปลี่ยน label '[Up3] โช๊ค' → 'โช๊ค'</span>
+    </li>
+  </ol>
+</div>
+
+<div style="background:#fff;border-radius:var(--radius);border:1px solid var(--line);padding:12px;font-size:12.5px;line-height:1.7;">
+  <p style="font-weight:700;margin-bottom:4px;color:var(--red);">สรุปจำนวน</p>
+  <p>P1 (ด่วน / มีผลต่อ workflow เซลล์) — 7 จุด</p>
+  <p>P2 (ควรแก้ใน sprint นี้) — 9 จุด</p>
+  <p>P3 (ปรับเล็กน้อย / label ยาว) — 5 จุด</p>
+  <p style="margin-top:6px;color:var(--muted);">ทั้งหมด 21 จุด · ส่วนใหญ่แก้ใน groupGHOpts CATS keywords + buildItemOpts label</p>
+</div>
+
+</div><!-- /tab-top5 -->
+
+<!-- ==================== TAB 4: ต้องถามพี่นัท ==================== -->
+<div class="panel" id="tab-ask">
+
+<div class="decide">
+  <h3>ต้องถามพี่นัท — ยังตัดสินไม่ได้</h3>
+  <ul>
+    <li><strong>bucket "🎨 สี / ผิว" ควร open หรือ พับ default?</strong><br>
+      ถ้า open → ฟอร์มยาวขึ้น · ถ้าพับ → เซลล์ต้องกดเพิ่ม 1 ครั้ง · สีเลือกบ่อยแค่ไหนต่องาน?</li>
+    <li><strong>"รื้อของเดิม" และ "งานเสริม/วิศวกรรม" ควรอยู่นอกกลุ่มพับหรือยัง?</strong><br>
+      ถ้าพี่นัทตอบว่าใช้บ่อยทุกออเดอร์ → ย้ายขึ้นมาโชว์ · ถ้าใช้น้อย → คงพับไว้ได้</li>
+    <li><strong>label "ดรอปพื้น" ลูกค้าใช้คำนี้ด้วยหรือเปล่า?</strong><br>
+      ถ้าลูกค้ารู้จัก → คงไว้ · ถ้าเป็นศัพท์ช่างล้วน → เปลี่ยนเป็น "ยกเส้นพื้น (ม.)" หรือ "เว้นพื้น (ม.)"</li>
+    <li><strong>bucket "🎨 สี / ผิว" ควรรวมกับ 🚪 ไหม สำหรับบางสินค้า?</strong><br>
+      เช่น บานเปิด — สีอบแทบไม่มี (สีตามอลู) ทำให้ bucket นี้ว่างเปล่า → อาจไม่ต้องสร้างถ้าว่างบ่อย</li>
+    <li><strong>"ผ้ามุ้ง" ควรขึ้นก่อน "จำนวนบานมุ้ง" จริงไหม?</strong><br>
+      เซลล์ตัดสินใจเรื่องผ้าก่อนหรือเรื่องจำนวนบานก่อน? (ถ้าราคาผ้าไม่ขึ้นกับบาน → ผ้าขึ้นก่อนสมเหตุผล)</li>
+  </ul>
+</div>
+
+<div style="background:#f0fdf4;border:1px solid var(--green-bd);border-radius:var(--radius);padding:10px 12px;font-size:12.5px;line-height:1.7;">
+  <p style="font-weight:700;color:var(--green);margin-bottom:4px;">จุดที่ตัดสินได้เลย (ไม่ต้องถาม)</p>
+  <ul style="padding-left:16px;">
+    <li>ลบ [Up3] ออกจาก label โช๊ค — ชัดเจนว่าเป็น dev tag หลุด</li>
+    <li>แยก bucket "🎨 สี/ผิว" ออกจาก 🚪 — keyword ปัจจุบันกว้างเกินไปทุก dev เห็นด้วย</li>
+    <li>เปลี่ยนชื่อ summary หลัก "อุปกรณ์เสริม" → "⚙ ปรับแต่งรายการ" — ไม่กระทบ logic</li>
+    <li>ตัดวงเล็บ "(คิดตามสูตร)" ออกจาก "มีคาดตาราง" — ฟุ่มเฟือย</li>
+    <li>ลำดับหลังคา สีวัสดุมุง → ใช้ "สี" label นำ — consistent ทุกรุ่น</li>
+  </ul>
+</div>
+
+</div><!-- /tab-ask -->
+
+<script>
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(function(t,i){
+    var panels=['tab-review','tab-ia','tab-top5','tab-ask'];
+    t.classList.toggle('on', panels[i]===id);
+  });
+  document.querySelectorAll('.panel').forEach(function(p){
+    p.classList.toggle('on', p.id===id);
+  });
+}
+function toggleGroup(el){
+  el.classList.toggle('open');
+}
+// init: open first group in each col by default
+document.querySelectorAll('.ia-group.open').forEach(function(g){
+  g.querySelector('.ia-group-body').style.display='block';
+});
+</script>
+</body>
+</html>

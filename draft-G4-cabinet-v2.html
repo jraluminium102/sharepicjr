@@ -1,0 +1,847 @@
+<style>
+/* ---- Reset / Base ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --jr: #B3151D;
+  --jr-light: #fdf3f3;
+  --jr-border: #e8c0c2;
+  --chip-h: 40px;
+  --radius: 8px;
+  --gap: 10px;
+}
+#g4-demo {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  color: #1a1a1a;
+  max-width: 400px;
+  background: #f9fafb;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+/* ---- Header ---- */
+.d-header {
+  background: var(--jr);
+  color: #fff;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.d-header .d-title { font-weight: 700; font-size: 15px; }
+.d-header .d-demo-badge {
+  background: rgba(255,255,255,0.25);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: .5px;
+}
+
+/* ---- Section wrappers ---- */
+.d-section {
+  background: #fff;
+  margin: 8px;
+  border-radius: var(--radius);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+.d-section-head {
+  background: #f8f8f8;
+  border-bottom: 1px solid #eee;
+  padding: 7px 12px;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--jr);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  min-height: 40px;
+}
+.d-section-head .arrow {
+  margin-left: auto;
+  font-size: 11px;
+  transition: transform .2s;
+}
+.d-section-head.collapsed .arrow { transform: rotate(-90deg); }
+.d-section-body { padding: 10px 12px; display: flex; flex-direction: column; gap: var(--gap); }
+.d-section-body.hidden { display: none; }
+
+/* ---- Field row ---- */
+.d-field { display: flex; flex-direction: column; gap: 4px; }
+.d-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+.d-field .auto-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #059669;
+  background: #d1fae5;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+.d-field .hint {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 1px;
+}
+
+/* ---- Size row (W x H) ---- */
+.size-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.size-row span { font-size: 13px; color: #9ca3af; }
+.size-row .unit { font-size: 12px; color: #6b7280; }
+
+/* ---- Chips ---- */
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip {
+  height: var(--chip-h);
+  min-width: 68px;
+  padding: 0 12px;
+  border-radius: 20px;
+  border: 1.5px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+.chip:active { transform: scale(.96); }
+.chip.on {
+  border-color: var(--jr);
+  background: var(--jr-light);
+  color: var(--jr);
+  font-weight: 700;
+}
+.chip.chip-sm {
+  height: 36px;
+  font-size: 12px;
+  min-width: 56px;
+  padding: 0 10px;
+}
+
+/* ---- Material visual pairing ---- */
+.mat-pair {
+  display: flex;
+  gap: 6px;
+}
+.mat-card {
+  flex: 1;
+  border: 2px solid #e5e7eb;
+  border-radius: var(--radius);
+  padding: 8px;
+  cursor: pointer;
+  transition: all .15s;
+  background: #fff;
+}
+.mat-card.on {
+  border-color: var(--jr);
+  background: var(--jr-light);
+}
+.mat-card .mat-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+  display: block;
+}
+.mat-card.on .mat-name { color: var(--jr); }
+.mat-card .mat-sub {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+.mat-card .mat-color-effect {
+  font-size: 11px;
+  margin-top: 4px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.mat-card.on .mat-color-effect {
+  background: rgba(179,21,29,.1);
+  color: var(--jr);
+  font-weight: 600;
+}
+.mat-card:not(.on) .mat-color-effect { color: #6b7280; }
+
+/* ---- Number input ---- */
+.d-input {
+  height: 40px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 14px;
+  width: 80px;
+  background: #fff;
+  transition: border-color .15s;
+}
+.d-input:focus { outline: none; border-color: var(--jr); }
+
+/* ---- Checkbox row ---- */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  cursor: pointer;
+}
+.check-row input[type=checkbox] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--jr);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.check-row .check-label { font-size: 13px; }
+.check-row .check-hint { font-size: 11px; color: #6b7280; }
+
+/* ---- Dropdown ---- */
+.d-select {
+  height: 40px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 13px;
+  background: #fff;
+  max-width: 100%;
+  transition: border-color .15s;
+}
+.d-select:focus { outline: none; border-color: var(--jr); }
+
+/* ---- Color indicator inline ---- */
+.color-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #fef9c3;
+  border-radius: 6px;
+  border: 1px solid #fde68a;
+  font-size: 12px;
+}
+.color-indicator .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #c0c0c0;
+  border: 1px solid #ccc;
+  flex-shrink: 0;
+}
+
+/* ---- Price preview ---- */
+.price-card {
+  background: #fff;
+  margin: 8px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--jr-border);
+  overflow: hidden;
+}
+.price-card-head {
+  background: var(--jr);
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.price-card-head .mock-badge {
+  font-size: 10px;
+  background: rgba(255,255,255,.25);
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+.price-lines { padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; }
+.price-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 12px;
+  gap: 8px;
+}
+.price-line .p-label { color: #374151; flex: 1; }
+.price-line .p-val { color: #111; font-weight: 600; white-space: nowrap; }
+.price-line.color-line .p-label { color: var(--jr); }
+.price-line.color-line .p-val { color: var(--jr); }
+.price-line.total-line {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1.5px solid var(--jr-border);
+}
+.price-line.total-line .p-label { font-weight: 700; font-size: 14px; }
+.price-line.total-line .p-val { font-size: 17px; font-weight: 700; color: var(--jr); }
+.price-note { font-size: 10px; color: #9ca3af; padding: 0 12px 8px; }
+
+/* ---- Separator ---- */
+.d-divider { height: 1px; background: #f3f4f6; margin: 2px 0; }
+
+/* ---- Inline hint inside section ---- */
+.section-hint {
+  font-size: 11px;
+  color: #6b7280;
+  background: #f3f4f6;
+  border-radius: 5px;
+  padding: 5px 8px;
+}
+
+/* ---- Future Tech section ---- */
+.ft-section {
+  background: #fff;
+  margin: 8px;
+  border-radius: var(--radius);
+  border: 1.5px dashed #d1d5db;
+  overflow: hidden;
+}
+.ft-head {
+  background: #f8f4ff;
+  border-bottom: 1px solid #e9d5f5;
+  padding: 7px 12px;
+  font-weight: 700;
+  font-size: 12px;
+  color: #7c3aed;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  min-height: 40px;
+}
+.ft-head .arrow { margin-left: auto; font-size: 11px; transition: transform .2s; }
+.ft-head.collapsed .arrow { transform: rotate(-90deg); }
+.ft-body { padding: 10px 12px; display: flex; flex-direction: column; gap: var(--gap); }
+.ft-body.hidden { display: none; }
+
+/* ---- Cascade warning ---- */
+.cascade-note {
+  font-size: 11px;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 5px;
+  padding: 4px 8px;
+}
+</style>
+
+<div id="g4-demo">
+
+  <!-- HEADER -->
+  <div class="d-header">
+    <span class="d-title">กลุ่ม 4 — ตู้อลูมิเนียม</span>
+    <span class="d-demo-badge">ตัวอย่าง UX</span>
+  </div>
+
+  <!-- PRODUCT SWITCHER (ตู้อลู / ฝาตู้) -->
+  <div class="d-section" style="margin-top:8px;">
+    <div class="d-section-body" style="gap:6px;">
+      <div class="d-field">
+        <label>เลือกสินค้า</label>
+        <div class="chip-row">
+          <button class="chip on" id="btn-cab" onclick="switchProduct('cabinet')">ตู้อลูมิเนียม</button>
+          <button class="chip" id="btn-ft" onclick="switchProduct('future_tech')">ฝาตู้ Future Tech</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === ตู้อลู FORM === -->
+  <div id="form-cabinet">
+
+    <!-- ขนาด -->
+    <div class="d-section">
+      <div class="d-section-head" onclick="toggleSection(this)">
+        ขนาดตู้ (ม.)
+        <span class="arrow">&#9660;</span>
+      </div>
+      <div class="d-section-body">
+        <div class="d-field">
+          <label>กว้าง x สูง</label>
+          <div class="size-row">
+            <input type="number" class="d-input" id="cab-w" step="0.1" min="0" value="1.2" oninput="calc()">
+            <span>x</span>
+            <input type="number" class="d-input" id="cab-h" step="0.1" min="0" value="2.4" oninput="calc()">
+            <span class="unit">ม.</span>
+          </div>
+        </div>
+        <div class="d-field">
+          <label>ลึก (ม.) <span class="auto-tag">auto</span></label>
+          <div class="size-row">
+            <input type="number" class="d-input" id="cab-d" step="0.1" min="0" value="0.6" oninput="calc()">
+            <span class="unit">ม.</span>
+          </div>
+          <span class="hint">ตู้ทั่วไป = 0.6 ม., รองเท้า = 0.4 ม.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- รายละเอียดตู้ -->
+    <div class="d-section">
+      <div class="d-section-head" onclick="toggleSection(this)">
+        รายละเอียดตู้
+        <span class="arrow">&#9660;</span>
+      </div>
+      <div class="d-section-body">
+
+        <!-- ประเภทตู้ -->
+        <div class="d-field">
+          <label>ประเภทตู้</label>
+          <div class="chip-row" id="chips-cabtype">
+            <button class="chip on" data-val="wardrobe" onclick="setChip('chips-cabtype',this,'cabtype')">ตู้ทั่วไป</button>
+            <button class="chip" data-val="shoe" onclick="setChip('chips-cabtype',this,'cabtype')">ตู้รองเท้า</button>
+          </div>
+        </div>
+
+        <!-- จำนวนบานหน้า -->
+        <div class="d-field">
+          <label>จำนวนบานหน้าตู้</label>
+          <div class="chip-row" id="chips-cabdoors">
+            <button class="chip chip-sm" data-val="1" onclick="setChip('chips-cabdoors',this,'cabdoors')">1 บาน</button>
+            <button class="chip chip-sm on" data-val="2" onclick="setChip('chips-cabdoors',this,'cabdoors')">2 บาน</button>
+            <button class="chip chip-sm" data-val="3" onclick="setChip('chips-cabdoors',this,'cabdoors')">3 บาน</button>
+          </div>
+        </div>
+
+        <!-- วัสดุผนังตู้ + ชนิดชั้น — จัดคู่ให้เห็นความสัมพันธ์กับค่าสี -->
+        <div class="d-divider"></div>
+        <div class="d-field">
+          <label>วัสดุผนัง + ชนิดชั้น</label>
+          <span class="hint" style="margin-bottom:4px;">เลือกวัสดุ — ค่าสีโครงเปลี่ยนตามที่เลือก</span>
+
+          <!-- Wall material cards -->
+          <div class="mat-pair" id="wall-cards">
+            <div class="mat-card on" data-val="alu" onclick="pickWall('alu')">
+              <span class="mat-name">อลูทึบ</span>
+              <div class="mat-sub">ผนัง 2 ข้าง + พื้น</div>
+              <div class="mat-color-effect">ค่าสี = rn90</div>
+            </div>
+            <div class="mat-card" data-val="glass" onclick="pickWall('glass')">
+              <span class="mat-name">กระจก</span>
+              <div class="mat-sub">ผนัง 2 ข้าง + พื้น</div>
+              <div class="mat-color-effect">ค่าสี = colorPrice เต็ม</div>
+            </div>
+          </div>
+
+          <!-- Shelf type chips — ใต้ wall cards ทันที -->
+          <div style="margin-top:8px;">
+            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">ชนิดชั้น</label>
+            <div class="chip-row" id="chips-shelfmat">
+              <button class="chip chip-sm on" data-val="" onclick="setChip('chips-shelfmat',this,'shelfmat')">ตามประเภท</button>
+              <button class="chip chip-sm" data-val="alu" onclick="setChip('chips-shelfmat',this,'shelfmat')">อลู (+1,200/ชั้น)</button>
+              <button class="chip chip-sm" data-val="glass" onclick="setChip('chips-shelfmat',this,'shelfmat')">กระจก (+1,000/ชั้น)</button>
+            </div>
+            <div id="shelf-color-note" class="cascade-note" style="margin-top:6px;display:none;">
+              ชั้นกระจก — ไม่คิดค่าสี (อลูทึบเท่านั้นที่มีค่าสีโครง)
+            </div>
+          </div>
+        </div>
+
+        <!-- จำนวนชั้น -->
+        <div class="d-field">
+          <label>จำนวนชั้น <span class="auto-tag">auto</span></label>
+          <div class="size-row">
+            <input type="number" class="d-input" id="cab-shelves" step="1" min="0" placeholder="auto" oninput="calc()" style="width:70px;">
+          </div>
+          <span class="hint">ว่าง = คำนวณอัตโนมัติ (~ทุก 40 ซม.)</span>
+        </div>
+
+        <!-- ผนังหลัง -->
+        <label class="check-row">
+          <input type="checkbox" id="cab-backwall" onchange="calc()">
+          <div>
+            <div class="check-label">+ผนังหลัง</div>
+            <div class="check-hint">ปกติ = ชนผนังปูน (ไม่คิดเนื้องาน)</div>
+          </div>
+        </label>
+
+      </div>
+    </div>
+
+    <!-- สีอลูมิเนียม (i-color equivalent) -->
+    <div class="d-section">
+      <div class="d-section-head" onclick="toggleSection(this)">
+        สีอลูมิเนียม (โครงตู้)
+        <span class="arrow">&#9660;</span>
+      </div>
+      <div class="d-section-body">
+        <div class="d-field">
+          <label>เลือกสี</label>
+          <select class="d-select" id="cab-color" onchange="calc()">
+            <option value="0">ขาว / ดำ (ฟรี)</option>
+            <option value="1">เทาซาฮาร่า (+ค่าสี rn90)</option>
+            <option value="2">สีลายไม้สต๊อก (+ค่าสี rn90)</option>
+            <option value="3">อบสีพิเศษ (+ค่าสี rn90)</option>
+            <option value="4">อบสีลายไม้ (+ค่าสี rn90)</option>
+          </select>
+        </div>
+
+        <!-- Color effect explanation cascade -->
+        <div id="color-cascade-note" class="cascade-note" style="display:none;"></div>
+
+        <div class="section-hint" id="color-hint-box">
+          ผนังอลู + พื้น + ชั้นอลู = ค่าสีแบบ rn90 (/ตร.ม.)
+          <br>ผนังกระจก = colorPrice เต็ม (tier ตามพื้นที่)
+          <br>ชั้นกระจก = ไม่คิดค่าสี
+        </div>
+      </div>
+    </div>
+
+    <!-- ราคา mock -->
+    <div class="price-card">
+      <div class="price-card-head">
+        ราคาโดยประมาณ
+        <span class="mock-badge">ตัวเลขสมมติ</span>
+      </div>
+      <div class="price-lines" id="price-lines-cab">
+        <!-- filled by JS -->
+      </div>
+      <div class="price-note">* ราคาในดราฟเป็น mock เพื่อ UX เท่านั้น ไม่ใช่ราคาจริง</div>
+    </div>
+
+  </div><!-- /form-cabinet -->
+
+  <!-- === ฝาตู้ FORM === -->
+  <div id="form-future-tech" style="display:none;">
+
+    <div class="ft-section">
+      <div class="ft-head" onclick="toggleFT(this)">
+        ฝาตู้ Future Tech
+        <span class="arrow">&#9660;</span>
+      </div>
+      <div class="ft-body" id="ft-body">
+
+        <!-- ขนาด/บาน -->
+        <div class="d-field">
+          <label>ขนาดต่อบาน (ม.)</label>
+          <div class="size-row">
+            <input type="number" class="d-input" id="ft-w" step="0.1" value="0.6" oninput="calcFT()">
+            <span>x</span>
+            <input type="number" class="d-input" id="ft-h" step="0.1" value="1.2" oninput="calcFT()">
+            <span class="unit">ม./บาน</span>
+          </div>
+          <span class="hint">กรอกขนาดต่อ 1 บาน (ระบบคำนวณรวม)</span>
+        </div>
+
+        <!-- จำนวนบาน -->
+        <div class="d-field">
+          <label>จำนวนบาน (max 3 บาน/ชุด)</label>
+          <div class="chip-row" id="chips-ftpanels">
+            <button class="chip chip-sm" data-val="1" onclick="setChip('chips-ftpanels',this,'ftpanels')">1 บาน</button>
+            <button class="chip chip-sm on" data-val="2" onclick="setChip('chips-ftpanels',this,'ftpanels')">2 บาน</button>
+            <button class="chip chip-sm" data-val="3" onclick="setChip('chips-ftpanels',this,'ftpanels')">3 บาน</button>
+          </div>
+          <div class="cascade-note" id="ft-extra-note" style="margin-top:6px;display:none;">
+            บานที่ 2 ขึ้นไป +5,500/บาน (ค่าบานเพิ่ม)
+          </div>
+        </div>
+
+        <!-- ประเภท -->
+        <div class="d-field">
+          <label>ประเภท</label>
+          <div class="chip-row" id="chips-ftype">
+            <button class="chip chip-sm on" data-val="door" onclick="setChip('chips-ftype',this,'ftype')">ประตู</button>
+            <button class="chip chip-sm" data-val="window" onclick="setChip('chips-ftype',this,'ftype')">หน้าต่าง</button>
+          </div>
+        </div>
+
+        <!-- สีฝาตู้ -->
+        <div class="d-field">
+          <label>สีฝาตู้</label>
+          <select class="d-select" id="ft-color" onchange="calcFT()">
+            <option value="0">ขาว / ดำ (ฟรี)</option>
+            <option value="1">เทาซาฮาร่า (+colorPlus)</option>
+            <option value="2">อบสีพิเศษ (+colorPlus)</option>
+            <option value="3">อบสีลายไม้ (+colorPlus)</option>
+          </select>
+          <span class="hint" style="color:#B3151D;">สีเส้นสำเร็จ — ดูตัวอย่างจริงก่อน</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ราคา mock ฝาตู้ -->
+    <div class="price-card">
+      <div class="price-card-head">
+        ราคาโดยประมาณ
+        <span class="mock-badge">ตัวเลขสมมติ</span>
+      </div>
+      <div class="price-lines" id="price-lines-ft">
+      </div>
+      <div class="price-note">* ราคาในดราฟเป็น mock เพื่อ UX เท่านั้น ไม่ใช่ราคาจริง</div>
+    </div>
+
+  </div><!-- /form-future-tech -->
+
+  <div style="height:8px;"></div>
+</div><!-- /g4-demo -->
+
+<script>
+// ---- State ----
+var S = {
+  product: 'cabinet',
+  cabtype: 'wardrobe',
+  cabdoors: 2,
+  shelfmat: '',      // '' = auto
+  wallmat: 'alu',
+  backwall: false,
+  color: 0,
+  shelves: null,
+  // FT
+  ftpanels: 2,
+  ftype: 'door',
+  ftcolor: 0,
+};
+
+// ---- Mock rate tables (ใกล้เคียงสูตรจริงแต่ไม่เป๊ะ — demo เท่านั้น) ----
+var RN90 = [
+  [0, 0],       // 0 = ขาว/ดำ ฟรี
+  [800, 600],   // 1 = ซาฮาร่า (rn90: ~600-800)
+  [1000, 800],  // 2 = ลายไม้สต๊อก
+  [1200, 1000], // 3 = อบพิเศษ
+  [1400, 1200], // 4 = ลายไม้อบพิเศษ
+];
+var COLOR_PRICE_RATES = [0, 700, 900, 1100, 1300]; // colorPrice per ตร.ม. mock
+
+var FT_BASE = [[0.5,1.0,7500],[1.0,1.5,10000],[1.5,1.7,12500]];
+var FT_COLOR_PLUS = [[0.5,1.0,1500],[1.0,1.5,2000],[1.5,2.0,2500]];
+
+function ftRate(a, table) {
+  if (a <= 0) return table[0][2];
+  for (var r of table) { if (a >= r[0] && a <= r[1]) return r[2]; }
+  if (a < table[0][0]) return table[0][2];
+  return table[table.length-1][2];
+}
+
+function rn90Rate(ci) {
+  if (!ci || ci < 1 || ci >= RN90.length) return 0;
+  return RN90[ci][1];
+}
+
+function colorPriceRate(ci) {
+  if (!ci || ci < 1 || ci >= COLOR_PRICE_RATES.length) return 0;
+  return COLOR_PRICE_RATES[ci];
+}
+
+function fmt(n) {
+  return Math.round(n).toLocaleString('th-TH');
+}
+
+// ---- Chip helper ----
+function setChip(groupId, btn, key) {
+  var group = document.getElementById(groupId);
+  if (!group) return;
+  group.querySelectorAll('.chip').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  S[key] = btn.dataset.val;
+  // cascade effects
+  if (key === 'cabtype') {
+    if (S.cabtype === 'shoe') {
+      document.getElementById('cab-d').value = '0.4';
+      document.getElementById('cab-h').value = '2.0';
+    } else {
+      document.getElementById('cab-d').value = '0.6';
+      document.getElementById('cab-h').value = '2.4';
+    }
+  }
+  if (key === 'shelfmat') {
+    updateShelfColorNote();
+  }
+  if (key === 'ftpanels') {
+    S.ftpanels = parseInt(btn.dataset.val);
+    var en = document.getElementById('ft-extra-note');
+    en.style.display = (S.ftpanels >= 2) ? '' : 'none';
+    calcFT(); return;
+  }
+  calc();
+}
+
+function updateShelfColorNote() {
+  var note = document.getElementById('shelf-color-note');
+  note.style.display = (S.shelfmat === 'glass') ? '' : 'none';
+}
+
+// ---- Wall material cards ----
+function pickWall(val) {
+  S.wallmat = val;
+  document.querySelectorAll('#wall-cards .mat-card').forEach(function(c){
+    c.classList.toggle('on', c.dataset.val === val);
+  });
+  updateColorHint();
+  calc();
+}
+
+function updateColorHint() {
+  var hint = document.getElementById('color-hint-box');
+  var note = document.getElementById('color-cascade-note');
+  if (S.wallmat === 'glass') {
+    note.style.display = '';
+    note.textContent = 'ผนังกระจก: ค่าสีคิดแบบ colorPrice เต็ม (tier ตามพื้นที่ผนัง)';
+  } else {
+    note.style.display = 'none';
+  }
+}
+
+// ---- Section toggle ----
+function toggleSection(head) {
+  var body = head.nextElementSibling;
+  head.classList.toggle('collapsed');
+  body.classList.toggle('hidden');
+}
+function toggleFT(head) {
+  var body = document.getElementById('ft-body');
+  head.classList.toggle('collapsed');
+  body.classList.toggle('hidden');
+}
+
+// ---- Product switch ----
+function switchProduct(prod) {
+  S.product = prod;
+  document.getElementById('btn-cab').classList.toggle('on', prod === 'cabinet');
+  document.getElementById('btn-ft').classList.toggle('on', prod === 'future_tech');
+  document.getElementById('form-cabinet').style.display = prod === 'cabinet' ? '' : 'none';
+  document.getElementById('form-future-tech').style.display = prod === 'future_tech' ? '' : 'none';
+}
+
+// ---- Cabinet calc (mock) ----
+function calc() {
+  // read inputs
+  var W = parseFloat(document.getElementById('cab-w').value) || 0;
+  var H = parseFloat(document.getElementById('cab-h').value) || 0;
+  var D = parseFloat(document.getElementById('cab-d').value) || 0.6;
+  var bw = document.getElementById('cab-backwall').checked;
+  var ci = parseInt(document.getElementById('cab-color').value) || 0;
+  var nDoors = parseInt(S.cabdoors) || 2;
+  var wallmat = S.wallmat;
+
+  // shelves
+  var spacing = S.cabtype === 'shoe' ? 0.2 : 0.4;
+  var shelveInput = parseInt(document.getElementById('cab-shelves').value);
+  var nsh = (shelveInput >= 1) ? shelveInput : Math.max(2, Math.round(H / spacing));
+
+  // shelf material
+  var sg = S.shelfmat || (S.cabtype === 'shoe' ? 'glass' : 'alu');
+  var srate = sg === 'glass' ? 1000 : 1200;
+
+  // -- บานหน้าตู้ (Future Tech สูตร) --
+  var aPerDoor = (W * H) / nDoors;
+  var baseRate = ftRate(aPerDoor, FT_BASE);
+  var colorPlusDoor = ci > 0 ? ftRate(aPerDoor, FT_COLOR_PLUS) : 0;
+  var perDoor = baseRate + colorPlusDoor;
+  var extraFee = nDoors >= 2 ? (nDoors - 1) * 5500 : 0;
+  var front = perDoor * nDoors + extraFee;
+
+  // -- เนื้องาน --
+  var aWall = 2 * D * H + (bw ? W * H : 0);
+  var aFloor = W * D;
+  var wall, cWall, cFloor, cShelf;
+
+  if (wallmat === 'glass') {
+    wall = Math.max(5000, aWall * 4500) * 0.7; // mock glass wall
+    cWall = aWall * colorPriceRate(ci);         // colorPrice mock
+  } else {
+    wall = aWall * 4000;
+    cWall = aWall * rn90Rate(ci);
+  }
+  cFloor = aFloor * rn90Rate(ci);
+  var nShelfAlu = sg === 'glass' ? 0 : nsh;
+  var aShelfAlu = aFloor * nShelfAlu;
+  cShelf = aShelfAlu * rn90Rate(ci);
+
+  var colorStruct = Math.round(cWall + cFloor + cShelf);
+  var fl = aFloor * 4000;
+  var shc = nsh * srate;
+  var total = Math.ceil((front + wall + fl + shc + colorStruct) / 500) * 500;
+
+  // -- render --
+  var colorNames = ['ขาว/ดำ (ฟรี)','เทาซาฮาร่า','ลายไม้สต๊อก','อบสีพิเศษ','อบสีลายไม้'];
+  var shelfTxt = sg === 'glass' ? 'ชั้นกระจก' : 'ชั้นอลู';
+  var wallTxt = wallmat === 'glass' ? 'ผนังกระจก' : 'ผนังอลูทึบ';
+
+  var lines = [
+    {label: 'บานหน้าตู้ ' + nDoors + ' บาน', val: front, extra: fmt(perDoor) + '/บาน' + (extraFee ? ' + บานเพิ่ม ' + fmt(extraFee) : '')},
+    {label: wallTxt + ' + พื้น', val: wall + fl},
+    {label: nsh + ' ชั้น (' + shelfTxt + ')', val: shc},
+  ];
+  if (colorStruct > 0) {
+    lines.push({label: 'ค่าสีโครง (' + (colorNames[ci] || '') + ')', val: colorStruct, isColor: true});
+  }
+
+  var html = '';
+  lines.forEach(function(l) {
+    html += '<div class="price-line' + (l.isColor ? ' color-line' : '') + '">'
+      + '<span class="p-label">' + l.label + (l.extra ? '<br><span style="color:#9ca3af;font-size:10px;">' + l.extra + '</span>' : '') + '</span>'
+      + '<span class="p-val">' + fmt(l.val) + '</span>'
+      + '</div>';
+  });
+  html += '<div class="price-line total-line"><span class="p-label">รวมประมาณ</span><span class="p-val">' + fmt(total) + '</span></div>';
+
+  document.getElementById('price-lines-cab').innerHTML = html;
+
+  // update color cascade note
+  updateColorHint();
+  updateShelfColorNote();
+}
+
+// ---- Future Tech calc (mock) ----
+function calcFT() {
+  var W = parseFloat(document.getElementById('ft-w').value) || 0;
+  var H = parseFloat(document.getElementById('ft-h').value) || 0;
+  var nDoors = S.ftpanels || 2;
+  var ci = parseInt(document.getElementById('ft-color').value) || 0;
+  var aPerDoor = W * H;
+
+  var baseRate = ftRate(aPerDoor, FT_BASE);
+  var colorPlus = ci > 0 ? ftRate(aPerDoor, FT_COLOR_PLUS) : 0;
+  var perDoor = baseRate + colorPlus;
+  var extraFee = nDoors >= 2 ? (nDoors - 1) * 5500 : 0;
+  var total = Math.ceil((perDoor * nDoors + extraFee) / 500) * 500;
+
+  var colorNames = ['ขาว/ดำ (ฟรี)','เทาซาฮาร่า (+colorPlus)','อบสีพิเศษ (+colorPlus)','อบสีลายไม้ (+colorPlus)'];
+  var html = '';
+  html += '<div class="price-line"><span class="p-label">บานหน้า ' + nDoors + ' บาน × ' + fmt(perDoor) + '</span><span class="p-val">' + fmt(perDoor * nDoors) + '</span></div>';
+  if (extraFee > 0) {
+    html += '<div class="price-line"><span class="p-label">ค่าบานเพิ่ม (' + (nDoors-1) + ' บาน)</span><span class="p-val">' + fmt(extraFee) + '</span></div>';
+  }
+  if (ci > 0) {
+    html += '<div class="price-line color-line"><span class="p-label">+ค่าสี (' + (colorNames[ci]||'') + ')</span><span class="p-val">รวมในบาน</span></div>';
+  }
+  html += '<div class="price-line total-line"><span class="p-label">รวมประมาณ</span><span class="p-val">' + fmt(total) + '</span></div>';
+  document.getElementById('price-lines-ft').innerHTML = html;
+}
+
+// ---- init ----
+(function init() {
+  // read state from default DOM
+  S.color = 0;
+  calc();
+  calcFT();
+  // set backwall listener
+  document.getElementById('cab-backwall').addEventListener('change', function(){
+    S.backwall = this.checked;
+    calc();
+  });
+  document.getElementById('cab-color').addEventListener('change', function(){
+    S.color = parseInt(this.value) || 0;
+    calc();
+  });
+  document.getElementById('ft-color').addEventListener('change', function(){
+    S.ftcolor = parseInt(this.value) || 0;
+    calcFT();
+  });
+})();
+</script>
