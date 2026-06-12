@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>รีวิวหัวข้อ+หมวด ฟอร์มหลังคา G3 — Before/After</title>
+<style>
+  :root{--red:#B3151D;--blue:#1D4ED8;--ok:#15803D;--warn:#92400E;--line:#E5E7EB;--bg:#F3F4F6;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:"Leelawadee UI","Tahoma",sans-serif;color:#1F2937;font-size:14px;line-height:1.5;margin:0;background:var(--bg);padding:10px;}
+  .g3rh-wrap{max-width:410px;margin:0 auto;}
+  h1{font-size:16px;color:var(--red);margin:0 0 2px;}
+  .g3rh-sub{color:#6B7280;font-size:11px;margin-bottom:10px;}
+  /* BA switcher */
+  .g3rh-ba{display:flex;gap:6px;margin-bottom:10px;}
+  .g3rh-ba button{flex:1;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;min-height:44px;}
+  .g3rh-ba button.on{background:var(--red);color:#fff;border-color:var(--red);}
+  /* panel */
+  .g3rh-panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;}
+  /* box accordion */
+  .g3rh-box{border:1px solid #eedede;border-radius:9px;margin:6px 0;background:#fffafa;overflow:hidden;}
+  .g3rh-box>.g3rh-bh{font-weight:700;color:var(--red);font-size:13px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:44px;user-select:none;gap:8px;}
+  .g3rh-box>.g3rh-bb{padding:4px 12px 10px;display:none;}
+  .g3rh-box.open>.g3rh-bb{display:block;}
+  .g3rh-ar{transition:.2s;font-size:12px;color:#9CA3AF;flex-shrink:0;}
+  .g3rh-box.open .g3rh-ar{transform:rotate(180deg);}
+  /* opt row */
+  .g3rh-opt{font-size:13px;padding:5px 0;border-bottom:1px solid #F3F4F6;display:flex;align-items:flex-start;gap:6px;}
+  .g3rh-opt:last-child{border-bottom:none;}
+  .g3rh-opt-label{flex:1;min-width:0;}
+  /* tags */
+  .g3rh-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:9px;margin-left:4px;vertical-align:middle;}
+  .g3rh-tag.bad{background:#FEE2E2;color:#991B1B;}
+  .g3rh-tag.ok{background:#DCFCE7;color:#166534;}
+  .g3rh-tag.warn{background:#FEF3C7;color:#92400E;}
+  .g3rh-tag.blue{background:#DBEAFE;color:#1D4ED8;}
+  .g3rh-tag.fix{background:#F3E8FF;color:#6B21A8;}
+  /* sub-group ใน box */
+  .g3rh-sg{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:7px;margin:5px 0;overflow:hidden;}
+  .g3rh-sg>.g3rh-sgh{padding:7px 10px;font-size:12px;font-weight:700;color:#374151;cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:40px;user-select:none;}
+  .g3rh-sg>.g3rh-sgb{padding:4px 10px 8px;display:none;}
+  .g3rh-sg.open>.g3rh-sgb{display:block;}
+  .g3rh-sg .g3rh-ar2{font-size:11px;color:#9CA3AF;transition:.2s;}
+  .g3rh-sg.open .g3rh-ar2{transform:rotate(180deg);}
+  /* issue callout */
+  .g3rh-issue{background:#FFF1F2;border:1px solid #FECACA;border-radius:8px;padding:7px 10px;font-size:12px;color:#991B1B;margin:4px 0 6px;}
+  .g3rh-issue b{color:var(--red);}
+  /* fix callout */
+  .g3rh-fix{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:7px 10px;font-size:12px;color:#166534;margin:4px 0 6px;}
+  /* slide toggle (หลังคาเลื่อน) */
+  .g3rh-slide{border:2px solid var(--blue);border-radius:10px;margin:6px 0;overflow:hidden;}
+  .g3rh-slide .g3rh-sh{padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;color:#1E40AF;font-size:13px;min-height:44px;user-select:none;}
+  .g3rh-tg{width:44px;height:26px;border-radius:14px;background:#CBD5E1;position:relative;transition:.2s;flex-shrink:0;}
+  .g3rh-tg::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;}
+  .g3rh-slide.on .g3rh-tg{background:var(--blue);}
+  .g3rh-slide.on .g3rh-tg::after{left:21px;}
+  .g3rh-slide .g3rh-sb{padding:0 12px 10px;display:none;}
+  .g3rh-slide.on .g3rh-sb{display:block;}
+  /* badge box หลุดหมวด (before) */
+  .g3rh-badbox{border:2px solid #FCA5A5;border-radius:9px;margin:6px 0;background:#FFF5F5;overflow:hidden;}
+  .g3rh-badbox>.g3rh-bh{font-weight:700;color:#DC2626;font-size:13px;padding:10px 12px;display:flex;align-items:center;gap:8px;min-height:44px;}
+  /* chips */
+  .g3rh-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+  .g3rh-chip{border:1px solid #C9CDD3;background:#fff;border-radius:18px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;min-height:38px;display:inline-flex;align-items:center;}
+  .g3rh-chip.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+  /* hint */
+  .g3rh-hint{font-size:11px;color:#9CA3AF;}
+  /* divider */
+  .g3rh-div{border:none;border-top:1px dashed #E5E7EB;margin:7px 0;}
+  /* note moved */
+  .g3rh-moved{display:flex;align-items:center;gap:6px;font-size:12px;color:#6B7280;font-style:italic;padding:4px 0;}
+  /* demo bar */
+  .g3rh-demo{background:#FEF9C3;border:1px solid #FDE047;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#854D0E;margin-bottom:8px;text-align:center;}
+  /* arrow between boxes */
+  .g3rh-arrow{text-align:center;font-size:18px;color:#9CA3AF;margin:3px 0;}
+  /* before label bullet */
+  .g3rh-blist{font-size:12.5px;margin:0;padding-left:18px;}
+  .g3rh-blist li{margin-bottom:5px;}
+  .x{color:var(--red);font-weight:700;}
+  .ok2{color:var(--ok);font-weight:700;}
+  /* footer */
+  .g3rh-foot{margin-top:12px;font-size:10px;color:#9CA3AF;text-align:center;}
+</style>
+</head>
+<body>
+<div class="g3rh-wrap">
+<h1>รีวิวหัวข้อ+หมวด — ฟอร์มหลังคา (G3)</h1>
+<div class="g3rh-sub">กดสลับ Before/After · กดกล่องพับ/เปิดได้ · เครื่องคิดราคา JR · 12 มิ.ย. 2026</div>
+
+<div class="g3rh-ba">
+  <button id="g3rh-bBefore" onclick="g3rhShow('before')">ก่อนแก้ (ปัญหาที่เจอ)</button>
+  <button id="g3rh-bAfter" class="on" onclick="g3rhShow('after')">หลังแก้ (เสนอ)</button>
+</div>
+
+<!-- ====================== BEFORE ====================== -->
+<div id="g3rh-before" style="display:none;">
+<div class="g3rh-demo">Before — ชี้จุดปัญหาหัวข้อ/หมวด (ไม่ใช่ฟอร์มจริง)</div>
+<div class="g3rh-panel">
+  <div style="font-weight:700;color:var(--red);margin-bottom:8px;">ปัญหาที่เจอ 8 จุด (🔴→🟡→🟢)</div>
+  <ul class="g3rh-blist">
+    <li><span class="x">🔴①</span> <b>กล่อง ⑥ "หมายเหตุ / งานเสริม"</b> มี "สีอลูมิเนียม" + "กระจก" ตกมาเพราะ keyword ไม่ครอบ — ทั้ง 2 เป็น field กลางของ addSet ไม่ใช่ option หลังคาจริงๆ แต่แสดงในกล่อง catch-all → ต้อง exclude ออกจาก groupGHOpts</li>
+    <li><span class="x">🔴②</span> <b>กล่อง ④ "ของเสริมหลังคา"</b> 10 รายการปนกัน ไม่มีหัวข้อรอง — เซลล์ต้องไล่อ่านทุกรายการเพื่อหาสิ่งที่ต้องการ</li>
+    <li><span class="x">🟡③</span> <b>ชื่อ "🏠 วัสดุมุง · สี · โครง"</b> — "สี" ในชื่อกล่องซ้ำกับ "สีอลู" (global) ทำให้งงว่า "สีใคร" · จริงๆ มีแค่สีวัสดุมุง</li>
+    <li><span class="x">🟡④</span> <b>ชื่อ "⬅️➡️ หลังคาเลื่อน"</b> — อิโมจิลูกศร 2 ตัวหนักตา · อ่าน 0.5 วินาทีก่อนเข้าใจ</li>
+    <li><span class="x">🟡⑤</span> <b>"บานติดตาย (บาน · ส่วนไม่เลื่อน · ระบุในใบ)"</b> — label ยาว 3 ชั้น เซลล์งงว่าต้องกรอกอะไร</li>
+    <li><span class="x">🟡⑥</span> <b>"ชนิดราง: อลู S / สแตนเลส M / สแตนเลส L"</b> อยู่หลัง "ระบบรางน้ำ: ท่อ/โซ่" — ลำดับสลับ (ควรเลือกชนิดรางก่อน แล้วค่อยระบบระบาย)</li>
+    <li><span class="x">🟢⑦</span> <b>"ต่อปลายวัสดุที่ 2 (หลังคาผสม)"</b> — ชื่อเข้าใจได้ แต่ "ต่อปลาย" ไม่ตรงกับภาษาช่าง · ช่างพูด "หลังคาผสม" หรือ "ต่อส่วนที่ 2"</li>
+    <li><span class="x">🟢⑧</span> <b>กล่อง ⑥ ชื่อ "หมายเหตุ / งานเสริม"</b> — "งานเสริม" หมายถึงอะไร? ควรชัดกว่านี้</li>
+  </ul>
+</div>
+
+<!-- Before: กล่อง ⑥ แสดงปัญหา -->
+<div class="g3rh-panel" style="margin-top:6px;">
+  <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px;">ตัวอย่าง: กล่อง ⑥ ที่มีรายการหลุดหมวด</div>
+
+  <div class="g3rh-badbox">
+    <div class="g3rh-bh">
+      📝 หมายเหตุ / งานเสริม (4)
+      <span class="g3rh-tag bad">catch-all</span>
+    </div>
+  </div>
+  <div style="padding:4px 6px;font-size:12px;">
+    <div class="g3rh-issue">
+      <b>หลุดมาจาก field กลาง addSet (ไม่ใช่ option หลังคา)</b><br>
+      — สีอลูมิเนียม (รายการนี้) → .i-color-wrap · display:none ปกติ<br>
+      — กระจก (รายการนี้) → .i-glass-wrap · display:none ปกติ<br>
+      ทั้ง 2 ถูก groupGHOpts ดึงไปใส่กล่อง catch-all เพราะ keyword ไม่ครอบ · แม้ display:none จะซ่อนอยู่แต่ถ้า product ไหนแสดงขึ้นมา จะโผล่ผิดหมวด
+    </div>
+    <div style="padding:4px 0;font-size:12px;color:#374151;">
+      <span class="g3rh-tag warn">ควรแก้</span> รายการที่ "ควร" อยู่ใน ⑥ จริงๆ:
+      <br>— งานเสริม/วิศวกรรม · รื้อของเดิม (ถูกหมวด)
+    </div>
+  </div>
+</div>
+
+<!-- Before: กล่อง ④ แสดงปัญหา -->
+<div class="g3rh-panel" style="margin-top:6px;">
+  <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px;">ตัวอย่าง: กล่อง ④ รายการปนกัน ไม่มีหัวข้อรอง</div>
+  <div class="g3rh-box open" id="g3rh-b4before">
+    <div class="g3rh-bh" onclick="g3rhTog('g3rh-b4before')">
+      <span>🔩 ของเสริมหลังคา (10)</span>
+      <span class="g3rh-ar">▼</span>
+    </div>
+    <div class="g3rh-bb">
+      <div class="g3rh-issue">10 รายการไม่แบ่งกลุ่ม → ต้องไล่อ่านทุกบรรทัด</div>
+      <div class="g3rh-opt"><span class="g3rh-tag bad">ปนกัน</span><span class="g3rh-opt-label">คานเหล็กถัก (รุ่น1/2/3)</span></div>
+      <div class="g3rh-opt"><span class="g3rh-tag bad">ปนกัน</span><span class="g3rh-opt-label">เสาแผง / เสา 4″×8″</span></div>
+      <div class="g3rh-opt"><span class="g3rh-tag bad">ปนกัน</span><span class="g3rh-opt-label">ซ่อนสโลป</span></div>
+      <div class="g3rh-opt"><span class="g3rh-tag bad">ปนกัน</span><span class="g3rh-opt-label">โซ่รางน้ำ / ปิดปลายกันน้ำ / ครอบท่อ PVC</span></div>
+      <div class="g3rh-opt"><span class="g3rh-tag bad">ปนกัน</span><span class="g3rh-opt-label">วัสดุปิดรอยต่อ + สี</span></div>
+      <div class="g3rh-opt"><span class="g3rh-tag bad">ปนกัน</span><span class="g3rh-opt-label">เสริมเพลทเหล็กล่าง / เหล็กดึงด้านบน</span></div>
+      <div class="g3rh-opt"><span class="g3rh-tag bad">ปนกัน</span><span class="g3rh-opt-label">ปิดซ่อนราง (กว้าง/สูง/ยาว)</span></div>
+      <div class="g3rh-opt"><span class="g3rh-tag bad">ปนกัน</span><span class="g3rh-opt-label">ครอบคาน (กว้างห่อ/ยาวคาน)</span></div>
+    </div>
+  </div>
+</div>
+</div><!-- end #g3rh-before -->
+
+<!-- ====================== AFTER ====================== -->
+<div id="g3rh-after">
+<div class="g3rh-demo">After (เสนอ) — ราคา/ตัวเลขเป็นเดโม ไม่ใช่ค่าจริง</div>
+
+<!-- ① วัสดุมุง + สี + โครง (แก้ชื่อ: ตัด "สี" ออก เพราะชัดว่าหมายถึงสีวัสดุมุง) -->
+<div class="g3rh-box open" id="g3rh-b1a">
+  <div class="g3rh-bh" onclick="g3rhTog('g3rh-b1a')">
+    <span>🏠 วัสดุมุง · โครง <span class="g3rh-tag fix">แก้ชื่อ</span></span>
+    <span class="g3rh-ar">▼</span>
+  </div>
+  <div class="g3rh-bb">
+    <div class="g3rh-fix" style="font-size:11px;">ตัด "สี" ออกจากชื่อกล่อง → "วัสดุมุง · โครง" · สีวัสดุมุงอยู่ข้างในอยู่แล้ว ไม่งงกับ "สีอลู" (global)</div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label"><b>สีวัสดุมุง</b> — ชิป สีเทา / สีขาว / สีน้ำตาล</span></div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label"><b>แป</b> — ชิป เดี่ยว / คู่</span></div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label"><b>โครงสร้าง</b> — ชิป อลูมิเนียม / เหล็กชุบซิงค์</span></div>
+  </div>
+</div>
+
+<!-- ② หลังคาเลื่อน (แก้อิโมจิ + label) -->
+<div class="g3rh-slide" id="g3rh-sl">
+  <div class="g3rh-sh" onclick="g3rhTogSlide()">
+    <span class="g3rh-tg"></span>
+    <span>🔄 หลังคาเลื่อน <span class="g3rh-tag fix">แก้อิโมจิ</span></span>
+  </div>
+  <div class="g3rh-sb">
+    <div class="g3rh-fix" style="font-size:11px;">เปลี่ยน "⬅️➡️" → "🔄" อ่านเร็วกว่า · label "บานติดตาย" ย่อ label ให้กระชับ</div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label">ชนิดเลื่อน — เลื่อนยื่น / เลื่อนข้าง</span></div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span>
+      <span class="g3rh-opt-label">
+        บานเลื่อน / บานติดตาย <span class="g3rh-tag fix">ย่อ label</span>
+        <div class="g3rh-hint" style="margin-top:2px;">เดิม: "บานติดตาย (บาน · ส่วนไม่เลื่อน · ระบุในใบ)" → แก้เป็น: "บานติดตาย" + hint "ส่วนที่ไม่เลื่อน"</div>
+      </span>
+    </div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label">พื้นที่เลื่อน (ยาว × ยื่น)</span></div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label">มอเตอร์ (ตัว)</span></div>
+  </div>
+</div>
+
+<!-- ③ ปลายหลังคา · รางน้ำ (แก้ลำดับ: ชนิดราง → ระบบระบาย) -->
+<div class="g3rh-box open" id="g3rh-b3a">
+  <div class="g3rh-bh" onclick="g3rhTog('g3rh-b3a')">
+    <span>🌧️ ปลายหลังคา · รางน้ำ</span>
+    <span class="g3rh-ar">▼</span>
+  </div>
+  <div class="g3rh-bb">
+    <div class="g3rh-fix" style="font-size:11px;">สลับลำดับ: ชนิดราง → ระบบระบาย (ท่อ/โซ่) · เหตุผล: ต้องรู้ชนิดรางก่อนถึงเลือกการระบาย · cascade ชัดขึ้น</div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label">ปลายหลังคา — ปล่อย / มีรางน้ำ</span></div>
+    <div class="g3rh-opt"><span class="g3rh-tag fix">สลับลำดับ</span><span class="g3rh-opt-label"><b>ชนิดราง</b> — อลู S / สแตน M / สแตน L <span class="g3rh-hint">(ขึ้นก่อน)</span></span></div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label">ระบบระบาย — ท่อ PVC / โซ่ + สี/ลาย</span></div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label">ตะแกรงกันใบไม้ (รวมราคา)</span></div>
+  </div>
+</div>
+
+<!-- ④ ของเสริมหลังคา (แบ่ง sub-group) -->
+<div class="g3rh-box" id="g3rh-b4a">
+  <div class="g3rh-bh" onclick="g3rhTog('g3rh-b4a')">
+    <span>🔩 ของเสริมหลังคา <span class="g3rh-tag fix">แบ่ง sub-group</span></span>
+    <span class="g3rh-ar">▼</span>
+  </div>
+  <div class="g3rh-bb">
+    <div class="g3rh-fix" style="font-size:11px;">แบ่ง 10 รายการเป็น 4 กลุ่มย่อย · แต่ละกลุ่มพับได้ · เซลล์กางแค่กลุ่มที่ต้องการ</div>
+
+    <!-- sub-group A: โครงสร้าง -->
+    <div class="g3rh-sg open" id="g3rh-sgA">
+      <div class="g3rh-sgh" onclick="g3rhTogSg('g3rh-sgA')">
+        <span>🏗️ เสา · คาน (โครงสร้างเพิ่ม)</span>
+        <span class="g3rh-ar2">▼</span>
+      </div>
+      <div class="g3rh-sgb">
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">คานเหล็กถัก — ไม่มี / รุ่น1 / รุ่น2 / รุ่น3</span></div>
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">เสาแผง (4,000/ต้น)</span></div>
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">เสา 4″×8″ (2,000/ต้น)</span></div>
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">เสริมเพลทเหล็กล่าง · เหล็กดึงด้านบน</span></div>
+      </div>
+    </div>
+
+    <!-- sub-group B: ซ่อนสโลป -->
+    <div class="g3rh-sg" id="g3rh-sgB">
+      <div class="g3rh-sgh" onclick="g3rhTogSg('g3rh-sgB')">
+        <span>🎨 ซ่อนสโลป · ปิด/ครอบ (งานสวยงาม)</span>
+        <span class="g3rh-ar2">▼</span>
+      </div>
+      <div class="g3rh-sgb">
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">ซ่อนสโลป — ไม่มี / คอมโพสิต 3,500 / สมาร์ทบอร์ด 4,000</span></div>
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">ปิดซ่อนราง (กว้าง/สูง/ยาว)</span></div>
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">ครอบคาน ลูกฟูก (กว้างห่อ/ยาวคาน · ลด 40%)</span></div>
+      </div>
+    </div>
+
+    <!-- sub-group C: กันน้ำ/รอยต่อ -->
+    <div class="g3rh-sg" id="g3rh-sgC">
+      <div class="g3rh-sgh" onclick="g3rhTogSg('g3rh-sgC')">
+        <span>💧 กันน้ำ · รอยต่อ</span>
+        <span class="g3rh-ar2">▼</span>
+      </div>
+      <div class="g3rh-sgb">
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">ปิดปลายกันน้ำ (1,000/ม.)</span></div>
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">วัสดุปิดรอยต่อแผ่นหลังคา + สี ขาว/ดำ/เทา</span></div>
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">โซ่รางน้ำ (3,000/เส้น)</span></div>
+        <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกกลุ่ม</span><span class="g3rh-opt-label">ครอบท่อ PVC (1,500/1.5ม.)</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ หลังคาผสม (แก้ชื่อ) -->
+<div class="g3rh-box" id="g3rh-b5a">
+  <div class="g3rh-bh" onclick="g3rhTog('g3rh-b5a')">
+    <span>➕ หลังคาผสม (วัสดุที่ 2) <span class="g3rh-tag fix">แก้ชื่อ</span></span>
+    <span class="g3rh-ar">▼</span>
+  </div>
+  <div class="g3rh-bb">
+    <div class="g3rh-fix" style="font-size:11px;">เปลี่ยน "ต่อปลายวัสดุที่ 2 (หลังคาผสม)" → "หลังคาผสม (วัสดุที่ 2)" — ชื่อหลักตรงกับที่ช่างพูด · "(หลังคาผสม)" เป็น label หลัก ไม่ใช่วงเล็บขยาย</div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label">เลือกวัสดุที่ 2 — ดีไลท์ / โพลีตัน / กระจกลามิเนต ฯลฯ</span></div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label">พื้นที่ส่วนที่ 2 (ตร.ม.)</span></div>
+  </div>
+</div>
+
+<!-- ⑥ งานพิเศษ/รื้อ (แก้ชื่อ + exclude field หลง) -->
+<div class="g3rh-box" id="g3rh-b6a">
+  <div class="g3rh-bh" onclick="g3rhTog('g3rh-b6a')">
+    <span>📝 งานพิเศษ · รื้อของเดิม <span class="g3rh-tag fix">แก้ชื่อ</span></span>
+    <span class="g3rh-ar">▼</span>
+  </div>
+  <div class="g3rh-bb">
+    <div class="g3rh-fix" style="font-size:11px;">เปลี่ยน "หมายเหตุ / งานเสริม" → "งานพิเศษ · รื้อของเดิม" — ตรงกว่า · "หมายเหตุ" อยู่ที่ textarea ด้านล่าง ไม่ใช่ชื่อหมวด · แก้ keyword ใน CATS ให้ exclude .i-color-wrap/.i-glass-wrap ออก</div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label">งานเสริม/วิศวกรรม (ระบุถ้ามี)</span></div>
+    <div class="g3rh-opt"><span class="g3rh-tag ok">ถูกที่</span><span class="g3rh-opt-label">รื้อของเดิม (ระบุชนิด/จำนวน)</span></div>
+    <hr class="g3rh-div">
+    <div class="g3rh-issue" style="font-size:11px;">
+      <b>ต้อง exclude ออก (ไม่ใช่หลังคา option):</b><br>
+      — สีอลูมิเนียม (รายการนี้) → .i-color-wrap — field กลาง addSet<br>
+      — กระจก (รายการนี้) → .i-glass-wrap — field กลาง addSet<br>
+      แก้: เพิ่ม class exclude-from-groupgh ให้ทั้ง 2 wrap หรือเช็คที่ groupGHOpts ก่อน loop ว่า element มี class i-color-wrap/i-glass-wrap → ข้ามไป
+    </div>
+  </div>
+</div>
+
+<!-- สรุปการเปลี่ยน -->
+<div class="g3rh-panel" style="margin-top:6px;">
+  <div style="font-weight:700;color:var(--red);margin-bottom:6px;">สรุป After — 6 กล่อง (ชื่อ+ลำดับ)</div>
+  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <tr style="background:#FFF5F5;"><th style="padding:5px 6px;text-align:left;border-bottom:1px solid #E5E7EB;">กล่อง</th><th style="padding:5px 6px;border-bottom:1px solid #E5E7EB;">เดิม</th><th style="padding:5px 6px;border-bottom:1px solid #E5E7EB;color:var(--ok);">เสนอ</th></tr>
+    <tr><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;">①</td><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;color:#6B7280;">🏠 วัสดุมุง · สี · โครง</td><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;color:var(--ok);font-weight:700;">🏠 วัสดุมุง · โครง</td></tr>
+    <tr><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;">②</td><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;color:#6B7280;">⬅️➡️ หลังคาเลื่อน</td><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;color:var(--ok);font-weight:700;">🔄 หลังคาเลื่อน</td></tr>
+    <tr><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;">③</td><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;color:#6B7280;">🌧️ ปลายหลังคา · รางน้ำ (ลำดับชนิดราง)</td><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;color:var(--ok);font-weight:700;">🌧️ ปลายหลังคา · รางน้ำ (ชนิดรางขึ้นก่อน)</td></tr>
+    <tr><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;">④</td><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;color:#6B7280;">🔩 ของเสริมหลังคา (10 รวม)</td><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;color:var(--ok);font-weight:700;">🔩 ของเสริมหลังคา (3 sub-group)</td></tr>
+    <tr><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;">⑤</td><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;color:#6B7280;">➕ ต่อปลายวัสดุที่ 2 (หลังคาผสม)</td><td style="padding:5px 6px;border-bottom:1px solid #F3F4F6;color:var(--ok);font-weight:700;">➕ หลังคาผสม (วัสดุที่ 2)</td></tr>
+    <tr><td style="padding:5px 6px;">⑥</td><td style="padding:5px 6px;color:#6B7280;">📝 หมายเหตุ / งานเสริม</td><td style="padding:5px 6px;color:var(--ok);font-weight:700;">📝 งานพิเศษ · รื้อของเดิม</td></tr>
+  </table>
+</div>
+
+</div><!-- end #g3rh-after -->
+
+<div class="g3rh-foot">รีวิว UX หัวข้อ+หมวด G3 หลังคา · READ-ONLY · ส่งสเปกแก้ให้ dev · 12 มิ.ย. 2026</div>
+</div><!-- end .g3rh-wrap -->
+
+<script>
+function g3rhShow(m){
+  document.getElementById('g3rh-before').style.display = m==='before' ? 'block' : 'none';
+  document.getElementById('g3rh-after').style.display  = m==='after'  ? 'block' : 'none';
+  document.getElementById('g3rh-bBefore').classList.toggle('on', m==='before');
+  document.getElementById('g3rh-bAfter').classList.toggle('on',  m==='after');
+}
+function g3rhTog(id){
+  var el = document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+function g3rhTogSg(id){
+  var el = document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+function g3rhTogSlide(){
+  document.getElementById('g3rh-sl').classList.toggle('on');
+}
+</script>
+</body>
+</html>

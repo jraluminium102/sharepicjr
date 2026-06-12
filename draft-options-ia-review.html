@@ -616,11 +616,14 @@ function switchTab(id){
   });
 }
 function toggleGroup(el){
+  var isOpen=el.classList.contains('open');
   el.classList.toggle('open');
+  var body=el.querySelector('.ia-group-body');
+  if(body) body.style.display=isOpen?'none':'block';
 }
-// init: open first group in each col by default
-document.querySelectorAll('.ia-group.open').forEach(function(g){
-  g.querySelector('.ia-group-body').style.display='block';
+document.querySelectorAll('.ia-group').forEach(function(g){
+  var body=g.querySelector('.ia-group-body');
+  if(body) body.style.display=g.classList.contains('open')?'block':'none';
 });
 </script>
 </body>
