@@ -1893,19 +1893,22 @@ function groupGHOpts(ch){
     {key:'➕ หลังคาผสม (วัสดุที่ 2)', open:false, kw:['ต่อปลายวัสดุ','หลังคาผสม','พื้นที่ส่วนที่ 2']}, // G3-round2 B⑤
     {key:'📝 งานพิเศษ · รื้อของเดิม', open:false, kw:[]} // G3-round2 B⑥
   ] : [
-    // G1G6-D: 7 หมวดทั่วไป (HANDOFF-G1G6 ข้อ2) + ตู้ (G4 product-specific) · ลำดับ array = ลำดับจับ keyword (เฉพาะเจาะจงก่อน) · disp = ลำดับแสดงผล ①-⑦
-    {key:'📦 รายละเอียดตู้', open:true, disp:0, kw:['cab-detail','ประเภทตู้','จำนวนบานหน้าตู้','ชนิดชั้น','ลึก(ม.)','จำนวนชั้น','ผนังหลัง','สีฝาตู้','วัสดุผนัง']}, // cab-detail = class marker (HANDOFF-G4-cabinet-next)
-    {key:'🔧 มือจับ / ล็อค / โช๊ค', open:false, disp:2, kw:['มือจับ','Cmech','โช๊ค','[Up','ชุดล็อค','กุญแจ','เลือกมือจับ']}, // ② · Bug#OPT-001 fix: ต้อง match ก่อน 🪟มุ้ง — "Cmech หลบมุ้ง" (o-cmechawn บานกระทุ้ง) มี 'มุ้ง' ใน label เคยตกหมวดมุ้งผิด · disp คุมลำดับแสดงแยก
-    {key:'🪟 มุ้ง', open:false, disp:3, kw:['มุ้ง','ผ้ามุ้ง','สีผ้า','สีกรอบมุ้ง']}, // ③
-    {key:'📐 คาดตาราง', open:false, disp:4, kw:['คาดตาราง','เส้นนอน','เส้นตั้ง','ราคา/ม.','เส้นโค้ง','เส้นแนวนอน','เส้นแนวตั้ง','สีเส้น','มีคาดตาราง']}, // ④
-    {key:'🚪 ธรณี / ครอบวงกบ / ติดตาย', open:true, disp:1, kw:['ธรณี','ครอบวงกบ','ติดตาย','ช่องแสง','ดรอปพื้น']}, // ① (จับหลังมือจับ — 'ติดตายกี่บาน' เข้า ① ตาม handoff o-fixed)
-    {key:'🧱 แผ่นทึบล่าง / ลูกฟูก', open:false, disp:6, kw:['แผ่นทึบ','ทึบล่าง','ลูกฟูก']}, // ⑥ จับก่อนโครงสร้าง (กัน 'สี ' กว้างแย่ง)
-    {key:'🏗️ โครงสร้าง / คาน / ราง / ซ่อน', open:false, disp:5, kw:[
+    // ALLG-v2 (มติพี่นัท): รวม 7 หมวด → 4 (+ตู้) · array = ลำดับ match (เฉพาะเจาะจงก่อน) · disp = ลำดับแสดง
+    // มือจับ·มุ้ง·คาด ต้อง match ก่อน ธรณี (o-mosq มีคำ 'ติดตาย' ในออปชั่น) · disp ให้ธรณีแสดงก่อน
+    {key:'📦 รายละเอียดตู้', open:true, disp:0, kw:['cab-detail','ประเภทตู้','จำนวนบานหน้าตู้','ชนิดชั้น','ลึก(ม.)','จำนวนชั้น','ผนังหลัง','สีฝาตู้','วัสดุผนัง']}, // G4 เฉพาะตู้
+    {key:'🔧 มือจับ · ล็อค · มุ้ง · คาดตาราง', open:false, disp:2, kw:[ // B = รวม มือจับ+มุ้ง+คาดตาราง · match ก่อน ธรณี
+      'มือจับ','Cmech','โช๊ค','[Up','ชุดล็อค','กุญแจ','เลือกมือจับ',
+      'มุ้ง','ผ้ามุ้ง','สีผ้า','สีกรอบมุ้ง',
+      'คาดตาราง','เส้นนอน','เส้นตั้ง','ราคา/ม.','เส้นโค้ง','เส้นแนวนอน','เส้นแนวตั้ง','สีเส้น','มีคาดตาราง'
+    ]},
+    {key:'🚪 ธรณี · ครอบวงกบ · ช่องแสง', open:true, disp:1, kw:['ธรณี','ครอบวงกบ','ติดตาย','ช่องแสง','ดรอปพื้น']}, // A (open) · 'ติดตายกี่บาน' o-fixed (มุ้งจับไปก่อนแล้ว)
+    {key:'🏗️ โครงสร้าง · แผ่นทึบ · ราง', open:false, disp:3, kw:[ // C = รวม โครงสร้าง+แผ่นทึบ
+      'แผ่นทึบ','ทึบล่าง','ลูกฟูก',
       'ชนิดการเปิด','โครงสร้าง','โชว์ราง','ซ่อนราง','ซ่อนคาน','เสริมคาน','รางยู','Soft Close','สลิง','ชนิดราง','มอเตอร์','ทำเป็นประตู','ค่าประตู',
       'ทิศระแนง','ลายระแนง','ความสูง','ราวจับ','combo บาน','แป ','ปลายหลังคา','สีวัสดุมุง','ของเสริมหลังคา','ซ่อนสโลป','รูปแบบ shower','ประเภทประตู',
       'อบสี','สีอบ','ผิว/สี','สี ','ลาย','ความลึก','จำนวนบาน','ประเภท'
-    ]}, // ⑤ (รวม legacy kw 🚪เดิม — ส่วนใหญ่ของ inline/skip ไปแล้ว เก็บกัน orphan)
-    {key:'➕ งานเสริม / หมายเหตุ / OPTION', open:false, disp:7, kw:[]} // ⑦ catch-all
+    ]},
+    {key:'➕ งานเสริม · หมายเหตุ', open:false, disp:4, kw:[]} // D catch-all
   ];
   var kids=[].slice.call(box.children);
   var skipEls=[]; // G3-round2 F: field กลาง (สีอลู .i-color-wrap / กระจก .i-glass-wrap) — ไม่จัดเข้ากล่องใด คงไว้นอก accordion (กันตกเข้ากล่อง "งานพิเศษ" ผิดหมวด)
@@ -2213,7 +2216,24 @@ function addGlasshouseSet(){
 const OC_CATS=[{id:'glass',label:'เปลี่ยนกระจก'},{id:'mosq',label:'เปลี่ยนผ้ามุ้ง'},{id:'color',label:'เปลี่ยนสีอลู'},{id:'handle',label:'เปลี่ยนมือจับ'},{id:'roof',label:'เปลี่ยนหลังคา'},{id:'other',label:'อื่นๆ (พิมพ์เอง)'}];
 // มือจับเหมา/ชุด (ตารางข้อ4 · ไม่ ×พื้นที่)
 const OC_HANDLES=[{n:'Cmech ฝัง ประตู ธรรมดา',p:1050},{n:'Cmech ฝัง ประตู พิเศษชุบ',p:1470},{n:'Cmech ฝัง หน้าต่าง ธรรมดา',p:350},{n:'Cmech ฝัง หน้าต่าง พิเศษชุบ',p:490},{n:'Cmech เมโทร ประตู ธรรมดา',p:1000},{n:'Cmech เมโทร ประตู พิเศษชุบ',p:1400},{n:'Cmech เมโทร หน้าต่าง ธรรมดา',p:600},{n:'Cmech เมโทร หน้าต่าง พิเศษชุบ',p:840}];
-function ocCatOptions(isRoof){ var cats=isRoof?OC_CATS.filter(function(c){return ['color','roof','other'].indexOf(c.id)>=0;}):OC_CATS; return '<option value="">— เลือกหมวด —</option>'+cats.map(function(c){return '<option value="'+c.id+'">'+c.label+'</option>';}).join(''); } // FIX B (G3): หลังคา → เหลือ สี/หลังคา/อื่นๆ (ตัด กระจก/มุ้ง/มือจับ)
+// ALLG-v2 (พี่นัท): OPTION ทางเลือกลูกค้า กรองตาม control ที่สินค้านั้น "มีจริง" — ติดตายไม่มีมุ้ง/มือจับ ฯลฯ
+function ocCatOptions(ch){
+  // เช็ค "มองเห็น" แบบไม่พึ่ง offsetParent (jsdom ใช้ไม่ได้) — ไล่ parent หา inline display:none
+  var has=function(sel){ var e=ch&&ch.querySelector(sel); if(!e)return false; for(var n=e;n&&n!==ch;n=n.parentElement){ if(n.style&&n.style.display==='none')return false; } return true; };
+  var hasEl=function(sel){ return !!(ch&&ch.querySelector(sel)); };
+  var ids;
+  if(hasEl('.o-roofend')){ ids=['color','roof','other']; } // หลังคา
+  else {
+    ids=[];
+    if(has('.i-glass-wrap')) ids.push('glass');                 // มีช่องกระจก
+    if(hasEl('.o-mosq')) ids.push('mosq');                      // มีมุ้ง
+    if(has('.i-color-wrap')||hasEl('.o-finish')) ids.push('color'); // สีอลู (บาน) หรือ ผิว/สี (ระแนง)
+    if(hasEl('.o-cmech')||hasEl('.o-digi')||hasEl('.o-xhandle')||hasEl('.o-cmechawn')) ids.push('handle'); // มีมือจับ
+    ids.push('other');
+  }
+  var byId={}; OC_CATS.forEach(function(c){byId[c.id]=c;});
+  return '<option value="">— เลือกหมวด —</option>'+ids.filter(function(i){return byId[i];}).map(function(i){return '<option value="'+i+'">'+byId[i].label+'</option>';}).join('');
+}
 function ocItemOptions(cat){
   if(cat==='glass'){ const grp={'กระจกใส/สี':[],'เทมเปอร์':[],'ลามิเนต':[],'อินซูเลท':[],'อื่นๆ':[]};
     GLASS.forEach(function(g,i){ var k=/อินซูเลท/.test(g.n)?'อินซูเลท':(/เทมเปอร์/.test(g.n)?'เทมเปอร์':(/ลามิเนต/.test(g.n)?'ลามิเนต':(/ใส|เขียว|ยูโร|reflective|เคลือบ/.test(g.n)?'กระจกใส/สี':'อื่นๆ'))); grp[k].push('<option value="'+i+'" data-r="'+(g.s||0)+'">'+g.n+'</option>'); });
@@ -2240,8 +2260,8 @@ function ocPick(sel){ var row=sel.closest('.oc-row'), ch=sel.closest('.ch'); if(
   else if(cat==='mosq'){ delta=Math.round((parseFloat(opt.getAttribute('data-r'))||0)*area); }
   else if(cat==='roof'){ var rp=PBYID[sel.value]; var nr=(rp&&rp.rates)?rateOf(area,RATES[rp.rates]):0; delta=Math.round(nr*area); }
   tx.value='เปลี่ยนเป็น'+name; dl.value=delta||''; calcQuote(); }
-function ocAddRow(btn){ var box=btn.closest('.oc-block').querySelector('.oc-list'); var _ocCh=btn.closest('.ch'); var _isRoof=!!(_ocCh&&_ocCh.querySelector('.o-roofend')); var row=document.createElement('div'); row.className='oc-row'; row.style.cssText='display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:5px;';
-  row.innerHTML='<select class="oc-cat" onchange="ocCat(this)" style="height:32px;font-size:12px;border:1px solid var(--line);border-radius:6px;">'+ocCatOptions(_isRoof)+'</select><select class="oc-item" onchange="ocPick(this)" style="height:32px;font-size:12px;max-width:200px;border:1px solid var(--line);border-radius:6px;display:none;"></select><input class="oc-text" placeholder="ข้อความ (auto · แก้ได้)" oninput="calcQuote()" style="height:32px;font-size:12px;flex:1;min-width:130px;border:1px solid var(--line);border-radius:6px;padding:0 6px;"><input type="number" class="oc-delta" placeholder="±บาท" oninput="calcQuote()" style="height:32px;width:90px;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:0 6px;"><button type="button" class="oc-del" onclick="this.closest(\'.oc-row\').remove();calcQuote();" style="height:32px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;color:#B3151D;">✕</button>';
+function ocAddRow(btn){ var box=btn.closest('.oc-block').querySelector('.oc-list'); var _ocCh=btn.closest('.ch'); var row=document.createElement('div'); row.className='oc-row'; row.style.cssText='display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:5px;';
+  row.innerHTML='<select class="oc-cat" onchange="ocCat(this)" style="height:32px;font-size:12px;border:1px solid var(--line);border-radius:6px;">'+ocCatOptions(_ocCh)+'</select><select class="oc-item" onchange="ocPick(this)" style="height:32px;font-size:12px;max-width:200px;border:1px solid var(--line);border-radius:6px;display:none;"></select><input class="oc-text" placeholder="ข้อความ (auto · แก้ได้)" oninput="calcQuote()" style="height:32px;font-size:12px;flex:1;min-width:130px;border:1px solid var(--line);border-radius:6px;padding:0 6px;"><input type="number" class="oc-delta" placeholder="±บาท" oninput="calcQuote()" style="height:32px;width:90px;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:0 6px;"><button type="button" class="oc-del" onclick="this.closest(\'.oc-row\').remove();calcQuote();" style="height:32px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;color:#B3151D;">✕</button>';
   box.appendChild(row); }
 // หลังคาเลื่อน: auto-fill ราคามอเตอร์ตามพื้นที่ (18,000/28,000/36,000/72,000) ลงช่อง · ผู้ใช้แก้ทับได้ (data-edited)
 function rfSlideMotorFill(ch){ try{ var ps=ch.querySelector('.i-prod'); var p=ps?PBYID[ps.value]:null; if(!p||!p.optSlide)return;
@@ -3801,7 +3821,7 @@ function buildQuoteDoc(rows, subtotal, discPct, cust, date, svc, discFlat, keepN
 /* ===== Item type prefix logic (ประตู/หน้าต่าง) ===== */
 const ITYPE_LOCK_DOOR = ['PC Door','YKK','บานเฟี้ยม','ประตูรั้ว','shower','บานเปลือย','ดัดโค้ง'];
 const ITYPE_LOCK_WINDOW = ['บานกระทุ้ง','บานยก'];
-const ITYPE_NA = ['หลังคา','ฝ้า-ผนัง','เสริม','ระแนง','ระแนง-บังตา','ระแนง-ผนัง','ระแนง-เกล็ด','ลูกฟูก+คอมโพสิททึบ','เส้นคาด','ราวบันได','มุ้ง','เลื่อนภายใน','ฝาตู้','ตู้อลู'];
+const ITYPE_NA = ['ติดตาย','หลังคา','ฝ้า-ผนัง','เสริม','ระแนง','ระแนง-บังตา','ระแนง-ผนัง','ระแนง-เกล็ด','ลูกฟูก+คอมโพสิททึบ','เส้นคาด','ราวบันได','มุ้ง','เลื่อนภายใน','ฝาตู้','ตู้อลู']; // ติดตาย: กระจกติดตาย ไม่มีประตู/หน้าต่าง (มติพี่นัท)
 function itypeFor(p){
   if(!p) return 'door';
   if(ITYPE_LOCK_DOOR.indexOf(p.cat)>=0) return 'door';
@@ -3820,7 +3840,8 @@ function refreshItype(d){
     if(_hl&&_hl.tagName==='LABEL') _hl.textContent=_roof?'ยื่น (ม.)':'สูง (ม.)';
   }
   const sel=d.querySelector('.i-type'); if(!sel) return;
-  const wrap=sel.closest('.full'); if(!wrap) return;
+  // ALLG-v2: i-type ย้ายเข้า .size-row แล้ว → ซ่อนแค่ .itype-seg (เดิม .full = size-row ทั้งแถว กว้าง/สูงหาย)
+  const wrap=sel.closest('.itype-seg')||sel.closest('.full'); if(!wrap) return;
   if(ITYPE_NA.indexOf(p.cat)>=0){ wrap.style.display='none'; return; }
   wrap.style.display='';
   const locked=itypeFor(p);
