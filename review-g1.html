@@ -2361,13 +2361,14 @@ function g3SelectorHTML(p){
   }
   return h+'</div>';
 }
-// G5-G (HANDOFF-G5-FINAL จุดG): drill-down มุ้ง 3 หมวด (เฟรม/จีบ/ม้วน) · imp30→เฟรม · imp33/imp35 ไม่อยู่ในชิป (ซ่อนจากเมนู · เก็บ PRODUCTS/เรต) · ใช้ g3SyncProd/g3PickProd ร่วม
+// G5-G: drill-down มุ้ง 4 หมวด (เฟรม/จีบ/จีบม่านรังผึ้ง/ม้วน · มติพี่นัท 15 มิ.ย.) · imp30→เฟรม · จีบนิรภัย=mj_screen_safety ตัวเดียว · ซ่อนจากชิป: imp31/imp32/imp33/imp35 (เก็บ PRODUCTS/เรต · ใบเก่าเปิดได้) · ใช้ g3SyncProd/g3PickProd ร่วม
 var MOSQ_GRP_PRODS={
   frame:[['imp21','เฟรมเล็ก'],['imp22','เฟรมเล็กติดตาย'],['imp23','เฟรมใหญ่'],['imp30','แม่เหล็กพับ']],
-  pleat:[['imp28','ตีนตะขาบ'],['mj_sd_basic','SD พื้นฐาน'],['mj_sd_twoway','SD ทูเวย์'],['mj_keep_twoway','ตีนตะขาบ ทูเวย์'],['mj_keep_honey','ตีนตะขาบ รังผึ้ง'],['mj_blackout','Blackout'],['imp31','นิรภัย 0.8'],['imp32','นิรภัย เสริมวงกบ'],['mj_screen_safety','จีบนิรภัย']],
+  pleat:[['imp28','ตีนตะขาบ'],['mj_sd_basic','SD พื้นฐาน'],['mj_screen_safety','จีบนิรภัย (ติดล้นนอกวงกบ)']],
+  honey:[['mj_blackout','Blackout'],['mj_sd_twoway','SD ทูเวย์'],['mj_keep_twoway','ตีนตะขาบ ทูเวย์'],['mj_keep_honey','ตีนตะขาบ รังผึ้ง']],
   roll:[['imp29','ม้วน'],['mj_kick_150','เตะ 150'],['mj_kick_300','เตะ 300'],['mj_kick_600','เตะ 600']]
 };
-var MOSQ_GRP_LABEL={frame:'เฟรม',pleat:'จีบ',roll:'ม้วน'};
+var MOSQ_GRP_LABEL={frame:'เฟรม',pleat:'จีบ',honey:'จีบม่านรังผึ้ง',roll:'ม้วน'};
 function mosqGrpOf(id){ for(var g in MOSQ_GRP_PRODS){ if(MOSQ_GRP_PRODS[g].some(function(x){return x[0]===id;})) return g; } return null; }
 function mosqPickGrp(btn){ var first=(MOSQ_GRP_PRODS[btn.dataset.grp]||[])[0]; if(first) g3SyncProd(btn.closest('.ch'), first[0]); }
 function mosqSelectorHTML(p){
@@ -2547,8 +2548,10 @@ function famSelectorHTML(p,grp,famOther){
 // ALLG-v2.1 "อื่นๆ" = บานที่เหลือ: cat ในกลุ่ม (reuse prodOptionsG6 membership) ที่ไม่ได้อยู่ในปุ่มหลัก FAM_CATS[grp]
 function prodsInGroup(g){ var s=document.createElement('select'); s.innerHTML=prodOptionsG6(String(g));
   return [].map.call(s.querySelectorAll('option'),function(o){return PBYID[o.value];}).filter(Boolean); }
+// cat ที่เป็น "ออปชั่น/อุปกรณ์เสริม" ไม่ใช่ชนิดบาน — ห้ามโผล่ในปุ่มเลือกบาน "บานอื่นๆ ที่เหลือ" (ตามดราฟ: ครอบวงกบ=o-fcsides · คาดตาราง=o-gridmark เป็นออปชั่นบนบานอยู่แล้ว)
+var NON_BANA_REST_CATS=['เสริม','เส้นคาด','ลูกฟูก+คอมโพสิททึบ'];
 function famRestCats(grp){ var main=FAM_CATS[grp]||[]; var seen={}, rest=[];
-  prodsInGroup(grp).forEach(function(q){ if(q && main.indexOf(q.cat)<0 && !seen[q.cat]){ seen[q.cat]=1; rest.push(q.cat); } });
+  prodsInGroup(grp).forEach(function(q){ if(q && main.indexOf(q.cat)<0 && NON_BANA_REST_CATS.indexOf(q.cat)<0 && !seen[q.cat]){ seen[q.cat]=1; rest.push(q.cat); } });
   return rest; }
 // กดบานที่เหลือ → คง famOther เปิดไว้ (ให้แผงบานที่เหลือ + รุ่นย่อยยังโชว์) แล้ว set product = default ของ cat
 function famPickOtherCat(btn){ var ch=btn.closest('.ch'); if(!ch)return; ch.dataset.famOther='1'; ch.dataset.rnStep='1'; var id=famDefaultProd(btn.dataset.cat); if(id) g3SyncProd(ch,id); }
@@ -3026,6 +3029,13 @@ function buildItemOpts(d){
     h+='<label class="opt">เส้นตั้ง <input type="number" class="o-gm-nv" step="1" min="0" value="0" style="width:55px;height:30px;"></label>';
     h+='<label class="opt">ราคา/ม. <input type="number" class="o-gm-rate" step="10" min="0" value="200" style="width:65px;height:30px;"></label>';
     h+='<label class="opt">เส้นโค้ง <input type="number" class="o-gm-curve" step="1" min="0" value="0" style="width:55px;height:30px;"></label>';
+    h+='</span>';
+    // ลูกฟูก/คอมโพ ล่าง (เสริมกระจก) — ใส่กลับ G1 ตามดราฟ (มติพี่นัท 2026-06-15 · เหมือน G6) · classes เดิม reconnect calcUnit L1552/readItem L3573
+    h+='<label class="opt">แผ่นทึบล่าง (ลูกฟูก/คอมโพ) <select class="o-solidlower" onchange="var c=this.closest(\'.ch\'); var w=c.querySelector(\'.o-sl-wrap\'); if(w)w.style.display=this.value?\'flex\':\'none\'; calcQuote();"><option value="">ไม่มี</option><option value="corrugated">อลูลูกฟูก 3,500/ตร.ม.</option><option value="composite">คอมโพสิท 3,300/ตร.ม.</option></select></label>';
+    h+='<span class="o-sl-wrap" style="display:none;flex-wrap:wrap;gap:4px 12px;">';
+    h+='<label class="opt">กว้าง <input type="number" class="o-sl-w" step="0.1" min="0" value="0" style="width:60px;height:30px;" oninput="calcQuote()"><span class="u">ม.</span></label>';
+    h+='<label class="opt">สูง <input type="number" class="o-sl-h" step="0.1" min="0" value="0" style="width:60px;height:30px;" oninput="calcQuote()"><span class="u">ม.</span></label>';
+    h+='<label class="opt">สีลูกฟูก <input type="number" class="o-sl-color" step="100" min="0" value="0" style="width:70px;height:30px;" oninput="calcQuote()"><span class="u">+/ตร.ม.</span></label>';
     h+='</span>';
   }
   // PC Door — เสริมคาน (ไม่มี track เพราะเป็นรางล่าง)
@@ -5240,23 +5250,6 @@ window.addEventListener('load',ckRefresh);
     G6R=sv; return lines; };
 })();
 </script>
-<!-- ===== REVIEW MIRROR (G1) — copy ของจริง · auto เปิดไอเทมกลุ่ม 1 พร้อมเล่น ===== -->
-<style>
-  #g1mirror-bar{position:sticky;top:0;z-index:9999;background:#B3151D;color:#fff;font-family:'Sarabun',sans-serif;font-size:12.5px;font-weight:700;text-align:center;line-height:1.4;padding:9px 12px;border-radius:0 0 10px 10px;}
-  #g1mirror-bar small{font-weight:400;opacity:.9;}
-</style>
-<div id="g1mirror-bar">🔍 ตรวจ G1 — งานบาน (เลื่อน/เปิด/เฟี้ยม/ติดตาย/กระทุ้ง/บานเปลือย/ผนังเบา) · Mirror ของจริง ราคา engine จริง กดเล่นได้เลย
-  <br><small>เลือกรูปแบบบาน(การ์ด)→รุ่น→ขนาด/สี/กระจก→ออปชั่น · มุ้ง 3 กลุ่ม · บานเปลือยมีสี · "อื่นๆ→ผนังเบา" · 15 มิ.ย. 2026</small></div>
-<script>
-  window.addEventListener('load',function(){ setTimeout(function(){ try{
-    var bar=document.getElementById('g1mirror-bar'); if(bar&&bar.parentNode!==document.body) document.body.insertBefore(bar,document.body.firstChild);
-    var items=document.getElementById('items');
-    if(items && !items.querySelector('.ch') && typeof addItem==='function'){ addItem(items); }
-    var ch=items&&items.querySelector('.ch');
-    if(ch){ var g=ch.querySelector('.i-group'); if(g){ g.value='1'; g.dispatchEvent(new Event('change',{bubbles:true})); }
-      var ps=ch.querySelector('.i-prod'); if(ps){ ps.value='casement_euro'; ps.dispatchEvent(new Event('change',{bubbles:true})); }
-      ch.scrollIntoView({behavior:'smooth',block:'center'}); }
-  }catch(e){ console.error('g1 mirror init',e); } }, 300); });
-</script>
+
 </body>
 </html>
