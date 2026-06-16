@@ -1,0 +1,203 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Draft UX เฟส 3 — ใบปะหน้า + เช็คลิสต์ (กดเล่นได้)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Sarabun',sans-serif;background:#eceef1;color:#1a1a1a;font-size:14px;padding:16px 12px 60px}
+.wrap{max-width:740px;margin:0 auto}
+h1{font-size:19px;color:#7d0f15;margin-bottom:2px}
+.lead{color:#667;font-size:13px;margin-bottom:14px}
+/* tabs */
+.tabs{display:flex;gap:8px;margin-bottom:14px;position:sticky;top:0;background:#eceef1;padding:8px 0;z-index:5}
+.tab{flex:1;padding:11px;border-radius:12px;border:none;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;background:#fff;color:#667;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.tab.on{background:#b3151d;color:#fff}
+.panel{display:none}.panel.on{display:block}
+/* guide */
+.guide{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.guide summary{font-weight:700;color:#7d0f15;cursor:pointer;font-size:14px;list-style:none}
+.guide summary::-webkit-details-marker{display:none}
+.guide summary::before{content:"📖 ";}
+.guide[open] summary::before{content:"📖 ";}
+.guide ol{margin:10px 0 0 18px;font-size:13px;line-height:1.9;color:#444}
+.guide b{color:#7d0f15}
+/* annotation */
+.anno{background:#fff8e1;border:1px solid #f1d98a;border-left:4px solid #f0b400;border-radius:8px;padding:9px 12px;font-size:12.5px;color:#6b5800;margin:10px 0}
+.anno b{color:#a06b00}
+/* card / sheet */
+.card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:14px}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.btn{border:none;border-radius:11px;padding:10px 16px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.btn.p{background:#b3151d;color:#fff}.btn.g{background:#eef0f3;color:#444}
+.spacer{flex:1}
+/* cover */
+.cov-head{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:12px}
+.warn{font-size:12px}
+.warn input{width:100%;border:1px dashed #e6a3a3;border-radius:7px;padding:5px 8px;font-family:inherit;font-size:12px;color:#c00;font-weight:700;background:#fff6f6}
+.warn.r input{text-align:right}
+.cust{text-align:center;font-weight:700;font-size:16px;border-bottom:1px solid #999;padding-bottom:3px}
+.cust .l{font-weight:400;font-size:12px;color:#888;margin-right:6px}
+table.cov{width:100%;border-collapse:collapse;table-layout:fixed}
+table.cov th{border:1px solid #555;padding:6px 7px;font-size:12px;text-decoration:underline;text-align:center;background:#faf3f3}
+table.cov td{border:1px solid #555;padding:6px 7px;vertical-align:top;font-size:12.5px}
+.colhint{font-size:10px;font-weight:400;color:#999;text-decoration:none;display:block;margin-top:2px}
+.cov ul{list-style:none;line-height:1.8}
+.cov .editcol{color:#c00}
+.cov textarea{width:100%;border:1px solid #e3c4c4;border-radius:7px;padding:5px 7px;font-family:inherit;font-size:12.5px;color:#c00;resize:none;overflow:hidden;background:#fffafa;line-height:1.7}
+.cov textarea::placeholder{color:#d8a0a0;font-style:italic}
+/* checklist */
+.tpl{margin-bottom:14px}
+.tplhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tplname{font-weight:700;color:#1e60c0;font-size:14px}
+.prog{height:6px;background:#e9ebee;border-radius:3px;overflow:hidden;margin:6px 0 10px}
+.prog i{display:block;height:100%;background:#22c55e;transition:width .25s}
+.chk{display:flex;gap:10px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:11px;padding:10px 12px;margin-bottom:7px;cursor:pointer;transition:background .15s}
+.chk.on{background:#f0fdf4;border-color:#bbf7d0}
+.box{width:19px;height:19px;border:1.5px solid #9aa;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;margin-top:1px}
+.chk.on .box{background:#22c55e;border-color:#22c55e}
+.chk .t{flex:1;font-size:13.5px}
+.chk.on .t{text-decoration:line-through;color:#9a9}
+.sign{font-size:10.5px;background:#dbeafe;color:#1e60c0;padding:1px 7px;border-radius:5px;margin-left:6px;white-space:nowrap}
+.note-in{width:100%;margin-top:7px;border:1px solid #e5e7eb;border-radius:8px;padding:6px 9px;font-family:inherit;font-size:12px}
+.save-row{text-align:right;margin-top:4px}
+/* responsive: มือถือ → คอลัมน์ใบปะหน้า stack */
+@media(max-width:560px){
+  table.cov,table.cov thead,table.cov tbody,table.cov tr,table.cov td,table.cov th{display:block;width:100%!important}
+  table.cov thead{display:none}
+  table.cov td{border:none;border-bottom:1px solid #ddd;padding:8px 4px}
+  table.cov td::before{content:attr(data-l);display:block;font-weight:700;font-size:11px;color:#7d0f15;text-decoration:underline;margin-bottom:4px}
+  .cov-head{grid-template-columns:1fr}
+}
+@media print{
+  body{background:#fff;padding:0}.tabs,.guide,.anno,.toolbar,.lead,h1,.colhint{display:none}
+  .card{box-shadow:none;padding:0;margin:0}.panel:not(.on){display:none}
+  .cov textarea{border:none;background:none;color:#c00;padding:0}
+}
+</style></head><body>
+<div class="wrap">
+<h1>Draft UX เฟส 3 — กดเล่นได้จริง</h1>
+<div class="lead">ตรวจ UX ก่อนใช้จริง · ติ๊ก/พิมพ์/กดพิมพ์ได้เลย · กล่องเหลือง = จุดที่ผมเสนอปรับ</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="sw(0)">▤ ใบปะหน้า</button>
+  <button class="tab" onclick="sw(1)">✓ เช็คลิสต์</button>
+</div>
+
+<!-- ═══ ใบปะหน้า ═══ -->
+<div class="panel on" id="p0">
+  <details class="guide"><summary>วิธีใช้ใบปะหน้า</summary>
+    <ol>
+      <li>เปิดงานในเมนู <b>ใบสั่งผลิต</b> → กดปุ่ม <b>ใบปะหน้า</b></li>
+      <li>คอลัมน์ <b>① สั่งของเตรียมผลิต</b> = ระบบดึงของให้เอง (แก้ไม่ได้)</li>
+      <li>คอลัมน์ <b>② แจ้งช่าง / ③ แจ้งลูกค้า</b> (ตัวแดง) = พิมพ์เพิ่ม/แก้ได้ ระบบเดามาให้บางส่วน</li>
+      <li>ใส่ <b>คำเตือน</b> มุมซ้าย/ขวาได้ (เช่น "ระวังมุ้งผิด")</li>
+      <li>กด <b>บันทึก</b> เก็บเข้าระบบ · กด <b>พิมพ์</b> แนบไปกับเอกสารสั่งผลิต</li>
+    </ol>
+  </details>
+
+  <div class="anno"><b>💡 ปรับแล้วใน draft นี้:</b> ช่องพิมพ์ ②③ <b>ขยายเองตามเนื้อหา</b> (แก้ปัญหาเดิมที่ตอนพิมพ์ข้อความยาวแล้วโดนตัด) · บนมือถือ 3 คอลัมน์ <b>เรียงลงเป็นการ์ด</b> กรอกง่ายขึ้น</div>
+
+  <div class="card">
+    <div class="toolbar">
+      <span style="font-weight:700;color:#7d0f15">ใบปะหน้างาน</span>
+      <span style="font-size:12px;color:#889">· PO2568060012</span>
+      <span class="spacer"></span>
+      <button class="btn g" onclick="alert('สาธิต: บันทึกเข้าระบบ')">บันทึก</button>
+      <button class="btn p" onclick="window.print()">🖶 พิมพ์</button>
+    </div>
+
+    <div class="cov-head">
+      <div class="warn"><input placeholder="คำเตือนซ้าย (ถ้ามี)"></div>
+      <div class="cust"><span class="l">ชื่อลูกค้า</span>คุณณัฐวดี (มด)</div>
+      <div class="warn r"><input placeholder="คำเตือนขวา"></div>
+    </div>
+
+    <table class="cov">
+      <thead><tr>
+        <th>รายละเอียด สั่งของเตรียมผลิต<span class="colhint">ระบบดึงให้เอง</span></th>
+        <th>แจ้งช่างตอนติดตั้ง<span class="colhint">พิมพ์เพิ่ม/แก้ได้</span></th>
+        <th>แจ้งลูกค้า+เตรียมของ<span class="colhint">พิมพ์เพิ่ม/แก้ได้</span></th>
+      </tr></thead>
+      <tbody><tr>
+        <td data-l="สั่งของเตรียมผลิต">
+          <ul>
+            <li>- อลูมิเนียม สีอบขาว</li>
+            <li>- กระจกเขียว หนา 6 มม.</li>
+            <li>- มุ้งจีบ ผ้าไฟเบอร์ดำ</li>
+          </ul>
+        </td>
+        <td data-l="แจ้งช่างตอนติดตั้ง" class="editcol">
+          <textarea class="grow" oninput="grow(this)" placeholder="- พิมพ์รายละเอียดแจ้งช่าง">- เสริมกล่อง (ด้าน A)
+- ดรอปพื้น (ด้าน B)
+- รื้อระแนง (ด้าน C)
+- พี่เป วัดงาน</textarea>
+        </td>
+        <td data-l="แจ้งลูกค้า+เตรียมของ" class="editcol">
+          <textarea class="grow" oninput="grow(this)" placeholder="- พิมพ์รายละเอียดแจ้งลูกค้า">- สีทาเก็บงาน (ลูกค้าเตรียม)</textarea>
+        </td>
+      </tr></tbody>
+    </table>
+  </div>
+
+  <div class="anno"><b>❓ จุดที่อยากให้พี่นัทช่วยเคาะ:</b> ใบนี้ <b>ไม่มีวันที่/เลขที่งาน</b>บนกระดาษ (ตรงใบจริง) — แต่ถ้าปริ้นหลายงานพร้อมกันจะแยกยาก · จะเติม "วันที่พิมพ์" ตัวเล็กมุมล่างไหม?</div>
+</div>
+
+<!-- ═══ เช็คลิสต์ ═══ -->
+<div class="panel" id="p1">
+  <details class="guide"><summary>วิธีใช้เช็คลิสต์</summary>
+    <ol>
+      <li>เปิดงานในเมนู <b>ใบสั่งผลิต</b> → กดปุ่ม <b>เช็คลิสต์</b></li>
+      <li><b>กดที่ข้อ</b> เพื่อติ๊ก/ยกเลิก · ใส่ <b>หมายเหตุ</b> ใต้ข้อได้</li>
+      <li>ป้าย <b>"ต้องเซ็น"</b> = ข้อที่ต้องมีลายเซ็นยืนยัน</li>
+      <li>แต่ละบทบาทเห็น<b>เฉพาะชุดของตัวเอง</b> · กด <b>บันทึก</b> เก็บเข้าระบบ</li>
+    </ol>
+  </details>
+
+  <div class="anno"><b>⚠️ หมายเหตุสำคัญ:</b> ตัวนี้คือ <b>โครงทดลอง</b> — flow จริงแต่ละชุดยังไม่ตกผลึก (เซลล์จะติ๊กบนแทปเล็ตหรือในระบบ · ช่างวัดอยากได้แบบ<b>ปริ้น</b>ตามชนิดงาน · QC ผลิตรอเอกสารจริง) ดูเพื่อตรวจ<b>หน้าตา/การกด</b>ก่อน</div>
+
+  <div class="card">
+    <div class="toolbar">
+      <span style="font-weight:700;color:#1e60c0">เช็คลิสต์งาน · คุณณัฐวดี</span>
+    </div>
+    <div id="tpls"></div>
+  </div>
+</div>
+
+</div>
+<script>
+function sw(i){
+  document.querySelectorAll('.tab').forEach((t,k)=>t.classList.toggle('on',k===i));
+  document.querySelectorAll('.panel').forEach((p,k)=>p.classList.toggle('on',k===i));
+}
+function grow(t){t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px';}
+document.querySelectorAll('.grow').forEach(grow);
+
+// checklist data (seed 3 ชุด)
+const TPL=[
+  {n:'เซลล์ปิดงาน',items:[['ยืนยันสีอลูมิเนียม (รหัสสี/ชื่อสี)',0,1],['ยืนยันชนิดกระจก',0,1],['ยืนยันทิศเปิด-ปิดบาน',0,0],['ระบุกำหนดส่ง ผลิต/ติดตั้ง',0,0],['เงื่อนไขมัดจำ/ชำระเงิน',0,0],['ลายเซ็นลูกค้ายืนยันรายการ',1,0]]},
+  {n:'ช่างวัดหน้างาน',items:[['วัดช่องเปิดจริง (กว้าง×สูง ทุกช่อง)',0,0],['ชนิดผนัง (ปูน/เบา/เหล็ก)',0,0],['ระดับพื้น/ผนังตรง',0,0],['ทิศบาน',0,0],['สภาพผนังรอบช่อง',0,0],['ลายเซ็นผู้วัดหน้างาน',1,0]]},
+  {n:'ฝ่ายผลิต',items:[['ตรวจจำนวนรายการครบ',0,0],['ตรวจสีอลูมิเนียมครบ',0,0],['กระจกพิเศษ สั่งล่วงหน้าแล้ว?',0,0],['งานเร่ง ยืนยันกำหนดส่ง',0,0],['วัดหน้างานแล้วก่อนผลิต',0,0],['QC ก่อนส่ง + ลายเซ็นผู้ตรวจ',1,0]]},
+];
+const wrap=document.getElementById('tpls');
+TPL.forEach((tp,ti)=>{
+  const d=document.createElement('div');d.className='tpl';
+  d.innerHTML=`<div class="tplhead"><span class="tplname">${tp.n}</span><span style="font-size:12px;color:#889" id="c${ti}"></span></div><div class="prog"><i id="b${ti}"></i></div><div id="it${ti}"></div><div class="save-row"><button class="btn g" onclick="alert('สาธิต: บันทึก')">บันทึก</button></div>`;
+  wrap.appendChild(d);
+  const box=d.querySelector('#it'+ti);
+  tp.items.forEach((it,ii)=>{
+    const row=document.createElement('div');row.className='chk'+(it[1]?' on':'');
+    row.innerHTML=`<span class="box">${it[1]?'✓':''}</span><span class="t">${it[0]}${it[2]?'<span class="sign">ต้องเซ็น</span>':''}</span>`;
+    row.onclick=(e)=>{if(e.target.classList.contains('note-in'))return;row.classList.toggle('on');row.querySelector('.box').textContent=row.classList.contains('on')?'✓':'';upd(ti);};
+    box.appendChild(row);
+  });
+  upd(ti);
+});
+function upd(ti){
+  const box=document.getElementById('it'+ti);
+  const rows=[...box.querySelectorAll('.chk')];
+  const done=rows.filter(r=>r.classList.contains('on')).length;
+  document.getElementById('c'+ti).textContent=done+'/'+rows.length+' รายการ';
+  document.getElementById('b'+ti).style.width=(done/rows.length*100)+'%';
+}
+</script>
+</body></html>
