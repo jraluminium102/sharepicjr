@@ -3139,6 +3139,16 @@ function g3SelectorHTML(p){
   }
   return h+'</div>';
 }
+// ธง4 (มติ 16มิ.ย.): G1 ผนังเบา profile solid — เลือกผนังนอก/ใน/isowall เท่านั้น (allowlist 3 ตัว · ไม่มี หลังคา/ฝ้าหลังคา/ฉาบเรียบ/กระจก) · ฉนวน+600/ทาสี render แยกใน buildItemOpts
+var G1_WALL_IDS=['wall_ext','wall_int','isowall'];
+function g1WallSelectorHTML(p){
+  var walls=G1_WALL_IDS.map(function(id){return PBYID[id];}).filter(Boolean);
+  var h='<div class="opt g1-wallsel" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FAFAFA;">';
+  h+='<label class="opt" style="width:100%;margin:0;"><b style="font-size:14px;color:#B3151D;">รุ่นผนังเบา</b><div class="chip-grid">';
+  walls.forEach(function(q){ h+='<button type="button" class="chip'+(q.id===p.id?' on':'')+'" data-id="'+q.id+'" onclick="g3PickProd(this)">'+q.name+'</button>'; });
+  h+='</div></label></div>';
+  return h;
+}
 // ══ ธงE (G3 2026-06-15): roof2 ต่อปลายวัสดุที่ 2 — chip กลุ่มวัสดุ + สี cascade + ยาว×ยื่น auto + ราคา preview ══
 // (display only · FIX-12 calc L1405 อ่าน optSel.roof2/roof2area เดิม — ราคาไม่เปลี่ยน)
 var _R2COLOR_GROUPS={
@@ -3784,9 +3794,11 @@ function buildItemOpts(d){
   }
   // ออกจากโหมดห้อง (สลับไปกลุ่มอื่น) → ลบพื้นที่ builder ที่ค้าง
   { var _ra=d.querySelector('.g6r-room-area'); if(_ra) _ra.remove(); }
-  // G3-v5: กลุ่ม 3 (หลังคา/ฝ้า-ผนัง) → แท็บ g3 · แต่กลุ่ม 6 ผนังเบา (ฝ้า-ผนัง) ให้ใช้ family chips เดิม (ALLG-v2) ไม่ใช่ g3
-  var _isG3sel=(p.cat==='หลังคา'||p.cat==='ฝ้า-ผนัง') && _famGrp!=='6';
+  // G3-v5: กลุ่ม 3 (หลังคา/ฝ้า-ผนัง) → แท็บ g3 · กลุ่ม 6 (ห้อง) + กลุ่ม 1 (ผนังเบา) ใช้ selector เฉพาะ ไม่ใช่ g3
+  var _isG3sel=(p.cat==='หลังคา'||p.cat==='ฝ้า-ผนัง') && _famGrp!=='6' && _famGrp!=='1';
   if(_isG3sel) h+=g3SelectorHTML(p);
+  // ธง4 (มติ 16มิ.ย.): G1 ผนังเบา — ไม่ลากฝ้าหลังคา/selector G3 · โชว์เฉพาะผนังเบา 3 ตัว (wall_ext/wall_int/isowall) profile solid
+  else if(_famGrp==='1' && p.cat==='ฝ้า-ผนัง') h+=g1WallSelectorHTML(p);
   if(p.cat==='มุ้ง') h+=mosqSelectorHTML(p); // G5-G: drill-down หมวดมุ้ง บนสุด
   if(FAM_CATS[_famGrp] && !_isG3sel) h+=famSelectorHTML(p,_famGrp,_famOther);
   if(p.cat==='ระแนง-บังตา'||p.cat==='ระแนง-ผนัง'||p.cat==='ระแนง-เกล็ด') h+=rnSelectorHTML(p,d); // G2: drill-down ระแนง cascade บนสุด (progressive · อ่าน d.dataset.rnStep)
@@ -4745,6 +4757,8 @@ function qrow(n,name,prod,size,glass,qty,unit,line,addons,optText,optDelta,note,
   const _ed = window.qEdit && itemId;  // งาน4: โหมดแก้ในใบ
   // R2-4: ถ้าเซลล์แก้ "รายละเอียดงาน" ไว้ → ใช้ข้อความที่แก้ (override ทั้งก้อน · คล้าย _nameOv)
   if(window._detOv && itemId && window._detOv[itemId]!=null && window._detOv[itemId]!=='') glass = window._detOv[itemId];
+  const _MARK0='###รายละเอียด###';
+  const _hasMark = !!(glass && String(glass).indexOf(_MARK0)>=0); // ใบ 5 บล็อก: note(OPTION/หมายเหตุ) ย้ายไประหว่างรายการ↔รายละเอียด
   let content = `<div style="font-weight:700;color:#1F2937;">${name}</div>`;
   // R4.3: แนบขนาดท้ายชื่อสินค้า (size = "(กว้าง × สูง ม.)" หรือ "" ถ้าไม่มี เช่น กั้นห้องกระจก)
   // #4 2026-06-05: prod รองรับ multiline (\n) — บรรทัดแรกผูก size, บรรทัดถัดไปเป็นบรรยายด้าน A-H/หลังคา
@@ -4763,7 +4777,8 @@ function qrow(n,name,prod,size,glass,qty,unit,line,addons,optText,optDelta,note,
     });
   }
   // R4.2: หมายเหตุ/OPTION ที่เซลล์พิมพ์เอง (ขึ้นก่อน "รายละเอียดงาน") — OPTION=แดง, อื่น=เทา
-  if (note) { String(note).split(/\n+/).forEach(function(ln){ ln=(ln||'').trim(); if(!ln) return;
+  // ใบ 5 บล็อก: ถ้ามี marker + ไม่ใช่โหมดแก้ → ย้าย note ไป render ระหว่างรายการ↔รายละเอียด (ด้านล่าง) · อื่น=คงเดิม
+  if (note && !(_hasMark && !_ed)) { String(note).split(/\n+/).forEach(function(ln){ ln=(ln||'').trim(); if(!ln) return;
     const isOpt = ln.indexOf('OPTION')===0;
     content += `<div style="margin:4px 0 0 8px;font-size:13px;color:${isOpt?'#B3151D':'#6B7280'};">${ln}</div>`; }); }
   if (addons && addons.length && window.qSplit){ addons.forEach(a => { content += `<div style="margin:2px 0 0 8px;display:flex;justify-content:space-between;color:#1F2937;font-size:13px;"><span>+ ${a.n}</span><span style="font-weight:600;">${fmt(a.p)}</span></div>`; }); }
@@ -4780,7 +4795,16 @@ function qrow(n,name,prod,size,glass,qty,unit,line,addons,optText,optDelta,note,
         const _all=_rk.map(g=>g.startsWith('-')?g:'- '+g).concat(_dt.length?['รายละเอียด'].concat(_dt.map(g=>g.startsWith('-')?g:'- '+g)):[]).join('\n');
         content += `<div contenteditable="true" onblur="setRowDet('${itemId}',this)" style="margin:4px 0 0 8px;color:#1F2937;font-size:13px;white-space:pre-wrap;border:1px dashed #B3151D;outline:none;cursor:text;padding:2px 5px;border-radius:4px;">${_all}</div>`;
       } else {
+        // ② รายการ (งาน · ไม่มีหัวข้อ)
         _rk.forEach(g=>{ content += `<div style="margin:1px 0 0 8px;color:#1F2937;font-size:13px;">${g.startsWith('-')?g:'- '+g}</div>`; });
+        // ③ OPTION (แดง) + ④ หมายเหตุ (เทา) — จาก note · อยู่ระหว่างรายการ↔รายละเอียด (ใบ 5 บล็อก)
+        if(note){ const _nl=String(note).split(/\n+/).map(s=>(s||'').trim()).filter(Boolean);
+          const _opt=_nl.filter(l=>l.indexOf('OPTION')===0), _rem=_nl.filter(l=>l.indexOf('OPTION')!==0);
+          _opt.forEach(l=>{ content += `<div style="margin:6px 0 0 8px;font-size:13px;color:#B3151D;">${l}</div>`; });
+          if(_rem.length){ content += `<div style="margin-top:6px;font-weight:600;color:#6B7280;">หมายเหตุ</div>`;
+            _rem.forEach(l=>{ content += `<div style="margin:1px 0 0 8px;font-size:13px;color:#6B7280;">${l.startsWith('-')?l:'- '+l}</div>`; }); }
+        }
+        // ⑤ รายละเอียด (สเปค · หัวข้อแดง)
         if(_dt.length){
           content += `<div style="margin-top:8px;font-weight:600;color:#B3151D;">รายละเอียด</div>`;
           _dt.forEach(g=>{ content += `<div style="margin:1px 0 0 8px;color:#1F2937;font-size:13px;">${g.startsWith('-')?g:'- '+g}</div>`; });
@@ -4796,7 +4820,7 @@ function qrow(n,name,prod,size,glass,qty,unit,line,addons,optText,optDelta,note,
       }
     }
   }
-  if(optText){ content += `<div style="margin-top:6px;color:#B3151D;font-size:13px;">OPTION : ${optText}${optDelta?(' (ราคา'+(optDelta>0?'+':'-')+fmt(Math.abs(optDelta))+' บาท)'):''}</div>`; }
+  if(optText && !_hasMark){ content += `<div style="margin-top:6px;color:#B3151D;font-size:13px;">OPTION : ${optText}${optDelta?(' (ราคา'+(optDelta>0?'+':'-')+fmt(Math.abs(optDelta))+' บาท)'):''}</div>`; }
   const unitCell = _ed ? `<span contenteditable="true" onblur="setRowPrice('${itemId}',this)" style="border-bottom:1px dashed #B3151D;outline:none;cursor:text;">${q2(unit)}</span>` : q2(unit);
   return `<tr><td style="vertical-align:top;text-align:center;">${n}</td><td style="vertical-align:top;text-align:left;padding:8px;">${content}</td>`+
     `<td class="r" style="vertical-align:top;">${qty} ชุด</td><td class="r" style="vertical-align:top;">${unitCell}</td><td class="r" style="vertical-align:top;">${q2(line)}</td></tr>`;
@@ -5193,6 +5217,7 @@ function genQuote(keepNo){
        ใบจริงโชว์เฉพาะวัสดุ (กระจก/สีอลู) ใต้ "รายละเอียดงาน" ไม่โชว์ราคาย่อย */
     // extraDesc ถูกลบแล้ว — หมายเหตุ/สเปกพิเศษใช้ i-note แทน
     let det = '';
+    var _g1FB=false; // G1 ใบ 5 บล็อก: ตั้ง true ใน branch บานประตู/หน้าต่าง (slide+else) เท่านั้น → post-process แยก รายการ/รายละเอียด
     if(it.p.fin){
       var _finColor=(it.finLabel||'ไม่อบสี');
       var _finColorTxt=(_finColor==='ไม่อบสี')?'ไม่อบสี':(/สี/.test(_finColor)?_finColor:'สี'+_finColor); // R2-4: กันคำซ้ำ "สีอบสีพิเศษ"
@@ -5316,21 +5341,25 @@ function genQuote(keepNo){
       det = [_zModelTxt, _zFabTxt, 'ระบบควบคุม: '+_zCtrlTxt].join('\n');
     }
     else if(it.p.cat==='มุ้ง'){
-      // v5: มุ้ง — โชว์เฉพาะชื่อมุ้ง + สีผ้า ไม่มีกระจก/อลู
-      const fabricMap = {fiber:'ผ้าไฟเบอร์',fiber_gray:'ผ้าไฟเบอร์เทา',fiber_black:'ผ้าไฟเบอร์ดำ',fiber_white:'ผ้าไฟเบอร์ขาว',cat:'ผ้ากันแมว/หมา',rat:'ผ้าสแตนกันหนู',safety08:'ผ้าสแตนนิรภัย 0.8มม.'};
-      const sf = (it.optSel&&it.optSel.screenFabric)||'fiber';
-      const mf = (it.optSel&&it.optSel.mosqFabric)||'fiber_gray';
-      const fabricLabel = fabricMap[sf]||fabricMap[mf]||'ผ้าไฟเบอร์';
-      // สีผ้า: ดึงจาก o-screenfabriccolor หรือ default
-      const sfcEl = it.div ? it.div.querySelector('.o-screenfabriccolor') : null;
-      const sfcColor = sfcEl ? sfcEl.value : 'ดำ';
-      // G5-FINAL F: rat (สแตนกันหนู) ระบุสีในใบด้วย (เงิน/ดำ) · fiber ระบุสีเดิม · อื่นใช้ label (ราคาไม่เปลี่ยน · สีเป็น label)
-      const fabricFull = (sf==='fiber') ? ('ผ้าไฟเบอร์'+sfcColor)
-                       : (sf==='rat')   ? ('ผ้าสแตนกันหนู'+sfcColor)
-                       : fabricLabel;
-      det = fabricFull;
-      // 🟡 fix (doc-option-auditor): สีกรอบมุ้ง (mscolor = index สี) ลงใบด้วย (เดิมคิดเงินถูก L1237 แต่ชื่อสีไม่ขึ้นใบ)
-      { var _mci=parseInt(it.optSel&&it.optSel.mscolor); if(!isNaN(_mci)&&_mci>0&&COLORS[_mci]) det += '\nสีกรอบมุ้ง '+(COLORS[_mci].quoteName||COLORS[_mci].n).replace(/[★⚠🔖🔒]/g,'').trim(); }
+      // G5 (5-block 16มิ.ย.): หัว=ชื่อ+ลักษณะเปิด+ขนาด · รายละเอียด(หัวแดง)=สีกรอบก่อน→ผ้าหลัง
+      var _mo=it.optSel||{};
+      var _fabMap={fiber:'ผ้าไฟเบอร์',fiber_gray:'ผ้าไฟเบอร์เทา',fiber_black:'ผ้าไฟเบอร์ดำ',fiber_white:'ผ้าไฟเบอร์ขาว',cat:'ผ้ากันแมว/หมา',rat:'ผ้าสแตนกันหนู',safety08:'ผ้าสแตนนิรภัย 0.8มม.',safety:'ผ้าสแตนนิรภัย 0.8มม.'};
+      // ── รายละเอียด: สีกรอบก่อน (เมื่อมีสีพิเศษ) · ตามด้วยผ้า (เมื่อมีการเลือกผ้าจริง) ──
+      var _mSpec=[];
+      var _mciM=parseInt(_mo.mscolor);
+      if(!isNaN(_mciM)&&_mciM>0&&COLORS[_mciM]) _mSpec.push('สีกรอบมุ้ง '+(COLORS[_mciM].quoteName||COLORS[_mciM].n).replace(/[★⚠🔖🔒]/g,'').trim());
+      var _sfM=_mo.screenFabric||'';
+      if(_sfM){
+        // screen_addon (imp21/22/23): ผ้า+สีผ้าจาก DOM .o-screenfabriccolor
+        var _sfcElM=it.div?it.div.querySelector('.o-screenfabriccolor'):null;
+        var _sfcColorM=_sfcElM?_sfcElM.value:'ดำ';
+        _mSpec.push((_sfM==='fiber')?('ผ้าไฟเบอร์'+_sfcColorM):(_sfM==='rat')?('ผ้าสแตนกันหนู'+_sfcColorM):(_fabMap[_sfM]||'ผ้าไฟเบอร์'));
+      } else if(_mo.mosqFabric) {
+        // non-screen ที่มี mosqFabric เลือกได้ (imp28/29/30)
+        _mSpec.push(_fabMap[_mo.mosqFabric]||'ผ้าไฟเบอร์');
+      }
+      // mj_* ไม่มี screenfabric/mosqFabric → ผ้าอยู่ในชื่อสินค้าแล้ว ไม่ push ซ้ำ
+      det='\n###รายละเอียด###\n'+_mSpec.join('\n');
     }
     else if(it.p.id==='shower'){
       // Pass2-C: shower — ประกอบข้อความจากชนิดบาน + ประเภทประตู → "กระจกเทมเปอร์ใส 10 มม. + ราวสแตนเลส"
@@ -5507,6 +5536,7 @@ function genQuote(keepNo){
       }
       det = _slLines.join('\n');
       if(!det.trim()) det = '-';
+      _g1FB=true; // บานเลื่อน/เลื่อนภายใน = G1 → 5 บล็อก
     }
     else if(it.p.handrail){
       // G2-10/11: ราวกันตกกระจก — บรรทัดอุปกรณ์สแตนเลส (บังคับทุกใบ) + ความหนากระจก 10/12
@@ -5598,6 +5628,7 @@ function genQuote(keepNo){
       // ข้อ8/18: "ใช้ภายใน ไม่กันน้ำ" เป็นคำเตือนเซลล์เท่านั้น (มีในชื่อสินค้าตอนเลือกแล้ว) — ไม่ลงรายละเอียดในใบลูกค้า
       det = lines.join('\n');
       if(!det.trim()) det = '-';
+      _g1FB=true; // บานประตู/หน้าต่างทั่วไป (เปิด/เฟี้ยม/ติดตาย/กระทุ้ง/โซลิด/...) = G1 → 5 บล็อก
     }
     if(_parts.length) det += '\n' + _parts.join('\n');
     // #2 2026-06-05: บานย่อย — เพิ่มบรรทัด "- {ชื่อบานย่อย}" ใต้บานหลัก (เหนือ "รายละเอียดงาน")
@@ -5611,7 +5642,31 @@ function genQuote(keepNo){
       var _rest=prodName.split('\n').slice(1);
       prodName=[window._nameOv[it.div.dataset.id]].concat(_rest).join('\n');
     }
-    return {prodName, det};
+    // G1 ใบ 5 บล็อก (มติ 16มิ.ย.): แยก det → work(รายการงาน) + spec(รายละเอียดสเปค) · ไม่แตะ det เดิม (grouped/G6 ใช้ flat)
+    var _g1Work=null, _g1Spec=null;
+    if(_g1FB && det && det!=='-'){
+      _g1Work=[]; _g1Spec=[];
+      // สีอลู (สเปค) — สร้างใหม่จากข้อมูลสี + รหัส/⚠เตือน (มิเรอร์ cabinet) แทนบรรทัด "อลูมิเนียม ..."
+      var _aluSpec='';
+      { var _aci=it.ci||0, _ac=COLORS[_aci];
+        if(_ac){ var _anm=(_ac.quoteName||_ac.n).replace(/\s*\(Stock\)\s*/,'').replace(/\s*—\s*เช็ค[^)]*\)\s*⚠?/,'').replace(/[★⚠]/g,'').trim().replace(/^สี/,'');
+          var _asx='';
+          if(_aci>0 && _ac.hasCode){ var _acEl=it.div?it.div.querySelector('.i-colorcode'):null; var _acd=_acEl?(_acEl.value||'').trim():''; _asx=_acd?(' · รหัส '+_acd):' · ⚠ ต้องระบุรหัสสี'; }
+          if(_ac.sampleConfirm){ var _ascEl=it.div?it.div.querySelector('.i-sampleconfirm'):null; _asx+=(_ascEl&&_ascEl.checked)?' · ลูกค้ายืนยันตัวอย่างแล้ว':' · ⚠ ยังไม่ยืนยันตัวอย่าง'; }
+          _aluSpec='สีอลูมิเนียม: '+_anm+_asx; // คงคำ "อลูมิเนียม" (ตรงใบจริง + ผ่าน quote-fidelity) · label สเปกตามมติใบ 5 บล็อก
+        }
+      }
+      det.split('\n').forEach(function(L){ L=(L||'').replace(/^-\s+/,'').trim(); if(!L||L==='-')return;
+        if(/^อลูมิเนียม/.test(L)){ if(_aluSpec && _g1Spec.indexOf(_aluSpec)<0) _g1Spec.push(_aluSpec); } // สีอลู → สเปค (recompute) · ไม่ใช้ \b (ไทยไม่ใช่ \w)
+        else if(/^กระจก/.test(L)){ _g1Spec.push(L); }                                                      // กระจก → สเปค
+        else if(/^มุ้ง/.test(L)){ var m=L.match(/^(.*?)\s*\(เฟรม(.*?)\s*\/\s*([^)]*)\)\s*$/);                // มุ้ง → ชื่อ(งาน) + ผ้า/เฟรม(สเปค)
+          if(m){ _g1Work.push(m[1].trim()); _g1Spec.push('ผ้ามุ้ง: '+m[3].trim()+' · เฟรม: '+m[2].trim()); }
+          else _g1Work.push(L); }
+        else { _g1Work.push(L); }                                                                          // บานทึบ/ช่องแสง/ชุดล็อค/เสริมคาน/มือจับ/ครอบวงกบ/ฝังราง/ธรณี/รื้อ ... → งาน
+      });
+      if(!_g1Work.length && !_g1Spec.length){ _g1Work=null; _g1Spec=null; }
+    }
+    return {prodName, det, work:_g1Work, spec:_g1Spec};
   }
   // Render grouped (ชุดหลายส่วน) — default ประโยคเดียว / qSplit แยกราคา
   window._qGroupKeys = Object.keys(groups);
@@ -5703,7 +5758,20 @@ function genQuote(keepNo){
     else if(_isLength && _w>0) _sz=`(ยาว ${it.w} ม.)`;
     else if(!_isGH && _w>0 && _h>0) _sz=`(${it.w} × ${it.h} ม.)`;
     // งาน5: item-level optDelta ส่งเป็น optDelta ใน qrow · note ส่งเป็น optText (ข้อความ)
-    rows += qrow(rowIdx, (it.position||it.name||('จุดที่ '+rowIdx)), d.prodName+(it.ship?' (ผลิตส่ง)':''), _sz, d.det, it.qty, it.r.sell, line, it.r.addonLines, '', it.itemOptDelta||0, it.note, (it.div?it.div.dataset.id:''));
+    // จุด N (มติ 16มิ.ย.): ไม่ใส่ตำแหน่ง/ชื่อ → เอาชื่อสินค้า(บรรทัดแรก)+ขนาด ขึ้นหัวข้อ "จุดที่ N {ชื่อ}" แทน "จุดที่ N" เปล่า (กันชื่อซ้ำ 2 ที่)
+    let _qHdr=(it.position||it.name||'').trim();
+    let _qProd=d.prodName+(it.ship?' (ผลิตส่ง)':'');
+    let _qSz=_sz;
+    if(!_qHdr){
+      const _pl=String(_qProd).split('\n');
+      _qHdr='จุดที่ '+rowIdx+' '+_pl[0]+(_qSz?(' '+_qSz):'');
+      _qProd=_pl.slice(1).join('\n'); // เหลือบานย่อย (ถ้ามี) เป็น bullet ใต้หัว
+      _qSz='';
+    }
+    // G1 ใบ 5 บล็อก: ถ้า itemDetail แยก work/spec → ประกอบ marker ###รายละเอียด### (qrow render รายการ→OPTION→หมายเหตุ→รายละเอียด) · อื่น=flat det
+    let _qDet=d.det;
+    if(d.work && d.spec && (d.work.length||d.spec.length)){ _qDet=d.work.join('\n')+'\n###รายละเอียด###\n'+d.spec.join('\n'); }
+    rows += qrow(rowIdx, _qHdr, _qProd, _qSz, _qDet, it.qty, it.r.sell, line, it.r.addonLines, '', it.itemOptDelta||0, it.note, (it.div?it.div.dataset.id:''));
   });
   const discPct=clampDisc(parseFloat(document.getElementById('discPct').value)||0, subtotal);
   const discFlat=parseFloat(document.getElementById('discFlat').value)||0;
