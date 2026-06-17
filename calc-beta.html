@@ -676,7 +676,7 @@ const PRODUCTS=[
  {id:'future_tech',cat:'ฝาตู้',name:'ฝาตู้ Future Tech (/บาน, max 3 บาน/ชุด)',future_tech:1,cost:null},
  {id:'bar_grid_z',cat:'ระแนง',name:'ระแนงบานเกล็ดอลู ลูกฟูกเรียบ 2 หน้า (ข้อ 38.1)',bar_grid:1,cost:null},
  {id:'bar_slide',cat:'ระแนง',name:'ระแนงเลื่อน (ลูกฟูกเรียบ 2 ทาง · ข้อ 38.2)',bar_slide:1,cost:null},
- {id:'bar_openclose',cat:'ระแนง',name:'ระแนงเปิด-ปิด (กล่อง 1"x4" โชว์ 4" · ข้อ 38.3)',bar_openclose:1,cost:null},
+ {id:'bar_openclose',cat:'ระแนง',name:'ระแนงหมุนเปิด-ปิด (กล่อง 1"x4" โชว์ 4" · ข้อ 38.3)',bar_openclose:1,cost:null},
  {id:'fence_gate',cat:'ประตูรั้ว',name:'ประตูรั้วระแนง',gate:1,cost:null}, // G2-2: ชื่อ generic · ลักษณะเปิดเลือกใน det
  {id:'grid_bars',cat:'เส้นคาด',name:'เส้นคาดตาราง',grid:1,cost:null},
  {id:'ceil_cshape',cat:'ฝ้า-ผนัง',name:'ฝ้าอลูมิเนียม ไทยทิพย์ (ตัวซี หน้า 15 ซม.)',ceiling:1,crates:{'ขาว-ดำ':2100,'ลายไม้':2700},cost:null},
@@ -3350,7 +3350,7 @@ var RF_SUBG={
 };
 function rfSubgOf(grp,id){ var s=RF_SUBG[grp]; if(!s)return null; for(var i=0;i<s.length;i++){ if(s[i][1].indexOf(id)>=0) return s[i][0]; } return s[0][0]; }
 function g3PickSubg(btn){ var ch=btn.closest('.ch'),grp=btn.dataset.grp,th=btn.dataset.th; var sg=(RF_SUBG[grp]||[]).filter(function(x){return x[0]===th;})[0]; if(sg&&sg[1][0]) g3SyncProd(ch, sg[1][0]); }
-var G3_WALL_PRODS=[['ceil_cshape','ฝ้าอลู ตัวซี'],['ceil_bsc','ฝ้าไม้เทียม remood'],['ceiling_smooth','ฝ้าฉาบเรียบ'],['ceil_ranae_1x5','ฝ้าระแนงอลู 1x5ซม.'],['ceil_ranae_16_5','ฝ้าระแนงอลู 1"x1.6" เว้น 5ซม.'],['ceil_ranae_16_2','ฝ้าระแนงอลู 1"x1.6" เว้น 2ซม.']]; // ธงB: เอา isowall ออก · +ฝ้าระแนงอลู 16มิ.ย.
+var G3_WALL_PRODS=[['ceil_cshape','ฝ้าอลู ไทยทิพย์'],['ceil_bsc','ฝ้าไม้เทียม remood'],['ceiling_smooth','ฝ้าฉาบเรียบ'],['ceil_ranae_1x5','ฝ้าระแนง 1×5'],['ceil_ranae_16_5','ฝ้าระแนง 1.6 เว้น5'],['ceil_ranae_16_2','ฝ้าระแนง 1.6 เว้น2']]; // AUDIT-ปุ่มชื่อยาว: label สั้น (name เต็มลงใบ) // ธงB: เอา isowall ออก · +ฝ้าระแนงอลู 16มิ.ย.
 function rfGrpOf(id){ for(var g in RF_GRP_PRODS){ if(RF_GRP_PRODS[g].some(function(x){return x[0]===id;})) return g; } return null; }
 function g3SyncProd(ch,prodId){ var sel=ch.querySelector('.i-prod'); if(!sel)return; if(!sel.querySelector('option[value="'+prodId+'"]')){ var o=document.createElement('option'); o.value=prodId; o.textContent=prodId; sel.appendChild(o); } if(sel.value===prodId)return; sel.value=prodId; sel.dispatchEvent(new Event('change',{bubbles:true})); }
 function g3PickProd(btn){ g3SyncProd(btn.closest('.ch'), btn.dataset.id); }
@@ -3629,7 +3629,7 @@ function rnDoorSwitch(ch){
 }
 // G2 เฟส4 ราวกันตก (imp1-6 cat ราวบันได): cascade ทรง(เฉียง/ตรง)→ระบบยึด(หมุด/ยู/เสา)→imp auto · ใช้ g3SyncProd ร่วม
 function railParse(p){ var nm=p.name||''; return { shape:/เฉียง/.test(nm)?'เฉียง':'ตรง', mount:/หมุด/.test(nm)?'หมุด':(/วางยู|ยูเหล็ก/.test(nm)?'ยู':'เสา') }; }
-var RAIL_TREE={}; var RAIL_MOUNT_LABEL={'หมุด':'หมุดแปะข้าง','ยู':'วางยู+ครอบอลู','เสา':'เสาตั้ง+ราวบน'};
+var RAIL_TREE={}; var RAIL_MOUNT_LABEL={'หมุด':'หมุดแปะข้าง','ยู':'ยูเหล็ก + ครอบอลู','เสา':'เสาตั้ง + ราวจับอลู'}; // AUDIT-ปุ่มชื่อยาว: ป้ายระบบยึดสั้น (ชื่อเต็มลงใบ)
 PRODUCTS.forEach(function(p){ if(p.cat==='ราวบันได'){ var d=railParse(p); (RAIL_TREE[d.shape]=RAIL_TREE[d.shape]||{})[d.mount]=p.id; } });
 function railResolve(shape,mount){ var n=RAIL_TREE[shape]; if(!n)return''; return n[mount]||n[Object.keys(n)[0]]||''; }
 function railPick(btn,dim){ var ch=btn.closest('.ch'); if(!ch)return; var ps=ch.querySelector('.i-prod'); var p=ps?PBYID[ps.value]:null; if(!p||p.cat!=='ราวบันได')return;
@@ -3685,6 +3685,14 @@ function famPickOther(btn){ var ch=btn.closest('.ch'); if(!ch)return; ch.dataset
   // ALLG-v2 fix (บั๊ก "กดอื่นๆแล้วค้าง"): ไม่เปิด native dropdown 154 รายการ → re-render เป็นช่องค้นหา+ชิปแทน
   buildItemOpts(ch);
   var inp=ch.querySelector('.fam-search'); if(inp){ try{ inp.focus(); }catch(e){} } }
+// AUDIT-ปุ่มชื่อยาว (พี่นัทเคาะ 17มิ.ย.): ชื่อสั้นโชว์บนปุ่ม "รุ่น" · ชื่อเต็ม (name) ยังลงใบ + title hover เหมือนเดิม · value/ราคา/logic ไม่แตะ
+var BTN_SHORT={
+  sliding_eseries:'E-series (เลิกขาย)',
+  casement_flush_solid:'โซลิด ทู', casement_inset_solid:'โซลิด วัน',
+  inner_top_slimlux:'SlimLux (ภายใน)', inner_top_xseries:'X-series (ภายใน)'
+};
+function btnShort(q,cur){ return (q&&BTN_SHORT[q.id])||((q&&q.name||'').replace(cur||'','').trim()); }
+function btnTitle(q){ return (q&&q.name||'').replace(/"/g,'&quot;'); }
 function famSelectorHTML(p,grp,famOther){
   var cats=FAM_CATS[grp]; if(!cats)return''; var cur=p.cat;
   var _hasRest=famRestCats(grp).length>0; // ซ่อนปุ่ม "อื่นๆ" เมื่อไม่มีบานเหลือ (เช่น G4 ตู้/ฝาตู้, G7 ม่านซิป) — กัน dead-end
@@ -3729,7 +3737,7 @@ function famSelectorHTML(p,grp,famOther){
       // รุ่นย่อยของ cat ที่เลือก (ถ้ามี >1 รุ่น)
       if(_restCats.indexOf(cur)>=0){ var _rm=prodsInGroup(grp).filter(function(q){return q.cat===cur;});
         if(_rm.length>1){ h+='<label class="opt" style="width:100%;margin:6px 0 0;">รุ่น<div class="chip-grid">';
-          _rm.forEach(function(q){ h+='<button type="button" class="chip'+(q.id===(p&&p.id)?' on':'')+'" data-id="'+q.id+'" onclick="g3PickProd(this)">'+q.name.replace(cur,'').trim()+'</button>'; });
+          _rm.forEach(function(q){ h+='<button type="button" class="chip'+(q.id===(p&&p.id)?' on':'')+'" data-id="'+q.id+'" title="'+btnTitle(q)+'" onclick="g3PickProd(this)">'+btnShort(q,cur)+'</button>'; });
           h+='</div></label>'; }
       }
     }
@@ -3739,7 +3747,7 @@ function famSelectorHTML(p,grp,famOther){
     var models=PRODUCTS.filter(function(q){return q.cat===cur && !_hideInnerBottom(q);}); // ธง⑤: ไม่โชว์เลื่อนรางล่างเป็นรุ่นเลือก
     if(models.length>1){
       h+='<label class="opt" style="width:100%;margin:6px 0 0;">รุ่น<div class="chip-grid">';
-      models.forEach(function(q){ h+='<button type="button" class="chip'+(q.id===p.id?' on':'')+'" data-id="'+q.id+'" onclick="g3PickProd(this)">'+q.name.replace(cur,'').trim()+'</button>'; });
+      models.forEach(function(q){ h+='<button type="button" class="chip'+(q.id===p.id?' on':'')+'" data-id="'+q.id+'" title="'+btnTitle(q)+'" onclick="g3PickProd(this)">'+btnShort(q,cur)+'</button>'; });
       h+='</div></label>';
     }
   }
@@ -5610,7 +5618,7 @@ function genQuote(keepNo){
     else if(it.p.bar_grid || it.p.bar_slide || it.p.bar_openclose){
       // G2 ใบ 5 บล็อก: _work=ชื่อระแนง+ประตู(รุ่น)+ทิศ · _spec=สีอบ (ถ้ามี)
       var _bo=it.optSel||{};
-      var _bMat=it.p.bar_grid?'ระแนงอลูมิเนียมเกล็ด':(it.p.bar_slide?'ระแนงอลูมิเนียมเลื่อน (ลูกฟูกเรียบ 2 ทาง)':'ระแนงอลูมิเนียมเปิด-ปิด');
+      var _bMat=it.p.bar_grid?'ระแนงอลูมิเนียมเกล็ด':(it.p.bar_slide?'ระแนงอลูมิเนียมเลื่อน (ลูกฟูกเรียบ 2 ทาง)':'ระแนงอลูมิเนียมหมุนเปิด-ปิด');
       var _bWork=[_bMat];
       // ทิศ (bar_grid: bgdir v/h · bar_openclose: bocDir v/h) → _work
       var _bDir=it.p.bar_grid?_bo.bgdir:(it.p.bar_openclose?_bo.bocDir:'');
