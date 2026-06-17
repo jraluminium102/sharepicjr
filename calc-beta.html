@@ -767,10 +767,10 @@ const PRODUCTS=[
  {id:'imp18',cat:'หลังคา',name:"ชินโคไลท์ 4 มม. รุ่น Shade",method:'bucket',min:44000,rates:'IMP18',cost:null,optSlide:true},
  {id:'imp19',cat:'หลังคา',name:"ชินโคไลท์ 10 มม. รุ่น Prime",method:'bucket',min:61000,rates:'IMP19',cost:null,optSlide:true},
  {id:'imp20',cat:'หลังคา',name:"ชินโคไลท์ 10 มม. รุ่น Grand",method:'bucket',min:61000,rates:'IMP19',cost:null,optSlide:true}, // FIX-5: Grang→Grand + ราคา=Prime (IMP19) มติพี่นัท
- {id:'imp21',cat:'มุ้ง',name:"มุ้งเฟรมเล็ก ผ้ามุ้งไฟเบอร์ (บานเปิด/เลื่อน/กระทุ้ง/ยก) ห้าม PC",method:'bucket',min:0,rates:'IMP21',cost:null,min_door:2400,min_window:1200,screen_addon:1,mscolor:true,deny_with:['pc_door_2','pc_door_4']},
+ {id:'imp21',cat:'มุ้ง',name:"มุ้งเฟรมเล็ก ผ้ามุ้งไฟเบอร์ (บานเปิด/เลื่อน/กระทุ้ง/ยก)",method:'bucket',min:0,rates:'IMP21',cost:null,min_door:2400,min_window:1200,screen_addon:1,mscolor:true,deny_with:['pc_door_2','pc_door_4']},
  {id:'imp22',cat:'มุ้ง',name:"มุ้งเฟรมเล็กติดตาย ผ้ามุ้งไฟเบอร์",method:'bucket',min:0,rates:'IMP22',cost:null,min_door:1500,min_window:800,screen_addon:1,mscolor:true},
  {id:'imp23',cat:'มุ้ง',name:"มุ้งเฟรมใหญ่ (เลื่อน/เปิด/กระทุ้ง/ยก · ตัด PC)",method:'bucket',min:0,rates:'IMP23',cost:null,min_door:7200,min_window:4800,screen_addon:1,mscolor:true,allow_with:['sliding_sms','sliding_euro','sliding_eseries','casement_euro','casement_dseries','casement_xseries','casement_velora','casement_flush_solid','casement_inset_solid','awning_euro','awning_aluinch','lift_sms','lift_aluinch']},
- {id:'imp28',cat:'มุ้ง',name:"มุ้งจีบ ตีนตะขาบ รุ่งรางเตี้ยแบบพิเศษ ผ้ามุ้งไฟเบอร์",method:'bucket',min:0,rates:'IMP28',cost:null,mscolor:true},
+ {id:'imp28',cat:'มุ้ง',name:"มุ้งจีบ ตีนตะขาบ รุ่นรางเตี้ยแบบพิเศษ ผ้ามุ้งไฟเบอร์",method:'bucket',min:0,rates:'IMP28',cost:null,mscolor:true},
  {id:'imp29',cat:'มุ้ง',name:"มุ้งม้วน ผ้ามุ้งไฟเบอร์ (เลื่อน/กระทุ้ง/ยก)",method:'bucket',min:0,rates:'IMP29',cost:null,mscolor:true,allow_with:['sliding_sms','sliding_euro','sliding_eseries','awning_euro','awning_aluinch','lift_sms','lift_aluinch']},
  {id:'imp30',cat:'มุ้ง',name:"มุ้งแม่เหล็ก พับเปิดได้",method:'bucket',min:0,rates:'IMP30',cost:null},
  {id:'imp31',cat:'มุ้ง',name:"มุ้งจีบนิรภัย มุ้งสแตนเลส หนา 0.8 มม.",method:'bucket',min:0,rates:'IMP31',cost:null,allow_with:['sliding_sms','sliding_euro','sliding_eseries','casement_euro','casement_dseries','casement_xseries','casement_velora','casement_flush_solid','casement_inset_solid','awning_euro','awning_aluinch','lift_sms','lift_aluinch','pc_door_2','pc_door_4','ykk_vent','ykk_exhido','tostem_a01']},
@@ -1340,7 +1340,13 @@ function calcUnit(p, w, h, gi, ci, panels, optSel, shipOnly){
     }
     // BUG2 fix (doc-option-auditor): โหมด B ค่าเสริมกล่อง/ราง — screen_addon (เฟรม imp21/22/23) return ก่อนถึง L1460 → บวกที่นี่ (เดิมคิดขาด)
     if(optSel && optSel.screen_existing){ const sx=parseFloat(optSel.screen_extra)||0; if(sx>0){ sell+=sx; msgs.push('🔧 ติดบานเดิม + ค่าเสริมกล่อง/ราง +'+fmt(sx)); } else { msgs.push('🔧 ติดบานเดิม (ไม่เสริมกล่อง/ราง)'); } }
-    msgs.push('⚠ ไม่รวมเสริมวงกบ/เสริมราง — คิดเพิ่มภายหลัง');
+    // BUG1 (ก้อนรวม 17มิ.ย.): ค่าทำสีกรอบมุ้งเฟรม — เดิม return ก่อนถึง mscolor block (L1465) = ไม่คิด · คิด colorPrice×0.5 เหมือนมุ้ง non-screen (imp28) · default '' = ไม่บวก (golden นิ่ง)
+    if(p.mscolor && optSel && optSel.mscolor){ const _mci=parseInt(optSel.mscolor); if(!isNaN(_mci)&&_mci>0&&COLORS[_mci]){ const _cAdd=colorPrice(_mci,A,'')*0.5; if(_cAdd>0){ sell+=_cAdd; const _lb=(COLORS[_mci].quoteName||COLORS[_mci].n).replace(/[★⚠🔖🔒]/g,'').trim(); msgs.push('สีกรอบ '+_lb+' (×0.5) +'+fmt(Math.round(_cAdd))); } } }
+    // BUG2 (ก้อนรวม 17มิ.ย.): ครอบวงกบมุ้งเฟรม — เดิม return ก่อนถึง L1727/1729 = Δ0 · คิดเรตตามสี (ci) เหมือนงานบาน · default fcsides=0/fcm=0 = ไม่บวก (golden นิ่ง)
+    if(optSel){ const _fr=ci<=2?700:(ci<=4?800:(ci<=7?1000:(ci<=9?1100:(ci===10?1200:(ci===11?1300:700)))));
+      const _fcm=parseFloat(optSel.fcm)||0; if(_fcm>0){ sell+=_fr*_fcm; msgs.push('ครอบวงกบ '+_fcm.toFixed(2)+'ม.×'+_fr+' = '+fmt(_fr*_fcm)); }
+      const _fcs=parseInt(optSel.fcsides)||0; if(_fcs===3||_fcs===4){ const _flen=_fcs===3?(W+2*H):2*(W+H); if(_flen>0){ sell+=_fr*_flen; msgs.push('ครอบวงกบอลู '+_fcs+' ด้าน '+_flen.toFixed(2)+'ม.×'+_fr+' = '+fmt(_fr*_flen)); } } }
+    msgs.push('⚠ ไม่รวมเสริมราง — คิดเพิ่มภายหลัง');
     return {a:A, sell:roundUp(sell), cost:null, addonLabel:'', msgs:[msgs.join(' · ')]};
   }
     if(p.bar_grid){
@@ -1857,7 +1863,7 @@ function calcUnit(p, w, h, gi, ci, panels, optSel, shipOnly){
       mosqBase = Math.max(_minPP*_mqPanels, mosqArea*_mqRate);
       const fabric = (optSel.mosqFabric)||'fiber_gray';
       const fabricExtra = (fabric==='anti_pet'?800:(fabric==='stainless'?1200:(fabric==='safety08'?((mosqArea<=1.5?3500:(mosqArea<=3?3200:3000))*mosqArea):0)));
-      const fabricLabel = {fiber_gray:'ผ้าไฟเบอร์เทา',fiber_black:'ผ้าไฟเบอร์ดำ',anti_pet:'ผ้ากันแมว/หมา',stainless:'ผ้าสแตนกันหนู',safety08:'ผ้าสแตนนิรภัย 0.8มม.'}[fabric];
+      const fabricLabel = {fiber_gray:'ผ้าไฟเบอร์เทา',fiber_black:'ผ้าไฟเบอร์ดำ',anti_pet:'ผ้ากันแมว',stainless:'ผ้าสแตนกันหนู',safety08:'ผ้าสแตนนิรภัย 0.8มม.'}[fabric];
       // ข้อ10: ค่าทำสีกรอบมุ้ง addon (×0.5) — เดิมอยู่ใน if(false) ดับ → ย้ายมา block ที่ใช้จริง
       let _mosqColorUp=0, _mosqColorLbl='';
       if(mscreen.mscolor && optSel.mosqColor){
@@ -2019,8 +2025,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   var _gg=document.getElementById('global-glass');
   if(_gc) _gc.innerHTML=colorOpts();
   if(_gg) _gg.innerHTML=glassOpts();
-  if(_gc){ colorDrillRender(_gc); }  // ① สีอลู drill-down (ทั้งใบ)
-  if(_gg){ glassDrillRender(_gg); }  // ② กระจก drill-down (ทั้งใบ)
+  // ก้อนรวม#6 (พี่นัทเคาะ 17มิ.ย.): revert สี/กระจก "ทั้งใบ" → ดรอปดาวน์ปกติ (เลิก drill-down เฉพาะตัวทั้งใบ) · รายบาน .i-color/.i-glass ยังเป็น drill-down
+  // (เดิม: colorDrillRender(_gc) / glassDrillRender(_gg) — ปิดไว้ ให้ #global-color/#global-glass คงเป็น select)
   if(_gc) _gc.addEventListener('change',syncGlobalColorGlass);
   if(_gg) _gg.addEventListener('change',syncGlobalColorGlass);
   addQuickItem();
@@ -3266,8 +3272,12 @@ function rfChips(cls, items, defVal, twoUp){
 }
 // G3-B1: ชิปย่อ + จุดสี (แบบ ค · สี/วัสดุ ≥6 ชื่อยาว) · items=[[valueเต็ม,ชื่อย่อ,hex],...] · ค่าเต็มลงใบ ชิปแค่ label · ใช้ chSetChip เดิม (fire input+change)
 function rfChipsSw(cls, items, defVal){
-  return '<div class="chip-group chip-sm">'+items.map(function(it){ return '<button type="button" class="chip'+(it[0]===defVal?' on':'')+'" data-val="'+it[0]+'" onclick="chSetChip(this,\''+cls+'\')"><span class="cdot" style="background:'+it[2]+';"></span>'+it[1]+'</button>'; }).join('')+'</div>';
+  return '<div class="chip-group chip-sm">'+items.map(function(it){ return '<button type="button" class="chip'+(it[0]===defVal?' on':'')+'" data-val="'+it[0]+'" onclick="chSetChip(this,\''+cls+'\')">'+(it[2]?'<span class="cdot" style="background:'+it[2]+';"></span>':'')+it[1]+'</button>'; }).join('')+'</div>';
 }
+// B3: palette สีชินโคไลท์ (เสนอจากชื่อสี · พี่นัทปรับ hex ได้) — key = string สีเต็มใน SHINCO_COLORS
+var SHINCO_SW={'HC-N828 Modern Grey':'#8a8d8f','HC-B703 Royal Blue':'#26408b','HC-570 Classic Brown':'#6b4a2f','HC-N590 Noble Green':'#2f5d43','SP-NB00 ขาวขุ่น':'#efece4','SP-NB30 Foggy Brown':'#8a7a68','SP-B857 Marine Blue':'#3a6e88','SP-NC95 Light Brown':'#a98b63','NT-001 ใส':'#e9f1f1','NT-332 เทาอ่อน':'#c2c4c2','Prime 562 Brownish Green':'#5a6347','Shade-430S Pearl White':'#f4f2ec'};
+// B3: ชื่อย่อชินโค = ตัดรหัสนำหน้า เหลือชื่อสี (อังกฤษ/ไทย) เช่น "HC-N828 Modern Grey"→"Modern Grey" · "SP-NB00 ขาวขุ่น"→"ขาวขุ่น"
+function shincoShort(full){ var m=String(full).match(/^[A-Za-z]+[-\s]?[\w]*\s+(.+)$/); return (m&&m[1])?m[1].trim():full; }
 // sync สถานะ 'on' ของชิป ให้ตรง value ของ select (ใช้เมื่อโค้ดตั้งค่า select เอง) + lock/unlock ชิป (กันแก้)
 function rfChipSync(ch,cls){ var sel=ch.querySelector('.'+cls); if(!sel)return; ch.querySelectorAll('.chip[onclick*="'+cls+'"]').forEach(function(c){ c.classList.toggle('on', c.dataset.val===sel.value); }); }
 function rfChipLock(ch,cls,on){ ch.querySelectorAll('.chip[onclick*="'+cls+'"]').forEach(function(c){ c.style.pointerEvents=on?'none':''; c.style.opacity=on?'0.45':''; }); }
@@ -4217,7 +4227,7 @@ function buildItemOpts(d){
   // PC Door — เสริมคาน (ไม่มี track เพราะเป็นรางล่าง)
   // ข้อ5(G1): เสริมคาน — บล็อกรวม cat บานเลื่อน/เลื่อนภายใน/บานเปิด/PC Door (เดิมมีแค่ PC/รางบน · งานจริงบางชุดต้องใช้คาน)
   // R3.9: เลิก "เสริมคาน รุ่น1/2/3" (o-beamm · บานเลื่อน/เปิด/PC) — เสริมคานเหลือเฉพาะเลื่อนภายใน+บานเฟี้ยม ผ่าน "เสริมคานซัพพอร์ท" (COMMON_OPTS) · บานเลื่อนรางล่าง/เปิด/PC ไม่มีเสริมคาน
-  if(p.optInsul || ['isowall','wall_ext','wall_int'].includes(p.id)){ h+=`<label class="opt"><input type="checkbox" class="o-insul" onchange="calcQuote();"> ฉนวนกันความร้อนและกันเสียง หนา 3" +600/ตร.ม.</label>`; }
+  if(p.optInsul || ['isowall','wall_ext','wall_int'].includes(p.id)){ const _insChk=['isowall','wall_ext','wall_int'].includes(p.id)?' checked':''; h+=`<label class="opt"><input type="checkbox" class="o-insul"${_insChk} onchange="calcQuote();"> ฉนวนกันความร้อนและกันเสียง หนา 3" +600/ตร.ม.</label>`; } // ก้อนรวม#5: default ติ๊กเฉพาะผนังเบา 3 ตัว (สเปกเฟิร์ม · ลูกค้าติ๊กออกได้) · ฝ้าฉาบเรียบ/optInsul อื่นไม่ติ๊ก
   // G3 ข้อ2 (มติพี่นัท ข): ฝ้า-ผนัง — รุ่น/ความหนา (ระบุในใบ) + ทาสี (กรอกราคาเอง)
   if(p.cat==='ฝ้า-ผนัง'){
     h+='<label class="opt" style="width:100%;">รุ่น/ความหนา <select class="o-wallmodel" style="width:auto;height:32px;max-width:340px;" onchange="calcQuote();"><option value="">ไม่ระบุ</option><option value="สมาร์ทบอร์ด หนา 12 มม.">สมาร์ทบอร์ด หนา 12 มม.</option><option value="เวเทอร์บล็อค ตราช้าง หนา 9 มม. เสริมฟอยล์กันร้อน/น้ำ/รา">เวเทอร์บล็อค ตราช้าง 9 มม. (ฟอยล์ กันร้อน/น้ำ/รา)</option></select> <span style="font-size:11px;color:#666;">(ระบุในใบ · ราคาตามวัสดุ รอเรต)</span></label>';
@@ -4268,7 +4278,9 @@ function buildItemOpts(d){
       // #6 (17มิ.ย.): ชินโคไลท์ — สี+รหัสครบทุกรุ่น (SHINCO_COLORS ต่อ id) · display · value="สี ..." ตรงใบจริง
       var _shc=(typeof SHINCO_COLORS!=='undefined'&&SHINCO_COLORS[p.id])||[];
       var _shPairs=[['','— ระบุสี —']].concat(_shc.map(function(c){return ['สี '+c, c];}));
-      h+='<label class="opt" style="width:100%;">สีชินโคไลท์ <select class="o-roofcolor" style="display:none;" onchange="calcQuote();">'+_shPairs.map(function(_p,_i){return '<option value="'+_p[0]+'"'+(_i===0?' selected':'')+'>'+_p[1]+'</option>';}).join('')+'</select>'+rfChips('o-roofcolor',_shPairs,'')+'</label>';
+      // B3 (ก้อนรวม 17มิ.ย.): ชิปแบบ ค — ชื่อย่อ (อังกฤษ/ไทย) + จุดสี · value เต็ม+รหัสคงเดิม (ลงใบ "สี HC-N828 Modern Grey")
+      var _shTri=[['','— ระบุสี —','']].concat(_shc.map(function(c){return ['สี '+c, shincoShort(c), SHINCO_SW[c]||'#ccc'];}));
+      h+='<label class="opt" style="width:100%;">สีชินโคไลท์ <span style="font-weight:400;color:var(--muted);font-size:11px;">(ชื่อเต็ม+รหัสลงใบ)</span> <select class="o-roofcolor" style="display:none;" onchange="calcQuote();">'+_shPairs.map(function(_p,_i){return '<option value="'+_p[0]+'"'+(_i===0?' selected':'')+'>'+_p[1]+'</option>';}).join('')+'</select>'+rfChipsSw('o-roofcolor',_shTri,'')+'</label>';
     }
     // FIX-12(G3): หลังคาผสม 2 วัสดุ — ต่อปลายวัสดุที่ 2 คิด ตร.ม.แยก (มติพี่นัท · feature)
     // ธงE: ต่อปลายวัสดุที่ 2 — ชิปกลุ่มวัสดุ + สี cascade + ยาว×ยื่น auto + ราคาหัวกล่อง (calc FIX-12 อ่าน .o-roof2/.o-roof2area เดิม)
@@ -4397,7 +4409,7 @@ function buildItemOpts(d){
     // ก้อน5: ชิปลักษณะการเปิด (.o-mosqopenstyle · ห้ามชน .o-mosqopen dead code) — โผล่เฉพาะ imp21/imp23 · label-only
     h+='<div class="mosq-openstyle-row" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed #90CAF9;"><div style="font-size:11px;font-weight:700;color:#1565C0;margin-bottom:6px;">ลักษณะการเปิด <span style="background:#E0F2FE;color:#0369A1;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;">label-only</span></div><div class="chip-group chip-sm"><button type="button" class="chip on" data-val="เปิด" onclick="mosqOpenStylePick(this)">เปิด</button><button type="button" class="chip" data-val="เลื่อน" onclick="mosqOpenStylePick(this)">เลื่อน</button><button type="button" class="chip" data-val="กระทุ้ง" onclick="mosqOpenStylePick(this)">กระทุ้ง</button><button type="button" class="chip" data-val="ยก" onclick="mosqOpenStylePick(this)">ยก</button></div><input type="hidden" class="o-mosqopenstyle" value="เปิด"><div style="margin-top:5px;font-size:11px;color:#6B7280;">ต่อท้ายชื่อมุ้งในใบ เช่น "มุ้งเฟรมเล็ก บานเลื่อน" — ไม่กระทบราคา</div></div>';
     // UX P2 (ux-designer): ผ้ามุ้งใน-บาน → ชิป (สม่ำเสมอกับ G5 standalone · ราคาอ่าน o-mosqfabric value เดิม)
-    h+='<label class="opt" style="width:100%;">ผ้ามุ้ง <select class="o-mosqfabric" style="display:none;" onchange="calcQuote()"><option value="fiber_gray" selected>ไฟเบอร์เทา (default)</option><option value="fiber_black">ไฟเบอร์ดำ</option><option value="anti_pet">กันแมว/หมา +800</option><option value="stainless">สแตนกันหนู +1,200</option><option value="safety08">สแตนนิรภัย 0.8มม. (+3,500-3,000/ตร.ม.)</option></select>'+rfChips('o-mosqfabric',[['fiber_gray','ไฟเบอร์เทา'],['fiber_black','ไฟเบอร์ดำ'],['anti_pet','กันแมว/หมา +800'],['stainless','สแตนกันหนู +1,200'],['safety08','สแตนนิรภัย 0.8']],'fiber_gray')+'</label>';
+    h+='<label class="opt" style="width:100%;">ผ้ามุ้ง <select class="o-mosqfabric" style="display:none;" onchange="calcQuote()"><option value="fiber_gray" selected>ไฟเบอร์เทา (default)</option><option value="fiber_black">ไฟเบอร์ดำ</option><option value="anti_pet">กันแมว +800</option><option value="stainless">สแตนกันหนู +1,200</option><option value="safety08">สแตนนิรภัย 0.8มม. (+3,500-3,000/ตร.ม.)</option></select>'+rfChips('o-mosqfabric',[['fiber_gray','ไฟเบอร์เทา'],['fiber_black','ไฟเบอร์ดำ'],['anti_pet','กันแมว +800'],['stainless','สแตนกันหนู +1,200'],['safety08','สแตนนิรภัย 0.8']],'fiber_gray')+'</label>';
     // ข้อ10: สีกรอบมุ้ง → ชิป 4 (value ตรงกับ calc · o-mosqcolor ซ่อน)
     h+='<label class="opt" style="width:100%;">สีกรอบมุ้ง <div class="chip-group chip-sm"><button type="button" class="chip on" data-val="" onclick="chSetChip(this,\'o-mosqcolor\')">ตามสีบาน</button><button type="button" class="chip" data-val="sahara" onclick="chSetChip(this,\'o-mosqcolor\')">เทาซาฮาร่า</button><button type="button" class="chip" data-val="kl_special" onclick="chSetChip(this,\'o-mosqcolor\')">KL พิเศษ</button><button type="button" class="chip" data-val="kl_wood" onclick="chSetChip(this,\'o-mosqcolor\')">KL ลายไม้</button></div><select class="o-mosqcolor" style="display:none;" onchange="calcQuote()"><option value="">ตามสีบาน (ฟรี)</option><option value="sahara">เทาซาฮาร่า (×0.5)</option><option value="kl_special">เคแอลอบพิเศษ (×0.5)</option><option value="kl_wood">เคแอลลายไม้ (×0.5)</option></select></label>';
     h+='</div></div></label>';
@@ -4500,7 +4512,7 @@ function buildItemOpts(d){
   if(p.ceiling && p.crates){ h+='<label class="opt">สี <select class="o-ckolor" style="width:auto;height:32px;">'+Object.keys(p.crates).map(function(k){return '<option value="'+k+'">'+k+' ('+fmt(p.crates[k])+'/ตร.ม.)</option>';}).join('')+'</select></label>'; } // ฝ้าระแนงอลู ไม่มี crates → ไม่โชว์สี (v1 สีมาตรฐาน)
   // สเปก rev2: ฝ้า-ผนัง — ฟิลด์รายละเอียดวัสดุ (โครง/สมาร์ทบอร์ด/ISOWALL/ฝ้าฉาบ)
   if(p.cat==='ฝ้า-ผนัง'){
-    h+='<label class="opt" style="width:100%;">โครง <select class="o-wallframe" style="display:none;" onchange="calcQuote();"><option value="">โครงอลูมิเนียม</option><option value="เหล็กชุบ">โครงเหล็กชุบซิงค์ (ไร้สนิม)</option></select>'+rfChips('o-wallframe',[['','อลูมิเนียม'],['เหล็กชุบ','เหล็กชุบซิงค์ (ไร้สนิม)']],'',true)+'</label>';
+    h+='<label class="opt" style="width:100%;">โครง <select class="o-wallframe" style="display:none;" onchange="calcQuote();"><option value="">โครงอลูมิเนียม</option><option value="เหล็กชุบ" selected>โครงเหล็กชุบซิงค์ (ไร้สนิม)</option></select>'+rfChips('o-wallframe',[['','อลูมิเนียม'],['เหล็กชุบ','เหล็กชุบซิงค์ (ไร้สนิม)']],'เหล็กชุบ',true)+'</label>'; // ก้อนรวม#5: default เหล็กชุบ (สเปกเฟิร์ม · ราคาเท่าอลู +0)
     if(p.id==='isowall'){
       h+='<label class="opt" style="width:100%;">ความหนา ISOWALL <select class="o-isothick" style="display:none;" onchange="calcQuote();"><option value="10">10 ซม.</option><option value="5">5 ซม.</option><option value="7.5">7.5 ซม.</option></select>'+rfChips('o-isothick',[['10','10 ซม.'],['5','5 ซม.'],['7.5','7.5 ซม.']],'10')+'</label>';
       h+='<label class="opt">สี <input type="text" class="o-isocolor" placeholder="เช่น ขาว" style="width:auto;min-width:90px;height:32px;" oninput="calcQuote();"></label>';
@@ -4530,7 +4542,7 @@ function buildItemOpts(d){
       +'<button type="button" class="chip" data-val="cat" onclick="chSetChip(this,\'o-screenfabric\');mosqFabricColors(this)">กันแมว ขาว +800</button>'
       +'<button type="button" class="chip" data-val="rat" onclick="chSetChip(this,\'o-screenfabric\');mosqFabricColors(this)">สแตนกันหนู +1,200</button>'
       +(p.rates==='IMP23'?'<button type="button" class="chip" data-val="safety" onclick="chSetChip(this,\'o-screenfabric\');mosqFabricColors(this)">นิรภัยสแตน 304 ดำ</button>':'')
-      +'</div><select class="o-screenfabric" style="display:none;" onchange="calcQuote();"><option value="fiber">ไฟเบอร์ เทา/ดำ</option><option value="cat">กันแมว/หมา สีขาว +800/ตร.ม.</option><option value="rat">สแตน 0.33มม. กันหนู (เงิน/ดำ) +1,200/ตร.ม.</option>'+(p.rates==='IMP23'?'<option value="safety">นิรภัยสแตน 304 สีดำ 0.8มม. (tier 3,500-3,000)</option>':'')+'</select></label>';
+      +'</div><select class="o-screenfabric" style="display:none;" onchange="calcQuote();"><option value="fiber">ไฟเบอร์ เทา/ดำ</option><option value="cat">กันแมว สีขาว +800/ตร.ม.</option><option value="rat">สแตน 0.33มม. กันหนู (เงิน/ดำ) +1,200/ตร.ม.</option>'+(p.rates==='IMP23'?'<option value="safety">นิรภัยสแตน 304 สีดำ 0.8มม. (tier 3,500-3,000)</option>':'')+'</select></label>';
     // G5-FINAL E: สีผ้า → chipwrap (mosqFabricColors rebuild ตามผ้า) · select ซ่อน value: ดำ/เทา/ขาว/เงิน
     h+='<label class="opt" style="width:100%;">สีผ้า <div class="o-sfc-chipwrap chip-group chip-sm" style="display:inline-flex;"></div><select class="o-screenfabriccolor" style="display:none;" onchange="calcQuote();"><option value="ดำ">ดำ</option><option value="เทา">เทา</option><option value="ขาว">ขาว</option><option value="เงิน">เงิน</option></select></label>';
     // G5 (มติพี่นัท 16 มิ.ย.): ลักษณะการเปิดมุ้งเฟรมขายเดี่ยว — imp21 เฟรมเล็ก / imp23 เฟรมใหญ่ เท่านั้น (imp22 ติดตายไม่มี · imp30 แม่เหล็กพับไม่ใช่ screen_addon) · label-only ไม่กระทบราคา · readItem อ่าน .o-mosqopenstyle อยู่แล้ว (L3711)
@@ -5516,7 +5528,7 @@ function genQuote(keepNo){
     else if(it.p.cat==='ฝ้า-ผนัง'){
       // G3 ใบ 5 บล็อก (CODE-READY จุด C · merge #8): รายการ(งาน)=แผ่น+โครง+ฉนวน · รายละเอียด=สี (ถ้ามี)
       var _os=it.optSel||{}, _work=[], _spec=[];
-      var _frame = _os.wallframe==='เหล็กชุบ' ? 'โครงเหล็กชุบซิงค์ (ไร้สนิม)' : 'โครงอลูมิเนียม';
+      var _frame = _os.wallframe==='เหล็กชุบ' ? 'โครงเหล็กชุบซิงค์ (ไร้สนิม) หนา 1.2 มม.' : 'โครงอลูมิเนียม'; // ก้อนรวม#5: เติมความหนา 1.2 มม.
       if(it.p.id==='isowall'){ _work.push('แผ่น ISOWALL หนา '+(_os.isothick||'10')+' ซม.'); _work.push(_frame);
         if(_os.isocolor) _spec.push('สี ISOWALL: '+_os.isocolor); }
       else if(it.p.id==='ceiling_smooth'){ _work.push('ฝ้าฉาบเรียบ'+(_os.ceilfinish?(' พร้อม'+_os.ceilfinish):'')); if(_os.ceilslope) _work.push('ฝ้าเฉียงตามแนวหลังคา'); }
@@ -5816,7 +5828,7 @@ function genQuote(keepNo){
       if(it.p.mosquito && it.optSel && it.optSel.mosqId){
         const _mscSl = MOSQUITO_SCREENS.find(function(m){return m.id===it.optSel.mosqId;});
         if(_mscSl){
-          const _mfMapSl={fiber_gray:'ผ้าไฟเบอร์เทา',fiber_black:'ผ้าไฟเบอร์ดำ',fiber_white:'ผ้าไฟเบอร์ขาว',fiber:'ผ้าไฟเบอร์ดำ',anti_pet:'ผ้ากันแมว/หมา',stainless:'ผ้าสแตนกันหนู',safety08:'ผ้าสแตนนิรภัย 0.8มม.'};
+          const _mfMapSl={fiber_gray:'ผ้าไฟเบอร์เทา',fiber_black:'ผ้าไฟเบอร์ดำ',fiber_white:'ผ้าไฟเบอร์ขาว',fiber:'ผ้าไฟเบอร์ดำ',anti_pet:'ผ้ากันแมว',stainless:'ผ้าสแตนกันหนู',safety08:'ผ้าสแตนนิรภัย 0.8มม.'};
           const _mfSl = (it.optSel.mosqFabric)||'fiber_gray';
           const _mfLblSl = _mfMapSl[_mfSl]||'ผ้าไฟเบอร์ดำ';
           const _mosqAddonSl = (it.r && it.r.addonLines||[]).find(function(al){return al.mosqArea!==undefined;});
@@ -5928,7 +5940,7 @@ function genQuote(keepNo){
       if(it.p.mosquito && it.optSel && it.optSel.mosqId){
         const mscreen = MOSQUITO_SCREENS.find(m=>m.id===it.optSel.mosqId);
         if(mscreen){
-          const fabricMapM={fiber_gray:'ผ้าไฟเบอร์เทา',fiber_black:'ผ้าไฟเบอร์ดำ',fiber_white:'ผ้าไฟเบอร์ขาว',fiber:'ผ้าไฟเบอร์ดำ',anti_pet:'ผ้ากันแมว/หมา',stainless:'ผ้าสแตนกันหนู',safety08:'ผ้าสแตนนิรภัย 0.8มม.'};
+          const fabricMapM={fiber_gray:'ผ้าไฟเบอร์เทา',fiber_black:'ผ้าไฟเบอร์ดำ',fiber_white:'ผ้าไฟเบอร์ขาว',fiber:'ผ้าไฟเบอร์ดำ',anti_pet:'ผ้ากันแมว',stainless:'ผ้าสแตนกันหนู',safety08:'ผ้าสแตนนิรภัย 0.8มม.'};
           const mf = (it.optSel.mosqFabric)||'fiber_gray';
           const mfLabel = fabricMapM[mf]||'ผ้าไฟเบอร์ดำ';
           // C1: ตัด "SD พื้นฐาน" ทิ้ง → รายละเอียดเหลือ "มุ้งจีบ {ผ้า}" (ชนิดอื่นเช่นตีนตะขาบยังคงไว้)
@@ -6151,7 +6163,7 @@ function qiQuoteRow(d,g){
   try{
     if(g==='3'){ r=qiCalcG3(d); var p3=PBYID[d.dataset.qiProd||'imp7']; prod=p3?p3.name:'หลังคา/ฝ้า'; detail=(r&&r.msgs&&r.msgs[0])||''; }
     else if(g==='4'){ r=qiCalcG4(d); var t4=d.dataset.qiG4type||'cabinet'; var p4=PBYID[t4==='cabinet'?'cabinet_alu':'future_tech']; prod=(p4?p4.name:'ตู้')+(d.dataset.qiG4color==='1'?' · สีพิเศษ':''); size=(t4==='cabinet')?(W+'×'+H+' ลึก'+((d.querySelector('.qi-g4depth')||{}).value||0.6)+' ม. · '+(d.dataset.qiG4doors||2)+' บานหน้า'):(W+'×'+H+'/บาน · '+(d.dataset.qiG4ftpanel||2)+' บาน'); }
-    else if(g==='5'){ r=qiCalcG5(d); var p5=PBYID[d.dataset.qiProd||'imp21']; prod=p5?p5.name:'มุ้ง'; var pn=parseInt((d.querySelector('.qi-panels')||{}).value)||1; if(pn>1)size+=' · '+pn+' บาน'; var fb=d.dataset.qiG5fab; if(fb&&fb!=='free')detail='ผ้า'+(fb==='cat'?'กันแมว/หมา':fb==='rat'?'กันหนูสแตน':fb==='safety'?'นิรภัย 304':fb); }
+    else if(g==='5'){ r=qiCalcG5(d); var p5=PBYID[d.dataset.qiProd||'imp21']; prod=p5?p5.name:'มุ้ง'; var pn=parseInt((d.querySelector('.qi-panels')||{}).value)||1; if(pn>1)size+=' · '+pn+' บาน'; var fb=d.dataset.qiG5fab; if(fb&&fb!=='free')detail='ผ้า'+(fb==='cat'?'กันแมว':fb==='rat'?'กันหนูสแตน':fb==='safety'?'นิรภัย 304':fb); }
     else if(g==='6'){ r=qiCalcG6(d); var st6=qiG6GetState(d); var reach=parseFloat((d.querySelector('.qi-w')||{}).value)||0; var len=parseFloat((d.querySelector('.qi-h')||{}).value)||0; var hgt=parseFloat((d.querySelector('.qi-g6hgt')||{}).value)||2.8; prod='กั้นห้องกระจก '+st6.shape+' ด้าน'; size='ยื่น'+reach+'×ยาว'+len+'×สูง'+hgt+' ม.'; var rk=QIG6_ROOF[st6.roof]&&QIG6_ROOF[st6.roof][1]; detail='บานต่อด้าน'+(rk?(' · หลังคา '+QIG6_ROOF[st6.roof][0]):''); }
     else if(g==='7'){ r=qiCalcG7(d); var ml=({auto:'auto',Z100:'JR-Z100',Z120:'JR-Z120',Z145D:'JR-Z145D 2ชั้น',Z120W:'JR-Z120W'})[d.dataset.qiZ7model||'auto']; prod='ม่านซิป '+ml; detail='ผ้า '+(d.dataset.qiZ7fab||'5')+'% · '+(d.dataset.qiZ7grp==='project'?'โครงการ':'ปลีก'); }
     else if(g==='2'){ r=qiCalcG2(d); var cat=d.dataset.qiG2cat||'gate';
