@@ -284,8 +284,8 @@
   .chip-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:6px; margin-top:4px; width:100%; } /* auto-fill = ปุ่มกว้างเท่ากันทุกจำนวน เรียงเต็มแถวไม่เละ */
   .chip-grid.cg3{ grid-template-columns:repeat(3,1fr); }
   .chip-grid.cg4{ grid-template-columns:repeat(4,1fr); }
-  .qi-groupchips{ grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); }
-  .qi-groupchips .chip{ white-space:nowrap; padding:7px 6px; font-size:12.5px; }
+  .qi-groupchips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .qi-groupchips .chip{ width:auto; flex:0 0 auto; white-space:nowrap; min-height:46px; padding:8px 16px; font-size:13.5px; }
   .chip-grid.cg2{ grid-template-columns:repeat(2,1fr); }
   .chip-grid .chip{ width:100%; min-height:44px; padding:6px 4px; font-size:12px; line-height:1.2; word-break:keep-all; overflow-wrap:anywhere; }
   @media(max-width:560px){ .chip-grid{ grid-template-columns:repeat(3,1fr); } .chip-grid.cg4,.chip-grid.cg2{ grid-template-columns:repeat(2,1fr); } }
@@ -1170,21 +1170,21 @@ function calcUnit(p, w, h, gi, ci, panels, optSel, shipOnly){
     const W=parseFloat(w)||0, H=parseFloat(h)||0;
     const A = W*H;
     if(A<=0) return {a:0, sell:0, cost:null, msgs:['กรอกขนาด'], addonLabel:''};
-    // หา rate ตาม tier
-    const rate = rateOf(A, RATES[p.rates]);
-    const baseSell = A * rate;
     // min ตาม itype
     let itype = 'door';
     try{ const tEl = d && d.querySelector ? d.querySelector('.i-type') : null; if(tEl) itype = tEl.value||'door'; }catch(e){}
     const panelN = parseInt(panels)||1;
     const minPerPanel = (itype==='window') ? (p.min_window||0) : (p.min_door||0);
-    const totalMin = minPerPanel * panelN;
-    let sell = Math.max(totalMin, baseSell);
+    // G5 (17มิ.ย.): มุ้งเฟรมคิดต่อบาน — พื้นที่/บาน → rate ต่อบาน → ×จำนวนบาน (เดิมใช้พื้นที่รวม = 2 บานราคาเท่า 1 บาน · panelN=1 ให้ค่าเดิม golden ไม่เพี้ยน)
+    const aPer = A / panelN;
+    const rate = rateOf(aPer, RATES[p.rates]);
+    const perPanel = Math.max(minPerPanel, aPer * rate);
+    let sell = perPanel * panelN;
     const msgs = [];
-    msgs.push('เฟรมมุ้ง: '+A.toFixed(2)+' ตร.ม. × '+fmt(rate)+' = '+fmt(baseSell)+(totalMin>baseSell?(' (ใช้ min '+(itype==='window'?'หน้าต่าง':'ประตู')+' '+fmt(minPerPanel)+'×'+panelN+' = '+fmt(totalMin)+')'):''));
+    msgs.push('เฟรมมุ้ง: '+aPer.toFixed(2)+' ตร.ม./บาน × '+fmt(rate)+(panelN>1?(' × '+panelN+' บาน'):'')+' = '+fmt(sell)+(perPanel<=minPerPanel?(' (min '+(itype==='window'?'หน้าต่าง':'ประตู')+' '+fmt(minPerPanel)+'/บาน)'):''));
     // Option ผ้ามุ้ง add-on
     const screen = (optSel && optSel.screenFabric) || 'fiber';
-    if(screen==='cat') { sell += A * 800; msgs.push('ผ้ามุ้ง: กันแมว/หมา (สีขาว) +'+fmt(A*800)); }
+    if(screen==='cat') { sell += A * 800; msgs.push('ผ้ามุ้ง: กันแมว (สีขาว) +'+fmt(A*800)); }
     else if(screen==='rat') { sell += A * 1200; msgs.push('ผ้ามุ้ง: สแตน 0.33มม. กันหนู +'+fmt(A*1200)); }
     else if(screen==='safety' && p.rates==='IMP23') {
       const sRate = rateOf(A, RATES.IMP31);
@@ -1885,7 +1885,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 let qSeq=0;
 // ALLG-v2: คิดเร็ว = ปุ่มเหมือนหน้าใบเสนอราคา (กลุ่ม 7 ชิป + รูปแบบบาน common chips + อื่นๆ ▾ dropdown) · ออปชั่นแค่สี/กระจก
 var QI_GROUPS=[['1','🪟 บาน'],['2','🚪 ระแนง·ราว'],['3','🏠 หลังคา'],['4','📦 ตู้'],['5','🦟 มุ้ง'],['6','🔲 กั้นห้อง'],['7','🎐 ม่านซิป']];
-function qiGroupChips(cur){ return '<div class="chip-grid qi-groupchips">'+QI_GROUPS.map(function(g){return '<button type="button" class="chip'+(g[0]===cur?' on':'')+'" data-g="'+g[0]+'" onclick="qiPickGroup(this)">'+g[1]+'</button>';}).join('')+'</div>'; }
+function qiGroupChips(cur){ return '<div class="qi-groupchips">'+QI_GROUPS.map(function(g){return '<button type="button" class="chip'+(g[0]===cur?' on':'')+'" data-g="'+g[0]+'" onclick="qiPickGroup(this)">'+g[1]+'</button>';}).join('')+'</div>'; }
 // ALLG-v2: คิดเร็ว กลุ่มที่ไม่มี FAM_CATS (3 หลังคา/ฝ้า · 5 มุ้ง) → ใช้ cat เป็นปุ่มแทน dropdown เปล่า
 var QI_EXTRA_CATS={'3':['หลังคา','ฝ้า-ผนัง'],'5':['มุ้ง']};
 function qiCatsOf(grp){ return FAM_CATS[grp]||QI_EXTRA_CATS[grp]||null; }
@@ -2240,7 +2240,7 @@ var QIG5_FAM=[
   {k:'roll',n:'มุ้งม้วน',items:[
     {id:'imp29',n:'ม้วนไฟเบอร์'},{id:'mj_kick_150',n:'ม้วนเตะ 150'},{id:'mj_kick_300',n:'ม้วนเตะ 300'},{id:'mj_kick_600',n:'ม้วนเตะ 600'}]}
 ];
-var QIG5_FABRIC=[{k:'free',n:'ไฟเบอร์ (เทา/ดำ)'},{k:'cat',n:'กันแมว/หมา +800'},{k:'rat',n:'กันหนูสแตน +1,200'},{k:'safety',n:'ผ้านิรภัย 304'}];
+var QIG5_FABRIC=[{k:'free',n:'ไฟเบอร์ (เทา/ดำ)'},{k:'cat',n:'กันแมว +800'},{k:'rat',n:'กันหนูสแตน +1,200'},{k:'safety',n:'ผ้านิรภัย 304'}];
 function qiG5FamOf(id){ for(var i=0;i<QIG5_FAM.length;i++){ for(var j=0;j<QIG5_FAM[i].items.length;j++){ if(QIG5_FAM[i].items[j].id===id)return i; } } return 0; }
 function qiG5ItemOf(id){ for(var i=0;i<QIG5_FAM.length;i++){ for(var j=0;j<QIG5_FAM[i].items.length;j++){ if(QIG5_FAM[i].items[j].id===id)return QIG5_FAM[i].items[j]; } } return null; }
 function qiRenderG5(d){
@@ -4370,7 +4370,7 @@ function buildItemOpts(d){
     // G5-FINAL D: ผ้ามุ้ง → ชิป (chSetChip + mosqFabricColors ผูกสีผ้า) · ซ่อน select เดิม (logic อ่าน .o-screenfabric value เดิม)
     h+='<label class="opt" style="width:100%;">ผ้ามุ้ง <div class="chip-group chip-sm">'
       +'<button type="button" class="chip on" data-val="fiber" onclick="chSetChip(this,\'o-screenfabric\');mosqFabricColors(this)">ไฟเบอร์ เทา/ดำ</button>'
-      +'<button type="button" class="chip" data-val="cat" onclick="chSetChip(this,\'o-screenfabric\');mosqFabricColors(this)">กันแมว/หมา ขาว +800</button>'
+      +'<button type="button" class="chip" data-val="cat" onclick="chSetChip(this,\'o-screenfabric\');mosqFabricColors(this)">กันแมว ขาว +800</button>'
       +'<button type="button" class="chip" data-val="rat" onclick="chSetChip(this,\'o-screenfabric\');mosqFabricColors(this)">สแตนกันหนู +1,200</button>'
       +(p.rates==='IMP23'?'<button type="button" class="chip" data-val="safety" onclick="chSetChip(this,\'o-screenfabric\');mosqFabricColors(this)">นิรภัยสแตน 304 ดำ</button>':'')
       +'</div><select class="o-screenfabric" style="display:none;" onchange="calcQuote();"><option value="fiber">ไฟเบอร์ เทา/ดำ</option><option value="cat">กันแมว/หมา สีขาว +800/ตร.ม.</option><option value="rat">สแตน 0.33มม. กันหนู (เงิน/ดำ) +1,200/ตร.ม.</option>'+(p.rates==='IMP23'?'<option value="safety">นิรภัยสแตน 304 สีดำ 0.8มม. (tier 3,500-3,000)</option>':'')+'</select></label>';
@@ -5344,16 +5344,19 @@ function genQuote(keepNo){
       }
     }
     else if(it.p.cat==='ฝ้า-ผนัง'){
-      // สเปก rev2: ฝ้า/ผนัง ออกรายละเอียดวัสดุ (เดิม render แต่หัวข้อ) — สมาร์ทบอร์ด/ISOWALL/ฝ้าฉาบ + ฉนวน + โครง
-      var _os=it.optSel||{}; var _wl=[];
+      // G3 ใบ 5 บล็อก (CODE-READY จุด C · merge #8): รายการ(งาน)=แผ่น+โครง+ฉนวน · รายละเอียด=สี (ถ้ามี)
+      var _os=it.optSel||{}, _work=[], _spec=[];
       var _frame = _os.wallframe==='เหล็กชุบ' ? 'โครงเหล็กชุบซิงค์ (ไร้สนิม)' : 'โครงอลูมิเนียม';
-      if(it.p.id==='isowall'){ _wl.push('แผ่น ISOWALL หนา '+(_os.isothick||'10')+' ซม.'+(_os.isocolor?(' สี'+_os.isocolor):'')); _wl.push(_frame); }
-      else if(it.p.id==='ceiling_smooth'){ _wl.push('ฝ้าฉาบเรียบ'+(_os.ceilfinish?(' พร้อม'+_os.ceilfinish):'')); if(_os.ceilslope) _wl.push('ฝ้าเฉียงตามแนวหลังคา'); }
-      else if(it.p.ceiling){ _wl.push(it.p.name.replace(/\s*\([^)]*\)/g,'').trim()+(_os.ckolor?(' สี'+_os.ckolor):'')); }
-      // #8 (17มิ.ย.): ภายใน=ยิปซั่ม · ภายนอก=สมาร์ทบอร์ด · + โครงคร่าวซี-ไลน์เสริมแรง (ฉนวน/โครง = ตาม option ที่เลือก · รอเคาะข้อความ marketing เต็ม)
-      else { _wl.push((it.p.id==='wall_int'?'แผ่นยิปซั่ม':('แผ่นสมาร์ทบอร์ด หนา '+(_os.smartthick||'12')+' มม.'))+(_os.wallpaint?(' พร้อม'+_os.wallpaint):'')); _wl.push(_frame+' พร้อมโครงคร่าวซี-ไลน์เสริมแรง'); }
-      if(_os.insul) _wl.push('ฉนวนกันความร้อนและกันเสียง หนา 3"');
-      det = _wl.join('\n') || '-';
+      if(it.p.id==='isowall'){ _work.push('แผ่น ISOWALL หนา '+(_os.isothick||'10')+' ซม.'); _work.push(_frame);
+        if(_os.isocolor) _spec.push('สี ISOWALL: '+_os.isocolor); }
+      else if(it.p.id==='ceiling_smooth'){ _work.push('ฝ้าฉาบเรียบ'+(_os.ceilfinish?(' พร้อม'+_os.ceilfinish):'')); if(_os.ceilslope) _work.push('ฝ้าเฉียงตามแนวหลังคา'); }
+      else if(it.p.ceiling){ _work.push(it.p.name.replace(/\s*\([^)]*\)/g,'').trim()); // ฝ้าระแนงอลู/ตัวซี/remood
+        if(_os.ckolor) _spec.push('สี/ลายฝ้า: '+_os.ckolor); }
+      // #8 (17มิ.ย.): ภายใน=ยิปซั่ม · ภายนอก=สมาร์ทบอร์ด · + โครงคร่าวซี-ไลน์เสริมแรง (ฉนวน/โครง = ตาม option · ข้อความ marketing เต็มรอเคาะ)
+      else { _work.push((it.p.id==='wall_int'?'แผ่นยิปซั่ม':('แผ่นสมาร์ทบอร์ด หนา '+(_os.smartthick||'12')+' มม.'))+(_os.wallpaint?(' พร้อม'+_os.wallpaint):'')); _work.push(_frame+' พร้อมโครงคร่าวซี-ไลน์เสริมแรง'); }
+      if(_os.insul) _work.push('ฉนวนกันความร้อนและกันเสียง หนา 3"');
+      det = _work.join('\n')+(_spec.length?('\n###รายละเอียด###\n'+_spec.join('\n')):'');
+      if(!det.trim()) det='-';
     }
     else if(it.p.cabinet){
       // G4 (โครงสร้างใบใหม่ 16มิ.ย.): หัว=ชื่อ+ขนาด+ลึก · รายการ(บน) + ###รายละเอียด### + สเปค(ล่าง)
@@ -5464,7 +5467,7 @@ function genQuote(keepNo){
     else if(it.p.cat==='มุ้ง'){
       // G5 (5-block 16มิ.ย.): หัว=ชื่อ+ลักษณะเปิด+ขนาด · รายละเอียด(หัวแดง)=สีกรอบก่อน→ผ้าหลัง
       var _mo=it.optSel||{};
-      var _fabMap={fiber:'ผ้าไฟเบอร์',fiber_gray:'ผ้าไฟเบอร์เทา',fiber_black:'ผ้าไฟเบอร์ดำ',fiber_white:'ผ้าไฟเบอร์ขาว',cat:'ผ้ากันแมว/หมา',rat:'ผ้าสแตนกันหนู',safety08:'ผ้าสแตนนิรภัย 0.8มม.',safety:'ผ้าสแตนนิรภัย 0.8มม.'};
+      var _fabMap={fiber:'ผ้าไฟเบอร์',fiber_gray:'ผ้าไฟเบอร์เทา',fiber_black:'ผ้าไฟเบอร์ดำ',fiber_white:'ผ้าไฟเบอร์ขาว',cat:'ผ้ากันแมว',rat:'ผ้าสแตนกันหนู',safety08:'ผ้าสแตนนิรภัย 0.8มม.',safety:'ผ้าสแตนนิรภัย 0.8มม.'};
       // ── รายละเอียด: สีกรอบก่อน (เมื่อมีสีพิเศษ) · ตามด้วยผ้า (เมื่อมีการเลือกผ้าจริง) ──
       var _mSpec=[];
       var _mciM=parseInt(_mo.mscolor);
@@ -5480,7 +5483,13 @@ function genQuote(keepNo){
         _mSpec.push(_fabMap[_mo.mosqFabric]||'ผ้าไฟเบอร์');
       }
       // mj_* ไม่มี screenfabric/mosqFabric → ผ้าอยู่ในชื่อสินค้าแล้ว ไม่ push ซ้ำ
-      det='\n###รายละเอียด###\n'+_mSpec.join('\n');
+      // #3 G5 (17มิ.ย.): เพิ่มรายการ(งาน) บน — ชื่อมุ้ง+ลักษณะเปิด+จำนวนบาน (เดิมว่าง · ทำเต็มเหมือน G1)
+      var _mWork=[];
+      var _mqNm=(it.p.name||'มุ้ง').replace(/\s*\([^)]*\)/g,'').replace(/\s*·\s*ข้อ\s*[\d.]+/g,'').replace(/\s+/g,' ').trim();
+      if(_mo.mosqOpenStyle) _mqNm+=' บาน'+_mo.mosqOpenStyle;
+      var _mqPnl=parseInt((it.div&&it.div.querySelector('.i-panels')||{}).value)||1;
+      _mWork.push(_mqNm+(_mqPnl>1?(' '+_mqPnl+' บาน'):''));
+      det=_mWork.join('\n')+(_mSpec.length?('\n###รายละเอียด###\n'+_mSpec.join('\n')):'');
     }
     else if(it.p.id==='shower'){
       // Pass2-C: shower — ประกอบข้อความจากชนิดบาน + ประเภทประตู → "กระจกเทมเปอร์ใส 10 มม. + ราวสแตนเลส"
@@ -5526,7 +5535,7 @@ function genQuote(keepNo){
       const _rfend = _os.rfend || 'ปล่อย';
       const _rfgutsys = _os.rfgutsys || 'ท่อ';
       // ชื่อโครง (อลู=เดิม / เหล็กชุบ=เปลี่ยน) · FIX-6: เติม "(ไร้สนิม)" ให้เหล็กชุบหลังคา (ตรงฝ้า/ผนัง)
-      const _frameTxt = _rfframe === 'โครงเหล็กชุบซิงค์' ? 'โครงเหล็กชุบซิงค์ (ไร้สนิม)' : ('โครงอลูมิเนียม'+_rcName);
+      const _frameTxt = _rfframe === 'โครงเหล็กชุบซิงค์' ? 'โครงเหล็กชุบซิงค์ (ไร้สนิม)' : 'โครงอลูมิเนียม'; // G3 5บล็อก: สีโครงไป spec (ไม่ต่อ _rcName)
       // FIX-2: แป ออกทั้งเดี่ยว/คู่ (เดิมเขียนเฉพาะแปคู่)
       const _battenSuffix = _rfbatten ? ' ('+_rfbatten+')' : '';
       // รางน้ำ line (F3: ปล่อย=ไม่เขียนรางน้ำ / รางน้ำ=ระบุระบบ) · ข้อ2: ลบ branch 'ปิดปลาย' (auto) ที่ตัดออกแล้ว
@@ -5553,9 +5562,9 @@ function genQuote(keepNo){
       const _rfColor = _os.rfcolor || '';
       const _roofType = (it.p.name||'หลังคา').replace(/^หลังคา\s*/,'');
       // FIX-4(G3): ลามิเนต — หัว = "หลังคากระจกลามิเนตใส ฟิล์ม{X} หนา {Y} มม."
-      let _roofTypeTxt = 'หลังคา'+_roofType + (_rfColor?(' '+_rfColor):'');
+      let _roofTypeTxt = 'หลังคา'+_roofType; // G3 5บล็อก: สีหลังคาไป spec (ไม่ต่อในหัว)
       if(it.p.id==='roof_laminate'){
-        _roofTypeTxt = 'หลังคากระจกลามิเนตใส ฟิล์ม'+(_os.lamfilm||'กันร้อน')+' หนา '+(_os.lamthick||'4+4')+' มม.';
+        _roofTypeTxt = 'หลังคากระจกลามิเนต'; // ฟิล์ม+ความหนาไป spec
       }
       // FIX-3(G3): "ยื่นปลาย" + แป อยู่บรรทัดหัว (ตามใบจริง "หลังคาไวนิล ยื่นปลาย (แปเดี่ยว)")
       const _roofHead = _roofTypeTxt + ' ยื่นปลาย'+_battenSuffix;
@@ -5594,8 +5603,22 @@ function genQuote(keepNo){
         const _sFx = Math.max(0, parseInt(_os.sfixed)||0); // FIX C③ บานติดตาย
         _rfExtra += '\nระบบหลังคาเลื่อนแบบ'+_sType+' '+_sN+' บาน'+(_sFx>0?(' + '+_sFx+' บานติดตาย'):'')+' (มอเตอร์ '+_sMq+' ตัว)';
       }
-      // F3: ถ้า _gutterLine ว่าง (ปล่อย) ไม่ใส่บรรทัดเปล่า · FIX-2/3: batten+ยื่นปลาย ย้ายไปหัวแล้ว
-      det = _roofHead+'\n'+_frameTxt+(_gutterLine?('\n'+_gutterLine+_drainLine):'')+_rfExtra;
+      // G3 ใบ 5 บล็อก (มติ 16มิ.ย. · CODE-READY จุด B): หัว=_roofHead · รายการ=โครง/ราง/เสริม · รายละเอียด=สีหลังคา/สีโครง(+รหัส⚠)/กระจกลามิเนต
+      prodName = _roofHead; // ย้ายหัวเข้า prodName เหมือน G4 (ขนาดต่อท้ายโดย _sz/จุด N)
+      var _work=[_frameTxt];
+      if(_gutterLine) _work.push(_gutterLine+_drainLine);
+      _rfExtra.split('\n').map(function(s){return s.trim();}).filter(Boolean).forEach(function(l){ _work.push(l); });
+      var _spec=[];
+      if(_rfColor) _spec.push('สีหลังคา: '+_rfColor);
+      var _rci=it.ci||0, _rcc=COLORS[_rci];
+      if(_rcc && _rfframe!=='โครงเหล็กชุบซิงค์'){
+        var _rcN=(_rcc.quoteName||_rcc.n).replace(/\s*\(Stock\)\s*/,'').replace(/[★⚠]/g,'').trim().replace(/^สี/,'');
+        if(_rci>0 && _rcc.hasCode){ var _ce=it.div?it.div.querySelector('.i-colorcode'):null; var _cv=_ce?(_ce.value||'').trim():'';
+          _spec.push('สีโครง: '+_rcN+(_cv?(' · รหัส '+_cv):' · ⚠ ต้องระบุรหัสสี')); }
+        else _spec.push('สีโครง: '+_rcN);
+      }
+      if(it.p.id==='roof_laminate') _spec.push('กระจกลามิเนตใส ฟิล์ม'+(_os.lamfilm||'กันร้อน')+' หนา '+(_os.lamthick||'4+4')+' มม.');
+      det=_work.join('\n')+(_spec.length?('\n###รายละเอียด###\n'+_spec.join('\n')):'');
     }
     else if((it.p.cat==='บานเลื่อน' || it.p.cat==='เลื่อนภายใน') && SLIDING_RAIL[it.p.id]){
       // บานเลื่อน/เลื่อนภายใน — รายละเอียดงาน: อลู/กระจก/มุ้ง(+ขนาด)/ชุดล็อค/มือจับ
