@@ -272,6 +272,8 @@
   .chip-2up{ }
   .chip-2up .chip{ flex:1; font-size:16px; min-height:52px; }
   .chip-sm .chip{ min-height:36px; padding:5px 10px; font-size:12.5px; } /* คิว B รอบ2: compact (เดิม 44/6-12/13) */
+  .chip.chip-discont{ opacity:.55; } /* ลำดับ3: รุ่นยกเลิกขาย ทำจาง แต่กดได้/ขายได้ปกติ */
+  .chip.chip-discont.on{ opacity:1; } /* เลือกแล้วเต็มสี */
   /* ① สีอลู drill-down: จุดสีกลมในชิป ([[chip-color-swatch-style]]) */
   .cdot{ display:inline-block; width:15px; height:15px; border-radius:50%; margin-right:6px; border:1px solid rgba(0,0,0,.28); vertical-align:middle; flex:0 0 auto; background-size:cover; }
   .chip.on .cdot{ border-color:rgba(255,255,255,.7); }
@@ -495,8 +497,7 @@
 <!-- quote modal -->
 <div id="quoteBox">
   <div id="qEditBanner" class="no-print" style="display:none;background:#FEF3C7;border:1px solid #F0C040;border-radius:8px;padding:7px 12px;margin-bottom:8px;font-size:12.5px;color:#92400e;">✏️ โหมดแก้: แก้/เพิ่ม/ลบ แถวได้ทุกช่อง · <b>การแก้เฉพาะใบนี้ ไม่บันทึกถาวร</b> · เริ่มใบใหม่/ล้างฟอร์ม = ล้างหมด</div>
-  <div class="quote" id="quoteContent"></div>
-  <div class="qbtns">
+  <div class="qbtns no-print" style="margin-bottom:10px;">
     <button type="button" class="btn-sec" onclick="document.getElementById('quoteBox').style.display='none'">ปิด</button>
     <button type="button" class="btn-prim" onclick="window.print()">พิมพ์ / เซฟ PDF</button>
     <button type="button" class="btn-prim" onclick="exportQuoteExcel()" style="background:#10803a;">Export Excel</button>
@@ -507,6 +508,7 @@
     <button type="button" class="btn-sec" onclick="toggleWatermark()" id="wmBtn">+ ฉบับร่าง</button>
     <button type="button" class="btn-sec" onclick="aiReviewQuote()" id="aiReviewBtn" style="background:#1f2937;color:#fff;">🤖 AI ตรวจใบเสนอ</button>
   </div>
+  <div class="quote" id="quoteContent"></div>
 </div>
 <div id="aiReviewResult" style="max-width:720px;margin:12px auto 24px;"></div>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -1938,6 +1940,8 @@ const REMARK_PRESETS=[
    'ราคาที่เสนอไม่รวมงาน รื้อพื้นเดิม / รื้อกระเบื้อง / รื้อหลังคาเดิม / งานเดินไฟ / งานสี',
    'ราคาที่เสนอไม่รวมงาน ย้ายกล้องวงจรปิด / ย้ายแอร์ (ลูกค้าดำเนินการเอง)',
    'ราคาที่เสนอไม่รวมงาน ถอดรางน้ำเดิม / งานทาสี / งานเดินไฟ',
+   'ราคาที่เสนอไม่รวมงานผนังสมาร์ทบอร์ด (ลูกค้าดำเนินการเอง)',
+   'ราคาที่เสนอไม่รวมงานระบบน้ำ/ประปา (ลูกค้าดำเนินการเอง)',
    'งานเดินไฟสำหรับมอเตอร์ (พ่วงปลั๊กบริเวณใกล้เคียง ระยะเดินสายไฟมอเตอร์ไม่เกิน 10 เมตร) และไม่รวมงานเดินไฟเข้าตู้เมนหลัก' ]},
  {g:'เงื่อนไข / วัสดุ',items:[
    'วัสดุและอุปกรณ์ตามแบบมาตรฐานผู้ผลิต',
@@ -2204,7 +2208,8 @@ function qiDispatch(d){
 var QIG3_CATS=[
   {c:'เมทัลชีท',items:['imp7','imp8','imp9','imp10','imp11','imp12','imp13','imp14']},
   {c:'ชินโคไลท์',items:['imp15','imp16','imp17','imp18','imp19','imp20']},
-  {c:'หลังคาอื่น',items:['roof_vinyl','roof_delight','roof_polyton','roof_laminate']},
+  {c:'ไวนิล/ดีไลท์',items:['roof_vinyl','roof_delight']},
+  {c:'โพลีตัน/กระจก',items:['roof_polyton','roof_laminate']},
   {c:'ฝ้า/เพดาน',items:['ceil_cshape','ceil_bsc','ceiling_smooth']},
   {c:'ผนังเบา',items:['isowall','wall_ext','wall_int']}
 ];
@@ -2228,6 +2233,7 @@ function qiRenderG3(d){
   h += '<div class="qi-row"><div class="qi-fld"><label>กว้าง (ม.)</label><input class="qi-w" type="number" step="0.1" min="0" value="'+(d.dataset.qiW||4)+'" oninput="calcQuickAll()"></div><div class="qi-fld"><label>ยาว (ม.)</label><input class="qi-h" type="number" step="0.1" min="0" value="'+(d.dataset.qiH||3)+'" oninput="calcQuickAll()"></div><div class="qi-fld"><label>ชุด</label><input class="qi-qty" type="number" step="1" min="1" value="'+(d.dataset.qiQty||1)+'" oninput="calcQuickAll()"></div></div>';
   h += '</div><div class="qi-pricecard"><h4>รายการราคา</h4><div class="qi-pc-body"></div><div class="qi-pc-foot">calcUnit จริง · ปัดขึ้นพัน · ฝ้าขั้นต่ำ 10 ตร.ม.</div></div></div>';
   d.querySelector('.qi-body').innerHTML = h;
+  calcQuickAll();   // กันราคาหายหลังกดชิปในคิดเร็ว (18มิ.ย.)
   d.querySelector('.qi-group') && (d.querySelector('.qi-group').value = '3');
 }
 function qiG3PickCat(btn,cat){
@@ -2292,6 +2298,7 @@ function qiRenderG4(d){
   h += '<div class="qi-row" style="grid-template-columns:90px;"><div class="qi-fld"><label>ชุด</label><input class="qi-qty" type="number" step="1" min="1" value="'+(d.dataset.qiQty||1)+'" oninput="calcQuickAll()"></div></div>';
   h += '</div><div class="qi-pricecard"><h4>รายการราคา</h4><div class="qi-pc-body"></div><div class="qi-pc-foot">calcUnit จริง · ปัดขึ้นพัน · ผนัง 3 ด้านเพิ่มที่ใบจริง</div></div></div>';
   d.querySelector('.qi-body').innerHTML = h;
+  calcQuickAll();   // กันราคาหายหลังกดชิปในคิดเร็ว (18มิ.ย.)
 }
 function qiG4PickType(btn,v){ var d=btn.closest('.ch'); qiSaveWH(d); d.dataset.qiG4type=v; if(v==='cabinet'){ d.dataset.qiW=2; d.dataset.qiH=2.4; } else { d.dataset.qiW=0.8; d.dataset.qiH=1.2; } qiRenderG4(d); }
 function qiG4PickCabtype(btn,v){ var d=btn.closest('.ch'); d.dataset.qiG4cabtype=v; qiSaveWH(d); qiRenderG4(d); }
@@ -2361,6 +2368,7 @@ function qiRenderG7(d){
   h += '<div class="qi-row"><div class="qi-fld"><label>กว้าง (ม.)</label><input class="qi-w" type="number" step="0.1" min="0" value="'+(d.dataset.qiW||3)+'" oninput="calcQuickAll()"></div><div class="qi-fld"><label>สูง (ม.)</label><input class="qi-h" type="number" step="0.1" min="0" value="'+(d.dataset.qiH||2.5)+'" oninput="calcQuickAll()"></div><div class="qi-fld"><label>ชุด</label><input class="qi-qty" type="number" step="1" min="1" value="'+(d.dataset.qiQty||1)+'" oninput="calcQuickAll()"></div></div>';
   h += '</div><div class="qi-pricecard"><h4>รายการราคา</h4><div class="qi-pc-body"></div><div class="qi-pc-foot">เรต ZIP ตรง engine · ปัดร้อย · ค่าติดตั้งคิดที่ระดับใบ</div></div></div>';
   d.querySelector('.qi-body').innerHTML = h;
+  calcQuickAll();   // กันราคาหายหลังกดชิปในคิดเร็ว (18มิ.ย.)
 }
 function qiG7Set(btn,k,v){ var d=btn.closest('.ch'); qiSaveWH(d); if(k==='model') d.dataset.qiZ7model=v; else if(k==='fab') d.dataset.qiZ7fab=v; else if(k==='ctrl') d.dataset.qiZ7ctrl=v; else if(k==='grp') d.dataset.qiZ7grp=v; qiRenderG7(d); }
 function qiCalcG7(d){
@@ -2431,6 +2439,7 @@ function qiRenderG5(d){
   h += '<div class="qi-row"><div class="qi-fld"><label>กว้าง (ม.)</label><input class="qi-w" type="number" step="0.1" min="0" value="'+(d.dataset.qiW||1)+'" oninput="calcQuickAll()"></div><div class="qi-fld"><label>สูง (ม.)</label><input class="qi-h" type="number" step="0.1" min="0" value="'+(d.dataset.qiH||2)+'" oninput="calcQuickAll()"></div><div class="qi-fld"><label>ชุด</label><input class="qi-qty" type="number" step="1" min="1" value="'+(d.dataset.qiQty||1)+'" oninput="calcQuickAll()"></div></div>';
   h += '</div><div class="qi-pricecard"><h4>รายการราคา</h4><div class="qi-pc-body"></div><div class="qi-pc-foot">เรต verify กับ engine · ปัดขึ้นพัน · มุ้งเฟรม: min ต่างประตู/หน้าต่าง</div></div></div>';
   d.querySelector('.qi-body').innerHTML = h;
+  calcQuickAll();   // กันราคาหายหลังกดชิปในคิดเร็ว (18มิ.ย.)
 }
 function qiG5PickFam(btn,fi){ var d=btn.closest('.ch'); qiSaveWH(d); d.dataset.qiProd=QIG5_FAM[fi].items[0].id; d.dataset.qiG5fab='free'; qiRenderG5(d); }
 function qiG5PickProd(btn,id){ var d=btn.closest('.ch'); qiSaveWH(d); d.dataset.qiProd=id; qiRenderG5(d); }
@@ -2509,6 +2518,7 @@ function qiRenderG6(d){
   h += '<div class="qi-row" style="grid-template-columns:90px;"><div class="qi-fld"><label>ชุด</label><input class="qi-qty" type="number" step="1" min="1" value="'+(d.dataset.qiQty||1)+'" oninput="calcQuickAll()"></div></div>';
   h += '</div><div class="qi-pricecard"><h4>รายการราคา</h4><div class="qi-pc-body"></div><div class="qi-pc-foot">ทุกบรรทัด = calcUnit จริง · บานต่อด้าน</div></div></div>';
   d.querySelector('.qi-body').innerHTML = h;
+  calcQuickAll();   // กันราคาหายหลังกดชิปในคิดเร็ว (18มิ.ย.)
 }
 function qiG6SetShape(btn,v){ var d=btn.closest('.ch'); qiSaveWH(d); d.dataset.qiG6shape=v; var sides=qiG6SidesOf(v,parseFloat(d.dataset.qiW||2),parseFloat(d.dataset.qiH||4)); d.dataset.qiG6sides=JSON.stringify(sides.map(function(s,i){return i===0?0:1;})); qiRenderG6(d); }
 function qiG6OnSz(inp){ var d=inp.closest('.ch'); qiSaveWH(d); qiRenderG6(d); }
@@ -2684,6 +2694,7 @@ function qiRenderG2(d){
   }
   h += '</div><div class="qi-pricecard"><h4>รายการราคา</h4><div class="qi-pc-body"></div><div class="qi-pc-foot">สูตร verify กับ engine · ปัดขึ้นพัน · TODO: เปลี่ยนเป็น calcUnit G2 เต็มรูปแบบ</div></div></div>';
   d.querySelector('.qi-body').innerHTML = h;
+  calcQuickAll();   // กันราคาหายหลังกดชิปในคิดเร็ว (18มิ.ย.)
 }
 function qiG2PickCat(btn,v){ var d=btn.closest('.ch'); qiSaveWH(d); d.dataset.qiG2cat=v; qiRenderG2(d); }
 function qiG2SetGtype(btn,v){ var d=btn.closest('.ch'); qiSaveWH(d); d.dataset.qiG2gtype=v; qiRenderG2(d); }
@@ -3301,6 +3312,16 @@ function rfChips(cls, items, defVal, twoUp){
 function rfChipsSw(cls, items, defVal){
   return '<div class="chip-group chip-sm">'+items.map(function(it){ return '<button type="button" class="chip'+(it[0]===defVal?' on':'')+'" data-val="'+it[0]+'" onclick="chSetChip(this,\''+cls+'\')">'+(it[2]?'<span class="cdot" style="background:'+it[2]+';"></span>':'')+it[1]+'</button>'; }).join('')+'</div>';
 }
+// Z4 A1/A2 (18มิ.ย.): สีกรอบมุ้ง (o-mscolor) + สีฝาตู้ (o-ftcolor) → ชิป+จุดสี แบบ ค ชุดเดียวกัน
+// คง value = COLORS index เดิม (ชิปแรก = freeVal) · ชื่อเต็มลงใบเหมือนเดิม (อ่าน optSel.mscolor/ftcolor ไม่แตะ) · จุดสี = colorSwStyle รองรับ gradient
+function msftColorChips(cls, defVal, freeVal, freeLabel){
+  var h='<div class="chip-group chip-sm"><button type="button" class="chip'+(freeVal===defVal?' on':'')+'" data-val="'+freeVal+'" onclick="chSetChip(this,\''+cls+'\')">'+freeLabel+'</button>';
+  COLORS.forEach(function(c,i){ if(i<2) return;
+    var nm=(c.quoteName||c.n).replace(/[★⚠🔖🔒]/g,'').trim();
+    h+='<button type="button" class="chip'+(String(i)===defVal?' on':'')+'" data-val="'+i+'" onclick="chSetChip(this,\''+cls+'\')"><span class="cdot" style="'+colorSwStyle(i)+'"></span>'+nm+'</button>';
+  });
+  return h+'</div>';
+}
 // B3: palette สีชินโคไลท์ (เสนอจากชื่อสี · พี่นัทปรับ hex ได้) — key = string สีเต็มใน SHINCO_COLORS
 var SHINCO_SW={'HC-N828 Modern Grey':'#8a8d8f','HC-B703 Royal Blue':'#26408b','HC-570 Classic Brown':'#6b4a2f','HC-N590 Noble Green':'#2f5d43','SP-NB00 ขาวขุ่น':'#efece4','SP-NB30 Foggy Brown':'#8a7a68','SP-B857 Marine Blue':'#3a6e88','SP-NC95 Light Brown':'#a98b63','NT-001 ใส':'#e9f1f1','NT-332 เทาอ่อน':'#c2c4c2','Prime 562 Brownish Green':'#5a6347','Shade-430S Pearl White':'#f4f2ec'};
 // B3: ชื่อย่อชินโค = ตัดรหัสนำหน้า เหลือชื่อสี (อังกฤษ/ไทย) เช่น "HC-N828 Modern Grey"→"Modern Grey" · "SP-NB00 ขาวขุ่น"→"ขาวขุ่น"
@@ -3313,6 +3334,7 @@ function rfChipLock(ch,cls,on){ ch.querySelectorAll('.chip[onclick*="'+cls+'"]')
 // ไม่รวม G7 ม่านซิป (o-zctrl/o-zmodel/o-zgrp) ตามมติพี่นัท
 var CHIPIFY_SELECTS=['o-closer','o-xhandle','o-wallmodel','o-gridcolor','o-awn_mode','o-showerhw','o-railtype','o-finish','o-bgcolor','o-bsdoor','o-ceildir','o-ceilpos','o-ckolor','o-gfin','o-bsfinish','o-bocfinish'];
 // G2-สลับตรวจ (คิวกลาง): สี/ผิวระแนง 3 ตัว → ชิป · o-bsfinish/o-bocfinish = 10 ตัวเลือก value=ราคา (มีซ้ำ) → chipify ผ่าน selectedIndex = ราคาตรงเป๊ะ · ปลด cap 7 เฉพาะ 2 ตัวนี้
+// A3 (18มิ.ย.): o-gcfinish (สีอบปิดราง) ยังไม่เพิ่ม — ตรวจแล้ว select L1537 เป็น dead code (อยู่หลัง return ของ gutter_cover ใน calcUnit · ไม่เคย render · optSel.gcFinish ไม่ถูก set) → chipify ไม่มีผล รอแก้ render ก่อน (flag คิวกลาง)
 var CHIPIFY_BIG=['o-bsfinish','o-bocfinish'];
 function chipifySelect(sel,big){
   if(!sel || sel.dataset.chipped==='1') return;
@@ -3691,11 +3713,13 @@ function famPickOther(btn){ var ch=btn.closest('.ch'); if(!ch)return; ch.dataset
   var inp=ch.querySelector('.fam-search'); if(inp){ try{ inp.focus(); }catch(e){} } }
 // AUDIT-ปุ่มชื่อยาว (พี่นัทเคาะ 17มิ.ย.): ชื่อสั้นโชว์บนปุ่ม "รุ่น" · ชื่อเต็ม (name) ยังลงใบ + title hover เหมือนเดิม · value/ราคา/logic ไม่แตะ
 var BTN_SHORT={
-  sliding_eseries:'E-series (เลิกขาย)',
+  sliding_eseries:'E-series',
   casement_flush_solid:'โซลิด ทู', casement_inset_solid:'โซลิด วัน',
   inner_top_slimlux:'SlimLux (ภายใน)', inner_top_xseries:'X-series (ภายใน)'
 };
-function btnShort(q,cur){ return (q&&BTN_SHORT[q.id])||((q&&q.name||'').replace(cur||'','').trim()); }
+// ลำดับ3 (18มิ.ย.): ปุ่มเลือกรุ่น ตัดคำ "(ยกเลิกขาย)/(เลิกขาย)" ออกจาก label (สถานะภายใน ไม่ขึ้นปุ่ม) · ยังกดได้/ขายได้ · ทำจางด้วย class chip-discont
+function btnShort(q,cur){ return ((q&&BTN_SHORT[q.id])||((q&&q.name||'').replace(cur||'','').trim())).replace(/\s*\((?:ยกเลิก|เลิก)ขาย\)/g,'').trim(); }
+function discCls(q){ return (q&&/ยกเลิกขาย/.test(q.name||''))?' chip-discont':''; }
 function btnTitle(q){ return (q&&q.name||'').replace(/"/g,'&quot;'); }
 function famSelectorHTML(p,grp,famOther){
   var cats=FAM_CATS[grp]; if(!cats)return''; var cur=p.cat;
@@ -3741,7 +3765,7 @@ function famSelectorHTML(p,grp,famOther){
       // รุ่นย่อยของ cat ที่เลือก (ถ้ามี >1 รุ่น)
       if(_restCats.indexOf(cur)>=0){ var _rm=prodsInGroup(grp).filter(function(q){return q.cat===cur;});
         if(_rm.length>1){ h+='<label class="opt" style="width:100%;margin:6px 0 0;">รุ่น<div class="chip-grid">';
-          _rm.forEach(function(q){ h+='<button type="button" class="chip'+(q.id===(p&&p.id)?' on':'')+'" data-id="'+q.id+'" title="'+btnTitle(q)+'" onclick="g3PickProd(this)">'+btnShort(q,cur)+'</button>'; });
+          _rm.forEach(function(q){ h+='<button type="button" class="chip'+(q.id===(p&&p.id)?' on':'')+discCls(q)+'" data-id="'+q.id+'" title="'+btnTitle(q)+'" onclick="g3PickProd(this)">'+btnShort(q,cur)+'</button>'; });
           h+='</div></label>'; }
       }
     }
@@ -3751,7 +3775,7 @@ function famSelectorHTML(p,grp,famOther){
     var models=PRODUCTS.filter(function(q){return q.cat===cur && !_hideInnerBottom(q);}); // ธง⑤: ไม่โชว์เลื่อนรางล่างเป็นรุ่นเลือก
     if(models.length>1){
       h+='<label class="opt" style="width:100%;margin:6px 0 0;">รุ่น<div class="chip-grid">';
-      models.forEach(function(q){ h+='<button type="button" class="chip'+(q.id===p.id?' on':'')+'" data-id="'+q.id+'" title="'+btnTitle(q)+'" onclick="g3PickProd(this)">'+btnShort(q,cur)+'</button>'; });
+      models.forEach(function(q){ h+='<button type="button" class="chip'+(q.id===p.id?' on':'')+discCls(q)+'" data-id="'+q.id+'" title="'+btnTitle(q)+'" onclick="g3PickProd(this)">'+btnShort(q,cur)+'</button>'; });
       h+='</div></label>';
     }
   }
@@ -4531,7 +4555,7 @@ function buildItemOpts(d){
     h+='<label class="opt">ราคาประตู (กรอกเอง · บาท) <input type="number" class="o-bsdoorprice" min="0" step="500" value="0" placeholder="ว่าง=auto" style="width:100px;height:32px;" oninput="calcQuote();"> <span style="font-size:11px;color:#666;">(กรอก &gt;0 = แทนราคารุ่น)</span></label>'; } // G2-5: สี display
   if(p.cat==='ระแนง-เกล็ด'){ h+='<label class="opt" style="width:100%;">ทิศติดตั้ง <select class="o-grdir" style="display:none;" onchange="calcQuote();"><option value="">— ระบุ —</option><option value="แนวตั้ง">แนวตั้ง</option><option value="แนวนอน">แนวนอน</option></select>'+rfChips('o-grdir',[['','— ระบุ —'],['แนวตั้ง','แนวตั้ง'],['แนวนอน','แนวนอน']],'')+'</label>'; } // G2-9: ทิศเกล็ด Z display
   // ดรอปดาวน์สีกรอบมุ้ง (กฎใหม่ 2026-05-28: ค่าทำสี × 0.5)
-  if(p.mscolor){ h+='<label class="opt">สีกรอบมุ้ง <select class="o-mscolor" style="width:auto;height:32px;max-width:250px;"><option value="">ตามสีบาน (ฟรี)</option>'+COLORS.map(function(c,i){return i>=2?('<option value="'+i+'">'+(c.quoteName||c.n).replace(/[★⚠🔖🔒]/g,'').trim()+' (ค่าทำสี×0.5)</option>'):'';}).join('')+'</select></label>'; }
+  if(p.mscolor){ h+='<label class="opt" style="flex:1 1 100%;">สีกรอบมุ้ง <select class="o-mscolor" style="display:none;"><option value="">ตามสีบาน (ฟรี)</option>'+COLORS.map(function(c,i){return i>=2?('<option value="'+i+'">'+(c.quoteName||c.n).replace(/[★⚠🔖🔒]/g,'').trim()+' (ค่าทำสี×0.5)</option>'):'';}).join('')+'</select>'+msftColorChips('o-mscolor','','','ตามสีบาน')+'</label>'; }
   if(p.bar_slide){
     const doorOpts = ['sliding_sms','sliding_euro','casement_euro','casement_dseries','folding','folding_xseries'] // G2-4: ตัด fence_gate (เลือกแล้วแครช TypeError — gate ไม่มี method/rates)
       .filter(id => PBYID[id])
@@ -4565,7 +4589,7 @@ function buildItemOpts(d){
   if(p.future_tech){
     // B4: ชิป switch สินค้า บนสุด (ฝาตู้ active) + B5 hint จำนวนบาน
     h+='<label class="opt cab-detail" style="width:100%;">สินค้า <div class="chip-group chip-sm"><button type="button" class="chip" onclick="cabProdSwitch(this,\'cabinet_alu\')">📦 ตู้อลู</button><button type="button" class="chip on" onclick="cabProdSwitch(this,\'future_tech\')">ฝาตู้</button></div><div style="font-size:11px;color:#6B7280;margin-top:3px;width:100%;">ℹ️ ขนาดที่กรอก = ต่อบาน · บานที่ 2-3 +5,500/บาน (max 3)</div></label>';
-    h+='<label class="opt cab-detail" style="flex:1 1 100%;">สีฝาตู้ <select class="o-ftcolor" style="width:auto;height:32px;max-width:240px;"><option value="0">ขาว/ดำ (ฟรี)</option>'+COLORS.map(function(c,i){return i>=2?('<option value="'+i+'">'+(c.quoteName||c.n).replace(/[\u2605\u26a0\ud83d\udd16\ud83d\udd12]/g,'').trim()+'</option>'):'';}).join('')+'</select> <span style="font-size:11px;color:#B3151D;">\u26a0 \u0e2a\u0e35\u0e40\u0e2a\u0e49\u0e19\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08 \u0e14\u0e39\u0e15\u0e31\u0e27\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e08\u0e23\u0e34\u0e07\u0e01\u0e48\u0e2d\u0e19</span></label>'; }
+    h+='<label class="opt cab-detail" style="flex:1 1 100%;">สีฝาตู้ <select class="o-ftcolor" style="display:none;"><option value="0">ขาว/ดำ (ฟรี)</option>'+COLORS.map(function(c,i){return i>=2?('<option value="'+i+'">'+(c.quoteName||c.n).replace(/[\u2605\u26a0\ud83d\udd16\ud83d\udd12]/g,'').trim()+'</option>'):'';}).join('')+'</select>'+msftColorChips('o-ftcolor','0','0','ขาว/ดำ (ฟรี)')+' <span style="font-size:11px;color:#B3151D;">\u26a0 \u0e2a\u0e35\u0e40\u0e2a\u0e49\u0e19\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08 \u0e14\u0e39\u0e15\u0e31\u0e27\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e08\u0e23\u0e34\u0e07\u0e01\u0e48\u0e2d\u0e19</span></label>'; }
   if(p.handrail){
     h+='<label class="opt" style="width:100%;">ความหนากระจก <div class="chip-group chip-sm"><button type="button" class="chip on" data-val="10" onclick="chSetChip(this,\'o-railglass\')">10 มม.</button><button type="button" class="chip" data-val="12" onclick="chSetChip(this,\'o-railglass\')">12 มม.</button></div><select class="o-railglass" style="display:none;" onchange="calcQuote();"><option value="10" selected>เทมเปอร์ใส 10 มม. (default)</option><option value="12">เทมเปอร์ใส 12 มม.</option></select> <span style="font-size:11px;color:#666;">ราคาไม่ขึ้นกับความหนา</span></label>'; // G2-10 · ชิป
     h+='<label class="opt" style="width:100%;">ราวมือจับด้านบน (option) <div class="chip-group chip-sm"><button type="button" class="chip on" data-val="" onclick="chSetChip(this,\'o-handrail\')">ไม่มี</button><button type="button" class="chip" data-val="u5" onclick="chSetChip(this,\'o-handrail\')">ยู อลูมิเนียม +500/ม.</button><button type="button" class="chip" data-val="box" onclick="chSetChip(this,\'o-handrail\')">กล่อง 1"x2" +600/ม.</button></div><select class="o-handrail" style="display:none;" onchange="calcQuote();"><option value="" selected>ไม่มี</option><option value="u5">ยู อลูมิเนียม +500/ม.</option><option value="box">กล่อง 1"x2" +600/ม.</option></select></label>'; // R3-4: ราวมือจับด้านบน (ชิป)
@@ -5425,7 +5449,7 @@ function genQuote(keepNo){
       .trim();
     // ถ้าเป็นสินค้า ยกเลิกขาย — ต่อท้ายชื่อ (ยกเลิกขาย)
     const isDiscontinued = it.p.name.includes('(ยกเลิกขาย)') || it.p.name.includes('ยกเลิกขาย');
-    const discontinuedSuffix = isDiscontinued ? ' (ยกเลิกขาย)' : '';
+    const discontinuedSuffix = '';  // ลำดับ3 (18มิ.ย.): ไม่โชว์สถานะภายใน "(ยกเลิกขาย)" ในใบลูกค้า · ยังเลือก/คิดราคาได้ปกติ (L5419 ตัดจากชื่ออยู่แล้ว)
     // เพิ่ม series tag ท้ายชื่อ (M/L/S) ตาม spec: "(รุ่น M เซมิยูโร)" "(รุ่น L ยูโร)" "(รุ่น S สลิม)"
     // ตัดคำซ้ำในชื่อก่อนใส่ tag: เซมิยูโร/SMS → ตัดออก, ยูโร → ตัดออก, สลิม → ตัดออก
     // โมเดล (X-series/Velora/SlimLux) คงไว้
@@ -5728,6 +5752,7 @@ function genQuote(keepNo){
       // #3 G5 (17มิ.ย.): เพิ่มรายการ(งาน) บน — ชื่อมุ้ง+ลักษณะเปิด+จำนวนบาน (เดิมว่าง · ทำเต็มเหมือน G1)
       var _mWork=[];
       var _mqNm=(it.p.name||'มุ้ง').replace(/\s*\([^)]*\)/g,'').replace(/\s*·\s*ข้อ\s*[\d.]+/g,'').replace(/\s+/g,' ').trim();
+      if(_sfM) _mqNm=_mqNm.replace(/\s*ผ้ามุ้ง\S*\s*/g,' ').replace(/\s+/g,' ').trim();  // B1 (18มิ.ย.): screen_addon เลือกผ้าแล้ว → ตัด "ผ้ามุ้ง..." ออกจากรายการ (ผ้าโชว์ที่ det ที่เดียว · imp28/29 ใช้ mosqFabric ไม่กระทบ)
       if(_mo.mosqOpenStyle) _mqNm+=' บาน'+_mo.mosqOpenStyle;
       var _mqPnl=parseInt((it.div&&it.div.querySelector('.i-panels')||{}).value)||1;
       _mWork.push(_mqNm+(_mqPnl>1?(' '+_mqPnl+' บาน'):''));
@@ -6811,6 +6836,7 @@ window.addEventListener('load',ckRefresh);
     out.push('อลูมิเนียม สีมาตรฐาน (ขาว/ดำ)');
     out.push('กระจกเขียว/ใส หนา 6 มม.');
     if(G6R.sides.some(function(s){return s.type==='wall';})) out.push('ผนังเบา (ISOWALL/สมาร์ทบอร์ด)');
+    var _rfS=roofTotalReal(); if(_rfS>0){ var _Rs=G6R.roof; var _rns=(_Rs.matId&&PBYID[_Rs.matId])?PBYID[_Rs.matId].name.replace(/^หลังคา\s*/,''):'เมทัลชีท'; out.push('หลังคา: '+_rns+(_Rs.frame?(' · '+_Rs.frame):'')); }  // C2 (18มิ.ย.): มีหลังคา → ใส่ชนิดหลังคาในรายละเอียด
     G6R=sv; return out.join('\n'); };
   window.g6rRoomDetail=function(itemEl){ if(!itemEl||!itemEl.__g6state)return ''; var sv=G6R; G6R=itemEl.__g6state; var out=[];
     G6R.sides.forEach(function(s,i){
