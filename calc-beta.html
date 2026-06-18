@@ -5568,7 +5568,7 @@ function genQuote(keepNo){
       const _fixedN = parseInt(_os.fixedPanes)||0;
       if(_fixedN > 0){ const _slideN = Math.max(0,(_panels||0)-_fixedN); _slideName += ' (เลื่อน '+_slideN+' บาน ติดตาย '+_fixedN+' บาน)'; }
       _slideName += _beamStr;
-      _slideName += _mosqStr;
+      // v7A ข้อ5 (แบบ A · 18มิ.ย.): มุ้งออกจากหัว → อยู่ในรายการงาน (det _slLines L5989) แล้ว ไม่เกาะหัวซ้ำ
       // กระจกติดตาย (บานย่อย — ระบุใน subItems แต่เพิ่มจากข้อความที่กรอก .i-position ไม่ได้ระบุ)
       // คาดตาราง (sliding) — handled by generic block below
       _slideName += seriesTag + discontinuedSuffix;
@@ -5583,19 +5583,15 @@ function genQuote(keepNo){
       var _mosqNm=(_mosqShortMap[it.optSel.mosqId]||'พร้อมมุ้งจีบ');
       // ก้อน5(G1 formux): imp21/imp23 ต่อท้ายลักษณะการเปิด (label-only · ไม่กระทบราคา) เช่น "พร้อมมุ้งเฟรมเล็ก บานเลื่อน"
       if((it.optSel.mosqId==='imp21'||it.optSel.mosqId==='imp23') && it.optSel.mosqOpenStyle){ _mosqNm += ' บาน'+it.optSel.mosqOpenStyle; }
-      prodName += ' '+_mosqNm+_mqDim;
+      // v7A ข้อ5 (แบบ A · 18มิ.ย.): มุ้ง+ขนาด ออกจากหัว → มุ้งอยู่ในรายการงาน (det lines L6087) · ขนาดโชว์ผ่าน _qSz แล้ว
+      void _mosqNm; void _mqDim;
     }
     // G5 (มติพี่นัท 16 มิ.ย.): มุ้งเฟรมขายเดี่ยว imp21/imp23 — ต่อท้ายลักษณะการเปิดที่เลือก (label-only) · ตัดวงเล็บตัวเลือกรกในชื่อออก เหลือเฉพาะที่เลือก
     if(it.p.screen_addon && (it.p.id==='imp21'||it.p.id==='imp23') && it.optSel && it.optSel.mosqOpenStyle){
       // chain replace ด้านบน (L4204-4208) ตัดวงเล็บตัวเลือก technical ออกแล้ว → prodName="มุ้งเฟรมเล็ก"/"มุ้งเฟรมใหญ่" · เติมที่เลือกจริง
       prodName += ' บาน'+it.optSel.mosqOpenStyle;
     }
-    // คาดตาราง generic — ต่อท้ายชื่อทุก cat (ยกเว้น p.grid เป็น grid_bars เอง)
-    if(!it.p.grid && it.optSel && it.optSel.gridmark){
-      const _dnh=parseInt(it.optSel.gmNh)||0, _dnv=parseInt(it.optSel.gmNv)||0;
-      if(_dnh>0 || _dnv>0){ prodName += ' (คาดตาราง แนวนอน '+_dnh+' เส้น แนวตั้ง '+_dnv+' เส้น)'; }
-      else { prodName += ' (มีคาดตาราง)'; }
-    }
+    // v7A ข้อ5 (แบบ A · 18มิ.ย.): คาดตาราง ย้ายจากหัว → รายการงาน (ดู _parts ด้านล่าง) · หัวสะอาด
     // ข้อ18: ย้ายคำบรรยาย "(รวม ...)" จากชื่อ → บรรทัดใต้หัวข้อ (ตัดส่วน "เทมเปอร์..." ออก ไม่เขียนต่อ)
     var _incl = (it.p.name.match(/\(รวม([^)]+)\)/)||[])[1];
     if(_incl){
@@ -5603,6 +5599,12 @@ function genQuote(keepNo){
       if(_fts.length) prodName += '\n(รวม '+_fts.join(' + ')+')';
     }
     const _parts=[];
+    // v7A ข้อ5 (แบบ A · 18มิ.ย.): คาดตาราง → รายการงาน (เดิมเกาะหัว) · หัวสะอาด
+    if(!it.p.grid && it.optSel && it.optSel.gridmark){
+      const _dnh=parseInt(it.optSel.gmNh)||0, _dnv=parseInt(it.optSel.gmNv)||0;
+      if(_dnh>0 || _dnv>0){ _parts.push('คาดตาราง แนวนอน '+_dnh+' เส้น แนวตั้ง '+_dnv+' เส้น'); }
+      else { _parts.push('มีคาดตาราง'); }
+    }
     // ข้อ8(G1) FIX: ฝังรางยู priority — ถ้าติ๊กรางยู ไม่ให้หลังเต่าโผล่ (กันขัดแย้ง + กันรางยูหาย)
     var _hasUchannel = !!(it.optSel && it.optSel.uchannel);
     // Pass2-A: ธรณี บานเปิด — หลังเต่าต่อท้าย det (default มาตรฐาน=no-op)
