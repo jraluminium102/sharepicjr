@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DRAFT G1 UX v2 — บาน/กระจก (เดโม)</title>
+<title>DRAFT G1 UX v2-crosschecked — บาน/กระจก (เดโม)</title>
 <style>
 :root{
   --red:#B3151D;
@@ -198,7 +198,7 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
 </head>
 <body>
 
-<div class="demo-banner">DRAFT v2 / เดโม — ราคาเป็นตัวอย่างคำนวณ ไม่ใช้อ้างอิงงานจริง</div>
+<div class="demo-banner">DRAFT v2-crosschecked 2026-06-13 / เดโม — ราคาเป็นตัวอย่างคำนวณ ไม่ใช้อ้างอิงงานจริง</div>
 
 <div class="page">
 <div class="page-title">กลุ่ม G1 — บานกระจก / ประตู-หน้าต่าง <span class="badge">DRAFT UX v2</span></div>
@@ -238,24 +238,75 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
         <label>แบบ (รุ่นผลิตภัณฑ์)</label>
         <select id="prod-__ID__" onchange="onProdChange('__ID__')">
           <optgroup label="บานเลื่อน">
-            <option value="sliding_sms">บานเลื่อน SMS</option>
+            <option value="sliding_sms">บานเลื่อน เซมิยูโร</option>
             <option value="sliding_euro" selected>บานเลื่อน ยูโร</option>
-            <option value="sliding_eseries">บานเลื่อน E-Series</option>
+            <option value="sliding_eseries">บานเลื่อน E-series (ยกเลิกขาย)</option>
           </optgroup>
           <optgroup label="บานเปิด">
             <option value="casement_euro">บานเปิด ยูโร</option>
-            <option value="casement_dseries">บานเปิด D-Series</option>
-            <option value="casement_xseries">บานเปิด X-Series</option>
+            <option value="casement_dseries">บานเปิด D-series (ยกเลิกขาย)</option>
+            <option value="casement_xseries">บานเปิด X-series (ใช้ภายใน)</option>
+            <option value="casement_velora">บานเปิด Velora (รวมเทมเปอร์6มม.)</option>
+            <option value="casement_flush_solid">ประตูบานเปิด โซลิด ทู (ลูกฟูกเสมอกรอบ)</option>
+            <option value="casement_inset_solid">ประตูบานเปิด โซลิด วัน (ลูกฟูกกลางบาน)</option>
           </optgroup>
           <optgroup label="ติดตาย">
             <option value="fixed_glass">กระจกติดตาย</option>
           </optgroup>
           <optgroup label="บานกระทุ้ง">
             <option value="awning_euro">บานกระทุ้ง ยูโร</option>
+            <option value="awning_aluinch">บานกระทุ้ง aluinch (ยกเลิกขาย)</option>
           </optgroup>
           <optgroup label="บานเฟี้ยม">
-            <option value="folding">บานเฟี้ยม</option>
-            <option value="folding_xseries">บานเฟี้ยม X-Series</option>
+            <option value="folding">บานเฟี้ยม เซมิยูโร</option>
+            <option value="folding_euro">บานเฟี้ยม ยูโร</option>
+            <option value="folding_xseries">บานเฟี้ยม X-series</option>
+          </optgroup>
+          <optgroup label="เลื่อนภายใน">
+            <option value="inner_top_stack">เลื่อนภายใน Stack</option>
+            <option value="inner_top_slimlux">เลื่อนภายใน Slimlux</option>
+            <option value="inner_top_xseries">เลื่อนภายใน X-series</option>
+            <option value="inner_bottom_sms">เลื่อนภายใน SMS รางล่าง</option>
+            <option value="inner_bottom_euro">เลื่อนภายใน ยูโร รางล่าง</option>
+          </optgroup>
+          <optgroup label="PC Door">
+            <option value="pc_door_2">PC Door 2 บาน</option>
+            <option value="pc_door_4">PC Door 4 บาน</option>
+          </optgroup>
+          <optgroup label="บานยก">
+            <option value="lift_sms">บานยก SMS</option>
+            <option value="lift_aluinch">บานยก aluinch (ยกเลิกขาย)</option>
+          </optgroup>
+          <optgroup label="บานหมุน">
+            <option value="pivot">บานหมุนเมืองทอง</option>
+            <option value="pivot_aluinch">บานหมุน aluinch (ยกเลิกขาย)</option>
+          </optgroup>
+          <optgroup label="ดัดโค้ง">
+            <option value="curved_double">ดัดโค้งคู่</option>
+            <option value="curved_single">ดัดโค้งเดี่ยว</option>
+            <option value="curved_fixed">ดัดโค้งติดตาย</option>
+            <option value="curved_slim">ดัดโค้ง Slim</option>
+          </optgroup>
+          <optgroup label="บานเปลือย">
+            <option value="frameless_fixed">บานเปลือยติดตาย</option>
+            <option value="frameless_door">ประตูสวิง/เลื่อน บานเปลือย</option>
+          </optgroup>
+          <optgroup label="shower">
+            <option value="shower">shower กั้นห้องอาบน้ำ</option>
+          </optgroup>
+          <optgroup label="YKK">
+            <option value="ykk_vent">YKK vent</option>
+            <option value="ykk_exhido">YKK Exhido</option>
+            <option value="tostem_a01">Tostem A01</option>
+          </optgroup>
+          <optgroup label="เส้นคาด">
+            <option value="grid_bars">เส้นคาดตาราง</option>
+          </optgroup>
+          <optgroup label="ลูกฟูก+คอมโพสิททึบ">
+            <option value="rn89">ลูกฟูกเรียบ 1 ทาง ไม่โครง</option>
+            <option value="rn90">ลูกฟูกเรียบ 2 ทาง ไม่โครง</option>
+            <option value="rn91">คอมโพสิต 3 มม.</option>
+            <option value="rn92">คอมโพสิต 4 มม.</option>
           </optgroup>
         </select>
       </div>
@@ -389,7 +440,7 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
     <div class="opts-section">
       <div class="opts-head">ปรับแต่งรายการนี้</div>
 
-      <!-- [8a] ธรณี (บานเปิดเท่านั้น) -->
+      <!-- [8a] ธรณี บานเปิด (o-thresh) -->
       <div class="opt-row" id="thresh-wrap-__ID__" style="display:none;">
         <div class="opt-row-lbl">ธรณี</div>
         <div class="opt-row-body">
@@ -397,10 +448,23 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
             <button class="chip on" data-val="std" onclick="pickThresh('__ID__','std',this)">ธรณีกันน้ำ (มาตรฐาน)</button>
             <button class="chip" data-val="turtle" onclick="pickThresh('__ID__','turtle',this)">หลังเต่า + Drop Seal (+1,000)</button>
           </div>
+          <div class="hint">— ติ๊กฝังรางยู (ด้านล่าง) แล้วเลือกหลังเต่าไม่ได้</div>
         </div>
       </div>
 
-      <!-- [8b] โช๊ค (closer) — บานเปิดเท่านั้น -->
+      <!-- [8a2] ธรณี บานเฟี้ยม (o-threshf) — cosmetic ไม่คิดเงิน -->
+      <div class="opt-row" id="threshf-wrap-__ID__" style="display:none;">
+        <div class="opt-row-lbl">ธรณี</div>
+        <div class="opt-row-body">
+          <div class="chips sm" id="threshfchips-__ID__">
+            <button class="chip on" data-val="outer" onclick="pickThreshF('__ID__','outer',this)">ธรณีกันน้ำภายนอก</button>
+            <button class="chip" data-val="inner" onclick="pickThreshF('__ID__','inner',this)">ธรณีหลังเต่าภายใน</button>
+          </div>
+          <div class="hint">label-only · ไม่กระทบราคา</div>
+        </div>
+      </div>
+
+      <!-- [8b] โช๊ค (closer) — บานเปิด + YKK + X-series (p.closer=1) -->
       <div class="opt-row" id="closer-row-__ID__" style="display:none;">
         <div class="opt-row-lbl">โช๊ค (closer)</div>
         <div class="opt-row-body">
@@ -410,20 +474,29 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
             <option value="5000r">รางเลื่อน +5,000</option>
             <option value="5000p">บานพับ +5,000</option>
           </select>
+          <div class="hint">บานเปิด / YKK / X-series (combo กับสแตน)</div>
         </div>
       </div>
 
-      <!-- [8c] มือจับ -->
+      <!-- [8c] มือจับ — โผล่เมื่อ digihandle/cmech/xseries/cmechawn applicable -->
+      <!-- digihandle: sliding_sms/euro, casement_euro/flush_solid/inset_solid, pivot, curved_double/single/slim, pc_door_2/4 -->
+      <!-- cmech (บานเลื่อน+บานเปิด), xseries (casement_xseries/slimlux), cmechawn (บานกระทุ้ง) -->
       <div class="opt-row" id="handle-wrap-__ID__">
         <div class="opt-row-lbl">มือจับ</div>
         <div class="opt-row-body">
           <div class="yellow-box">
-            <div class="yhead">ติ๊กแบรนด์ที่ใช้ (ติ๊กได้หลายอัน)</div>
+            <div class="yhead">ติ๊กแบรนด์ที่ใช้ (ติ๊กได้หลายอัน · ยังไม่ติ๊ก = ซ่อนทุก sub)</div>
             <div class="chips sm" id="hbrand-chips-__ID__">
+              <!-- Cmech: บานเลื่อน + บานเปิด -->
               <button class="chip" data-hb="cmech" onclick="toggleBrand('__ID__','cmech',this)">Cmech</button>
+              <!-- digital/stainless/other: digihandle=1 products -->
               <button class="chip" data-hb="digital" onclick="toggleBrand('__ID__','digital',this)">ดิจิตอล</button>
               <button class="chip" data-hb="stainless" onclick="toggleBrand('__ID__','stainless',this)">สแตนอร่าม</button>
+              <!-- X-series: casement_xseries หรือ slimlux -->
               <button class="chip" data-hb="xseries" onclick="toggleBrand('__ID__','xseries',this)">X-series (ฟรี)</button>
+              <!-- Cmech หลบมุ้ง: บานกระทุ้งเท่านั้น -->
+              <button class="chip" id="hbrand-cmechawn-__ID__" data-hb="cmechawn" onclick="toggleBrand('__ID__','cmechawn',this)" style="display:none;">Cmech หลบมุ้ง</button>
+              <!-- รุ่นอื่น: digihandle=1 products -->
               <button class="chip" data-hb="other" onclick="toggleBrand('__ID__','other',this)">รุ่นอื่น ✎</button>
             </div>
             <!-- Cmech sub -->
@@ -437,13 +510,15 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
                 <option value="black">สีดำ</option><option value="white">สีขาว</option>
                 <option value="silver">Silver (ชุบ)</option><option value="champagne">Champagne (ชุบ)</option>
                 <option value="gold">Gold (ชุบ)</option><option value="bronze">Bronze (ชุบ)</option>
+                <option value="copper">Copper (ชุบ)</option>
               </select>
             </div>
             <!-- ดิจิตอล sub -->
             <div class="hsub" id="hsub-digital-__ID__">
-              <div style="font-size:11px;color:#E65100;margin-bottom:6px;">มือจับดิจิตอล</div>
+              <div style="font-size:11px;color:#E65100;margin-bottom:6px;">มือจับดิจิตอล (เลือกจาก DIGI รายการ)</div>
               <select id="digi-__ID__" style="height:44px;width:100%;max-width:260px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;" onchange="calcItem('__ID__')">
                 <option value="">ไม่ใส่</option>
+                <!-- ราคาจริงจาก DIGI[] ใน index.html — เดโมใส่ตัวอย่าง -->
                 <option value="3500">ดิจิตอล รุ่น A +3,500</option>
                 <option value="5000">ดิจิตอล รุ่น B +5,000</option>
                 <option value="8000">ดิจิตอล Smart Lock +8,000</option>
@@ -451,7 +526,7 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
             </div>
             <!-- สแตนอร่าม sub -->
             <div class="hsub" id="hsub-stainless-__ID__">
-              <div style="font-size:11px;color:#E65100;margin-bottom:6px;">มือจับสแตนเลสอร่าม</div>
+              <div style="font-size:11px;color:#E65100;margin-bottom:6px;">มือจับสแตนเลสอร่าม (จาก HANDLE_STAINLESS[])</div>
               <select id="stainless-__ID__" style="height:44px;width:100%;max-width:260px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;" onchange="calcItem('__ID__')">
                 <option value="">ไม่ใส่</option>
                 <option value="900">600 มม. +900</option><option value="1050">750 มม. +1,050</option>
@@ -469,6 +544,21 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
                 <option value="XT">XT (ห้ามล็อค/กุญแจ)</option>
               </select>
             </div>
+            <!-- Cmech หลบมุ้ง sub — บานกระทุ้งเท่านั้น -->
+            <div class="hsub" id="hsub-cmechawn-__ID__">
+              <div style="font-size:11px;color:#E65100;margin-bottom:4px;">Cmech หลบมุ้ง (บานกระทุ้ง)</div>
+              <div style="font-size:11px;color:#666;margin-bottom:6px;">ⓘ บานกระทุ้งคู่/หลายบาน: ใส่จำนวนบานทั้งหมดด้านบน</div>
+              <select id="cmechawn-__ID__" style="height:40px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;" onchange="calcItem('__ID__')">
+                <option value="">ไม่ใส่</option>
+                <option value="black">สีดำ +600</option>
+                <option value="white">สีขาว +600</option>
+                <option value="silver">Silver ชุบ +840</option>
+                <option value="champagne">Champagne ชุบ +840</option>
+                <option value="gold">Gold ชุบ +840</option>
+                <option value="bronze">Bronze ชุบ +840</option>
+                <option value="copper">Copper ชุบ +840</option>
+              </select>
+            </div>
             <!-- รุ่นอื่น sub -->
             <div class="hsub" id="hsub-other-__ID__">
               <div style="font-size:11px;color:#E65100;margin-bottom:6px;">รุ่นอื่น (กรอกเอง)</div>
@@ -482,7 +572,7 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
       </div>
 
       <!-- [8d] แผ่นทึบล่าง (o-solidlower) — เพิ่มใหม่ตาม feedback ข้อ 4 -->
-      <div class="opt-row">
+      <div class="opt-row" id="solidlower-wrap-__ID__">
         <div class="opt-row-lbl">แผ่นทึบล่าง</div>
         <div class="opt-row-body">
           <div class="chips sm" id="solidlower-chips-__ID__">
@@ -524,7 +614,10 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
             <label>เส้นนอน <input type="number" id="gm-nh-__ID__" min="0" step="1" value="0" oninput="calcItem('__ID__')"></label>
             <label>เส้นตั้ง <input type="number" id="gm-nv-__ID__" min="0" step="1" value="0" oninput="calcItem('__ID__')"></label>
             <label>ราคา/ม. <input type="number" id="gm-rate-__ID__" min="0" step="10" value="200" oninput="calcItem('__ID__')"></label>
+            <!-- เส้นโค้ง — หล่นจาก v2 เดิม (o-gm-curve ใน index.html มีอยู่) -->
+            <label>เส้นโค้ง (เส้น) <input type="number" id="gm-curve-__ID__" min="0" step="1" value="0" oninput="calcItem('__ID__')"></label>
           </div>
+          <div class="hint">เส้นตั้ง auto = จำนวนบาน (ถ้าไม่กรอก) · เส้นโค้ง +3,000/เส้น</div>
         </div>
       </div>
 
@@ -598,8 +691,127 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
         </div>
       </div>
 
-      <!-- [8g] ครอบวงกบ -->
-      <div class="opt-row">
+      <!-- [8f2] combo บานกระทุ้งเข้าใน — เฉพาะ casement_euro/flush_solid/inset_solid -->
+      <div class="opt-row" id="combo-awn-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">combo บานกระทุ้ง</div>
+        <div class="opt-row-body">
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" id="combo-awn-__ID__" style="width:18px;height:18px;accent-color:var(--red);" onchange="calcItem('__ID__')">
+            combo บานกระทุ้งเข้าใน + มุ้งจีบนิรภัยติดตายนอก
+          </label>
+          <div class="opt-sub" style="margin-top:4px;">
+            <label>ราคา combo (กรอกเอง) <input type="number" id="combo-price-__ID__" min="0" step="500" value="0" placeholder="บาท" style="width:100px;" oninput="calcItem('__ID__')"> บาท</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- [8f3] ช่องแสง (solid_door) — เฉพาะ casement_flush_solid / casement_inset_solid -->
+      <div class="opt-row" id="solidlight-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">ช่องแสง (กระจก)</div>
+        <div class="opt-row-body">
+          <div class="opt-sub">
+            <label>พื้นที่กระจก <input type="number" id="solidlight-__ID__" min="0" step="0.1" value="0" placeholder="ตร.ม." style="width:80px;" oninput="calcItem('__ID__')"> ตร.ม.</label>
+          </div>
+          <div class="hint">เว้น 0 = ทึบล้วน · ส่วนทึบลูกฟูกไม่คิดกระจก</div>
+        </div>
+      </div>
+
+      <!-- [8f4] ตารางเต็มบาน (full_grid) — เฉพาะ casement_flush_solid / casement_inset_solid -->
+      <div class="opt-row" id="fullgrid-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">ตารางเต็มบาน</div>
+        <div class="opt-row-body">
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" id="fullgrid-__ID__" style="width:18px;height:18px;accent-color:var(--red);" onchange="calcItem('__ID__')">
+            ตารางเต็มบาน +5,000 (กว้าง≤1.2 / สูง≤3)
+          </label>
+        </div>
+      </div>
+
+      <!-- [8f5] shower — รูปแบบ + ประเภทประตู — เฉพาะ shower -->
+      <div class="opt-row" id="shower-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">รูปแบบ shower</div>
+        <div class="opt-row-body">
+          <select id="shtype-__ID__" style="height:40px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;margin-bottom:6px;" onchange="calcItem('__ID__')">
+            <option value="door_fixed">(ก) ประตู + กระจกติดตาย (มาตรฐาน)</option>
+            <option value="fixed_only">(ข) กระจกติดตายอย่างเดียว</option>
+            <option value="door_only">(ค) ประตูอย่างเดียว</option>
+          </select>
+          <div class="opt-sub" style="flex-wrap:wrap;gap:6px;">
+            <label>ประเภทประตู (ถ้ามี)
+              <select id="shdoortype-__ID__" style="height:36px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;" onchange="calcItem('__ID__')">
+                <option value="swing">บานเปิด (swing)</option>
+                <option value="sliding">บานเลื่อน</option>
+              </select>
+            </label>
+            <!-- shower opts จาก p.opts: เข้ามุม +3,000 / อุปกรณ์สี select -->
+            <label style="display:flex;align-items:center;gap:6px;">
+              <input type="checkbox" id="shower-corner-__ID__" style="width:18px;height:18px;accent-color:var(--red);" onchange="calcItem('__ID__')"> เข้ามุม +3,000
+            </label>
+            <label>อุปกรณ์ (สี)
+              <select id="shower-hw-__ID__" style="height:36px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;" onchange="calcItem('__ID__')">
+                <option value="0">เงิน (default)</option>
+                <option value="4000">ดำ +4,000</option>
+                <option value="6000">ทอง +6,000</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- [8f6] บานเปลือย (frameless_door) — ประเภท + สีเฟรม -->
+      <div class="opt-row" id="frameless-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">ประเภทบานเปลือย</div>
+        <div class="opt-row-body">
+          <div class="opt-sub" style="flex-wrap:wrap;gap:8px;">
+            <label>ประเภทประตู
+              <select id="frametype-__ID__" style="height:36px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;" onchange="calcItem('__ID__')">
+                <option value="swing">สวิง (บานเปิด)</option>
+                <option value="sliding">เลื่อน</option>
+              </select>
+            </label>
+            <label>สีเฟรมอลูมิเนียม
+              <select id="framecolor-__ID__" style="height:36px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;" onchange="calcItem('__ID__')">
+                <option value="ขาว">ขาว (ด้าน/เงา)</option>
+                <option value="ดำ">ดำ (ด้าน/เงา)</option>
+                <option value="บรอนซ์">บรอนซ์</option>
+                <option value="แชมเปญ">แชมเปญ</option>
+                <option value="เทาซาฮาร่า">เทาซาฮาร่า</option>
+                <option value="สีอบพิเศษ">สีอบพิเศษ</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- [8f7] บานกระทุ้ง opts (awning_mode) — เฉพาะ awning_euro/aluinch -->
+      <div class="opt-row" id="awning-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">แบบเปิด</div>
+        <div class="opt-row-body">
+          <select id="awn-mode-__ID__" style="height:40px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;" onchange="calcItem('__ID__')">
+            <option value="0">เปิดล่าง (Std)</option>
+            <option value="1">เปิดข้าง (Std)</option>
+            <option value="2">tilt &amp; turn (+5,000/บาน)</option>
+          </select>
+          <div class="hint warn" id="tilt-warn-__ID__" style="display:none;">tilt&amp;turn ต้องเปิดออกนอกบ้านเท่านั้น เปิดเข้า = เสี่ยงน้ำเข้า</div>
+        </div>
+      </div>
+
+      <!-- [8f8] ลูกฟูก/คอมโพสิททึบ — ผิว/สี (p.fin) -->
+      <div class="opt-row" id="finish-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">ผิว/สี</div>
+        <div class="opt-row-body">
+          <select id="finish-__ID__" style="height:40px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;" onchange="calcItem('__ID__')">
+            <option value="0">สีอบขาว (default)</option>
+            <option value="0">สีดำ</option>
+            <option value="0">ไม่อบสี</option>
+            <!-- ค่าจาก p.fin จริง — rn89/90 มีค่าสี, rn91/92 ไม่มี fin -->
+          </select>
+          <div class="hint">rn89: ซาฮาร่า+700 ลายไม้สต๊อก+2,500 อบพิเศษ+2,500 ลายไม้อบ+3,500 · rn90: ซาฮาร่า+400 ลายไม้สต๊อก+1,500 อบพิเศษ+1,600 ลายไม้อบ+2,200</div>
+        </div>
+      </div>
+
+      <!-- [8g] ครอบวงกบ — ซ่อนเมื่อ shower/frameless -->
+      <div class="opt-row" id="fcsides-wrap-__ID__">
         <div class="opt-row-lbl">ครอบวงกบ</div>
         <div class="opt-row-body">
           <div class="chips sm" id="fcsides-chips-__ID__">
@@ -614,9 +826,10 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
         </div>
       </div>
 
-      <!-- [8h] เสริมคาน -->
-      <div class="opt-row" id="beam-row-__ID__">
-        <div class="opt-row-lbl">เสริมคาน</div>
+      <!-- [8h] COMMON_OPTS — โผล่ตาม product id จริง (ไม่ใช่ทุก product) -->
+      <!-- beam_support: inner_top_stack/slimlux/xseries, folding/euro/xseries, pc_door_2/4 -->
+      <div class="opt-row" id="beam-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">เสริมคานซัพพอร์ท</div>
         <div class="opt-row-body">
           <label style="font-size:13px;color:#374151;display:flex;align-items:center;gap:6px;">
             <input type="checkbox" id="beam-__ID__" onchange="calcItem('__ID__')" style="width:18px;height:18px;accent-color:var(--red);">
@@ -625,10 +838,97 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
           <div class="opt-sub" style="margin-top:4px;">
             <label>ความยาว (ม.) <input type="number" id="beam-len-__ID__" min="0" step="0.1" value="0" oninput="calcItem('__ID__')"></label>
           </div>
+          <div class="hint">โผล่เฉพาะ: inner_top_stack/slimlux/xseries · folding (ทุกรุ่น) · pc_door_2/4</div>
         </div>
       </div>
 
-      <!-- [8i] ดรอปพื้น -->
+      <!-- [8h2] ซ่อนคาน (hide_beam) — inner_top_*, folding/xseries -->
+      <div class="opt-row" id="hide-beam-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">ซ่อนคาน</div>
+        <div class="opt-row-body">
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="hide-beam-__ID__" onchange="calcItem('__ID__')" style="width:18px;height:18px;accent-color:var(--red);">
+            ซ่อนคาน (base 4,000)
+          </label>
+          <div class="opt-sub" style="margin-top:4px;">
+            <label>ความยาว (ม.) <input type="number" id="hide-beam-len-__ID__" min="0" step="0.1" value="0" oninput="calcItem('__ID__')"></label>
+          </div>
+          <div class="hint">≤3ม.=4,000 · เกิน +500/ม. | โผล่เฉพาะ: inner_top_*/folding</div>
+        </div>
+      </div>
+
+      <!-- [8h3] ซ่อนราง (hide_track) — folding/xseries เท่านั้น -->
+      <div class="opt-row" id="hide-track-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">ซ่อนราง</div>
+        <div class="opt-row-body">
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="hide-track-__ID__" onchange="calcItem('__ID__')" style="width:18px;height:18px;accent-color:var(--red);">
+            ซ่อนราง (base 4,000)
+          </label>
+          <div class="opt-sub" style="margin-top:4px;">
+            <label>ความยาว (ม.) <input type="number" id="hide-track-len-__ID__" min="0" step="0.1" value="0" oninput="calcItem('__ID__')"></label>
+          </div>
+          <div class="hint">≤3ม.=4,000 · เกิน +500/ม. | โผล่เฉพาะ: folding/folding_xseries</div>
+        </div>
+      </div>
+
+      <!-- [8h4] ฝังรางยู U-Track — folding/xseries, inner_top_slimlux/xseries -->
+      <div class="opt-row" id="u-track-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">ฝังรางยู (U-Track)</div>
+        <div class="opt-row-body">
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="u-track-__ID__" onchange="calcItem('__ID__')" style="width:18px;height:18px;accent-color:var(--red);">
+            ฝังรางยู U-Track (base 4,000)
+          </label>
+          <div class="opt-sub" style="margin-top:4px;">
+            <label>ความยาว (ม.) <input type="number" id="u-track-len-__ID__" min="0" step="0.1" value="0" oninput="calcItem('__ID__')"></label>
+          </div>
+          <div class="hint">≤2ม.=4,000 · เกิน +500/ม. | โผล่เฉพาะ: folding/xseries · inner_top_slimlux/xseries</div>
+        </div>
+      </div>
+
+      <!-- [8h5] Soft Close + Sling — inner_top_stack, inner_top_xseries -->
+      <div class="opt-row" id="soft-close-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">Soft Close / Sling</div>
+        <div class="opt-row-body">
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <input type="checkbox" id="soft-close-__ID__" onchange="calcItem('__ID__')" style="width:18px;height:18px;accent-color:var(--red);">
+            Soft Close (สลักหน่วงบาน) +4,000
+          </label>
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="sling-__ID__" onchange="calcItem('__ID__')" style="width:18px;height:18px;accent-color:var(--red);">
+            สลิงเปิดซ้อน +2,000/บาน
+          </label>
+          <div class="hint">โผล่เฉพาะ: inner_top_stack · inner_top_xseries</div>
+        </div>
+      </div>
+
+      <!-- [8h6] มอเตอร์บานยก — เฉพาะ lift_sms/aluinch -->
+      <div class="opt-row" id="lift-motor-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">มอเตอร์บานยก</div>
+        <div class="opt-row-body">
+          <select id="lift-motor-__ID__" style="height:40px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px;font-family:inherit;" onchange="calcItem('__ID__')">
+            <option value="0">ไม่มี</option>
+            <option value="18000">80 กก. +18,000</option>
+            <option value="28000">300 กก. +28,000</option>
+          </select>
+          <div class="hint">โผล่เฉพาะ: lift_sms / lift_aluinch</div>
+        </div>
+      </div>
+
+      <!-- [8h7] ชุดล็อค PC Door — เฉพาะ pc_door_2/4 + itype=door -->
+      <div class="opt-row" id="pc-lock-row-__ID__" style="display:none;">
+        <div class="opt-row-lbl">ชุดล็อค PC Door</div>
+        <div class="opt-row-body">
+          <div class="chips sm" id="pc-lockchips-__ID__">
+            <button class="chip on" data-val="มีกุญแจ" onclick="pickPcLock('__ID__','มีกุญแจ',this)">มีกุญแจ</button>
+            <button class="chip" data-val="ไม่มีกุญแจ" onclick="pickPcLock('__ID__','ไม่มีกุญแจ',this)">ไม่มีกุญแจ</button>
+          </div>
+          <div class="hint">โผล่เฉพาะ: pc_door_2/4 + itype=ประตู</div>
+        </div>
+      </div>
+
+      <!-- [8i] ดรอปพื้น — ซ่อนเมื่อ: เลื่อนภายใน/บานหมุน/ติดตาย/มุ้ง/ตู้/zipscreen/handrail/areaOnly -->
       <div class="opt-row" id="dropfloor-row-__ID__">
         <div class="opt-row-lbl">ดรอปพื้น</div>
         <div class="opt-row-body">
@@ -636,6 +936,38 @@ details.extra > *:not(summary){padding:8px 12px 10px;}
             <label>(ม.) <input type="number" id="dropfloor-__ID__" min="0" step="0.1" value="0" oninput="calcItem('__ID__')"></label>
             <span style="font-size:11px;color:var(--gray);">0 = ไม่มี</span>
           </div>
+          <div class="hint">ซ่อนเมื่อ: เลื่อนภายใน / บานหมุน / ติดตาย / มุ้ง</div>
+        </div>
+      </div>
+
+      <!-- [8j] ฝังรางยู (o-uchannel) — ซ่อนเมื่อ: หลังคา/ฝ้า-ผนัง/shower/บานเปลือย/ดัดโค้ง/บานหมุน/เลื่อนภายใน/มุ้ง/บานเฟี้ยม/ตู้/handrail -->
+      <div class="opt-row" id="uchannel-row-__ID__">
+        <div class="opt-row-lbl">ฝังรางยู</div>
+        <div class="opt-row-body">
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="uchannel-__ID__" onchange="calcItem('__ID__')" style="width:18px;height:18px;accent-color:var(--red);">
+            ฝังรางยู (ในพื้น) <span style="font-size:11px;color:var(--gray);">— ติ๊กแล้วเลือกธรณีหลังเต่าไม่ได้</span>
+          </label>
+          <div class="hint">ซ่อนเมื่อ: shower / บานเปลือย / ดัดโค้ง / บานหมุน / เลื่อนภายใน / มุ้ง / บานเฟี้ยม</div>
+        </div>
+      </div>
+
+      <!-- [8k] งานเสริม/วิศวกรรม (o-extrawork) — ทุกสินค้า -->
+      <div class="opt-row">
+        <div class="opt-row-lbl">งานเสริม</div>
+        <div class="opt-row-body">
+          <input type="text" id="extrawork-__ID__" placeholder="ระบุถ้ามี เช่น งานแก้กรอบ / เสริมเหล็ก" style="width:100%;height:40px;border:1px solid var(--border);border-radius:8px;padding:0 10px;font-size:13px;font-family:inherit;" oninput="calcItem('__ID__')">
+        </div>
+      </div>
+
+      <!-- [8l] รื้อของเดิม (o-removeold) — ทุกสินค้า -->
+      <div class="opt-row">
+        <div class="opt-row-lbl">รื้อของเดิม</div>
+        <div class="opt-row-body">
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="removeold-__ID__" onchange="calcItem('__ID__')" style="width:18px;height:18px;accent-color:var(--red);">
+            รื้อของเดิม (รายการนี้)
+          </label>
         </div>
       </div>
 
@@ -835,25 +1167,129 @@ function delItem(id) {
 // ===== PRODUCT CHANGE =====
 function onGrpChange(id) { calcItem(id); }
 
+// ===== PRODUCT METADATA (ตรง index.html) =====
+var PROD_DIGIHANDLE = ['sliding_sms','sliding_euro','casement_euro','casement_flush_solid','casement_inset_solid','pivot','curved_double','curved_single','curved_slim','pc_door_2','pc_door_4'];
+var PROD_CLOSER = ['casement_euro','casement_dseries','casement_xseries','casement_velora','casement_flush_solid','casement_inset_solid','ykk_vent','ykk_exhido','tostem_a01'];
+var PROD_MOSQUITO = ['sliding_sms','sliding_euro','sliding_eseries','awning_euro','awning_aluinch','casement_euro','casement_dseries','casement_xseries','casement_velora','casement_flush_solid','casement_inset_solid','folding','folding_euro','folding_xseries','lift_sms','lift_aluinch','pc_door_2','pc_door_4'];
+var PROD_SLIDING = ['sliding_sms','sliding_euro','sliding_eseries'];
+var PROD_INNER_TOP = ['inner_top_stack','inner_top_slimlux','inner_top_xseries'];
+var PROD_INNER_BOTTOM = ['inner_bottom_sms','inner_bottom_euro'];
+var PROD_INNER_ALL = PROD_INNER_TOP.concat(PROD_INNER_BOTTOM);
+var PROD_CASEMENT = ['casement_euro','casement_dseries','casement_xseries','casement_velora','casement_flush_solid','casement_inset_solid'];
+var PROD_FOLDING = ['folding','folding_euro','folding_xseries'];
+var PROD_AWNING = ['awning_euro','awning_aluinch'];
+var PROD_SHOWER = ['shower'];
+var PROD_FRAMELESS_DOOR = ['frameless_door'];
+var PROD_SOLID = ['casement_flush_solid','casement_inset_solid'];
+var PROD_COMBO_AWN = ['casement_euro','casement_flush_solid','casement_inset_solid'];
+var PROD_LIFT = ['lift_sms','lift_aluinch'];
+var PROD_PC = ['pc_door_2','pc_door_4'];
+var PROD_YKK = ['ykk_vent','ykk_exhido','tostem_a01'];
+var PROD_CURVED = ['curved_double','curved_single','curved_fixed','curved_slim'];
+var PROD_PIVOT = ['pivot','pivot_aluinch'];
+var PROD_CORRUGATED = ['rn89','rn90']; // มี p.fin
+// cat ที่ไม่มี uchannel
+var NO_UCHANNEL_PRODS = ['shower','frameless_fixed','frameless_door','curved_double','curved_single','curved_fixed','curved_slim','pivot','pivot_aluinch','inner_top_stack','inner_top_slimlux','inner_top_xseries','inner_bottom_sms','inner_bottom_euro','folding','folding_euro','folding_xseries'];
+// cat ที่ไม่มี gridmark (p.grid หรือ cat exclusion)
+var NO_GRIDMARK_PRODS = ['shower','frameless_fixed','frameless_door','fixed_glass','grid_bars','rn89','rn90','rn91','rn92'];
+// solidlower cats
+var SOLIDLOWER_PRODS = ['sliding_sms','sliding_euro','sliding_eseries','casement_euro','casement_dseries','casement_xseries','casement_velora','casement_flush_solid','casement_inset_solid','fixed_glass','awning_euro','awning_aluinch','folding','folding_euro','folding_xseries','pc_door_2','pc_door_4'];
+// no dropfloor (dfm)
+var NO_DROPFLOOR_PRODS = ['inner_top_stack','inner_top_slimlux','inner_top_xseries','inner_bottom_sms','inner_bottom_euro','pivot','pivot_aluinch','fixed_glass'];
+// COMMON_OPTS per product
+var HAS_BEAM_SUPPORT = ['inner_top_stack','inner_top_slimlux','inner_top_xseries','folding','folding_euro','folding_xseries','pc_door_2','pc_door_4'];
+var HAS_HIDE_BEAM = ['inner_top_stack','inner_top_slimlux','inner_top_xseries','folding','folding_xseries'];
+var HAS_HIDE_TRACK = ['folding','folding_xseries'];
+var HAS_U_TRACK = ['folding','folding_xseries','inner_top_slimlux','inner_top_xseries'];
+var HAS_SOFT_CLOSE = ['inner_top_stack','inner_top_xseries'];
+
+function show(id, visible) {
+  var el = document.getElementById(id);
+  if(el) el.style.display = visible ? '' : 'none';
+}
+function showFlex(id, visible) {
+  var el = document.getElementById(id);
+  if(el) el.style.display = visible ? 'flex' : 'none';
+}
+
 function onProdChange(id) {
   var prodSel = document.getElementById('prod-'+id);
   if(!prodSel) return;
   var prod = prodSel.value;
-  var isSlide = ['sliding_sms','sliding_euro','sliding_eseries'].includes(prod);
-  var isCasement = ['casement_euro','casement_dseries','casement_xseries'].includes(prod);
-  var isFolding = ['folding','folding_xseries'].includes(prod);
 
+  var isSlide = PROD_SLIDING.includes(prod);
+  var isInner = PROD_INNER_ALL.includes(prod);
+  var isCasement = PROD_CASEMENT.includes(prod);
+  var isFolding = PROD_FOLDING.includes(prod);
+  var isAwning = PROD_AWNING.includes(prod);
+  var isShower = PROD_SHOWER.includes(prod);
+  var isFramelessDoor = PROD_FRAMELESS_DOOR.includes(prod);
+  var isSolid = PROD_SOLID.includes(prod);
+  var isComboAwn = PROD_COMBO_AWN.includes(prod);
+  var isLift = PROD_LIFT.includes(prod);
+  var isPc = PROD_PC.includes(prod);
+  var isYkk = PROD_YKK.includes(prod);
+  var isCorrugated = PROD_CORRUGATED.includes(prod);
+  var isXseries = prod === 'casement_xseries' || prod === 'inner_top_xseries';
+  var isSlideOrCasement = isSlide || isCasement;
+  var hasDigiHandle = PROD_DIGIHANDLE.includes(prod);
+  var hasCloser = PROD_CLOSER.includes(prod);
+  var hasMosquito = PROD_MOSQUITO.includes(prod);
+  var hasCmech = isSlideOrCasement;
+  var hasCmechawn = isAwning;
+
+  // บล็อกบานเลื่อน
   var sb = document.getElementById('slideblock-'+id);
   if(sb) sb.style.display = isSlide ? 'flex' : 'none';
 
-  var tw = document.getElementById('thresh-wrap-'+id);
-  if(tw) tw.style.display = isCasement ? 'flex' : 'none';
-
-  var cr = document.getElementById('closer-row-'+id);
-  if(cr) cr.style.display = isCasement ? 'flex' : 'none';
-
-  var br = document.getElementById('beam-row-'+id);
-  if(br) br.style.display = isFolding ? 'flex' : 'none';
+  // ธรณี บานเปิด
+  showFlex('thresh-wrap-'+id, isCasement);
+  // ธรณี บานเฟี้ยม
+  showFlex('threshf-wrap-'+id, isFolding);
+  // โช๊ค (closer)
+  show('closer-row-'+id, hasCloser);
+  // มือจับ box — โผล่เมื่อมี brand ใดๆ
+  show('handle-wrap-'+id, hasDigiHandle || hasCmech || isXseries || hasCmechawn);
+  // Cmech หลบมุ้ง chip — เฉพาะบานกระทุ้ง
+  var cmechnawn = document.getElementById('hbrand-cmechawn-'+id);
+  if(cmechnawn) cmechnawn.style.display = hasCmechawn ? '' : 'none';
+  // มุ้ง
+  show('mosq-outer-'+id, hasMosquito);
+  // combo บานกระทุ้งเข้าใน
+  show('combo-awn-row-'+id, isComboAwn);
+  // ช่องแสง solid_door
+  show('solidlight-row-'+id, isSolid);
+  // full_grid
+  show('fullgrid-row-'+id, isSolid);
+  // shower opts
+  show('shower-row-'+id, isShower);
+  // frameless opts
+  show('frameless-row-'+id, isFramelessDoor);
+  // awning mode
+  show('awning-row-'+id, isAwning);
+  // ผิว/สี finish (p.fin)
+  show('finish-row-'+id, isCorrugated);
+  // gridmark
+  show('gridmark-wrap-'+id, !NO_GRIDMARK_PRODS.includes(prod));
+  // solidlower
+  show('solidlower-wrap-'+id, SOLIDLOWER_PRODS.includes(prod));
+  // ครอบวงกบ (ซ่อน shower/บานเปลือย)
+  show('fcsides-wrap-'+id, !['shower','frameless_fixed','frameless_door'].includes(prod));
+  // ดรอปพื้น
+  show('dropfloor-row-'+id, !NO_DROPFLOOR_PRODS.includes(prod));
+  // uchannel
+  show('uchannel-row-'+id, !NO_UCHANNEL_PRODS.includes(prod));
+  // COMMON_OPTS
+  show('beam-row-'+id, HAS_BEAM_SUPPORT.includes(prod));
+  show('hide-beam-row-'+id, HAS_HIDE_BEAM.includes(prod));
+  show('hide-track-row-'+id, HAS_HIDE_TRACK.includes(prod));
+  show('u-track-row-'+id, HAS_U_TRACK.includes(prod));
+  show('soft-close-row-'+id, HAS_SOFT_CLOSE.includes(prod));
+  // มอเตอร์บานยก
+  show('lift-motor-row-'+id, isLift);
+  // PC Door ชุดล็อค
+  var itype = (document.getElementById('itype-'+id)||{}).value||'door';
+  show('pc-lock-row-'+id, isPc && itype==='door');
 
   calcItem(id);
   updateSummary(id);
@@ -1035,9 +1471,9 @@ function rebuildMosqChips(id, n) {
   if(!wrap) return;
   n = parseInt(n)||1;
   var cap = Math.min(n, 8);
-  var html = '<button class="chip on" data-mp="auto" onclick="pickMosqPanels(\''+id+'\',\'auto\',this)" style="min-height:36px;font-size:13px;padding:0 10px;">auto</button>';
+  var html = '<button class="chip on" data-mp="auto" onclick="pickMosqPanels(\''+id+'\',\'auto\',this)" style="min-height:44px;font-size:13px;padding:0 10px;">auto</button>';
   for(var i=1; i<=cap; i++){
-    html += '<button class="chip" data-mp="'+i+'" onclick="pickMosqPanels(\''+id+'\',\''+i+'\',this)" style="min-height:36px;font-size:13px;padding:0 10px;min-width:44px;">'+i+'</button>';
+    html += '<button class="chip" data-mp="'+i+'" onclick="pickMosqPanels(\''+id+'\',\''+i+'\',this)" style="min-height:44px;font-size:13px;padding:0 10px;min-width:44px;">'+i+'</button>';
   }
   wrap.innerHTML = html;
 }
@@ -1050,13 +1486,41 @@ function pickMosqPanels(id, val, btn) {
   calcItem(id);
 }
 
-// ===== THRESH =====
+// ===== THRESH (บานเปิด) =====
 function pickThresh(id, val, btn) {
   var chips = document.getElementById('threshchips-'+id);
   if(chips) chips.querySelectorAll('.chip').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   calcItem(id);
 }
+
+// ===== THRESH F (บานเฟี้ยม) =====
+function pickThreshF(id, val, btn) {
+  var chips = document.getElementById('threshfchips-'+id);
+  if(chips) chips.querySelectorAll('.chip').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  // cosmetic only — ไม่แตะราคา
+}
+
+// ===== PC LOCK =====
+function pickPcLock(id, val, btn) {
+  var chips = document.getElementById('pc-lockchips-'+id);
+  if(chips) chips.querySelectorAll('.chip').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+}
+
+// ===== AWNING MODE =====
+document.addEventListener('change', function(e) {
+  var el = e.target;
+  if(!el.id) return;
+  var m = el.id.match(/^awn-mode-(.+)$/);
+  if(m) {
+    var iid = m[1];
+    var warn = document.getElementById('tilt-warn-'+iid);
+    if(warn) warn.style.display = (el.value==='2') ? '' : 'none';
+    calcItem(iid);
+  }
+});
 
 // ===== SUBITEM =====
 function addSubItem(id) {

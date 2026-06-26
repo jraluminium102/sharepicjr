@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โครงสร้างราคา R4.0 + ราคาต่อบาน</title>
+<style>
+  :root{ --red:#c0392b; --red2:#e74c3c; --ink:#222; --mut:#777; --line:#e5e5e5;
+    --grn:#1e8449; --grnbg:#e8f6ee; --amb:#b9770e; --ambbg:#fef5e7; --blu:#2471a3; --blubg:#eaf2f8; --pur:#7d3c98; --purbg:#f4ecf7;}
+  *{box-sizing:border-box}
+  body{font-family:"Sarabun","Segoe UI",sans-serif; margin:0; background:#f4f5f7; color:var(--ink); line-height:1.55}
+  .wrap{max-width:940px; margin:0 auto; padding:22px 18px 70px}
+  .top{background:linear-gradient(135deg,var(--red),var(--red2)); color:#fff; border-radius:16px; padding:22px 24px; box-shadow:0 6px 20px rgba(192,57,43,.25)}
+  .top h1{margin:0 0 4px; font-size:22px}
+  .top p{margin:0; opacity:.95; font-size:13.5px}
+  .lock{display:inline-block; margin-top:10px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.4); padding:5px 12px; border-radius:999px; font-size:12.5px; font-weight:600}
+  h2.sec{font-size:16px; color:var(--red); margin:28px 0 8px; padding-bottom:5px; border-bottom:2px solid #f0d9d5}
+  .card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin:12px 0; box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  code,.mono{font-family:"Consolas",monospace; font-size:12.5px}
+  .codebox{background:#2b2b2b; color:#eee; border-radius:10px; padding:12px 14px; font-family:"Consolas",monospace; font-size:12.5px; overflow-x:auto; margin:8px 0; line-height:1.7}
+  .codebox .k{color:#ff8a80} .codebox .n{color:#82b1ff} .codebox .c{color:#9e9e9e} .codebox .h{background:#5a4a00; color:#ffe082; padding:1px 3px; border-radius:3px}
+  .pin{display:inline-block; background:var(--ambbg); color:var(--amb); border:1px solid #f0d9a0; border-radius:6px; padding:2px 8px; font-size:12px; font-weight:700}
+  table{width:100%; border-collapse:collapse; margin:8px 0; font-size:13px; background:#fff; border-radius:8px; overflow:hidden}
+  th,td{border:1px solid var(--line); padding:7px 9px; text-align:center; vertical-align:middle}
+  th{background:#fafafa; color:#555; font-weight:700}
+  td.l{text-align:left}
+  .up{color:var(--red); font-weight:700} .down{color:var(--grn); font-weight:700}
+  .opt{border-left:5px solid #ccc; padding-left:14px; margin:14px 0}
+  .opt.a{border-color:var(--grn)} .opt.b{border-color:var(--blu)} .opt.c{border-color:var(--pur)}
+  .opt h3{margin:0 0 4px; font-size:15.5px}
+  .badge{font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:999px; margin-left:6px}
+  .b-rec{background:var(--grnbg); color:var(--grn)} .b-mid{background:var(--blubg); color:var(--blu)} .b-hard{background:var(--purbg); color:var(--pur)}
+  .pc{display:flex; gap:14px; flex-wrap:wrap; margin-top:6px}
+  .pc > div{flex:1; min-width:200px; border-radius:8px; padding:8px 12px; font-size:13px}
+  .pro{background:var(--grnbg)} .con{background:#fdecea}
+  .pro b{color:var(--grn)} .con b{color:var(--red)}
+  .ill{background:#fbfbfd; border:1px dashed #ccc; border-radius:10px; padding:12px 14px; margin:8px 0; font-size:13.5px}
+  .formula{background:#eef7ff; border:1px solid #c5e0f5; border-radius:8px; padding:8px 12px; font-family:monospace; font-size:13px; margin:6px 0; color:#1a5276}
+  .formula .add{color:var(--red); font-weight:700}
+  .ans{background:var(--grnbg); border:1px solid #b7e0c5; border-radius:12px; padding:14px 16px; margin:10px 0}
+  .ans b{color:var(--grn)}
+  .foot{text-align:center; color:var(--mut); font-size:12px; margin-top:30px}
+  ul{margin:6px 0; padding-left:20px} li{margin:4px 0}
+  .step-dot{display:inline-block; width:22px; height:22px; border-radius:50%; background:var(--red); color:#fff; text-align:center; font-weight:700; font-size:13px; line-height:22px; margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <h1>🏗️ โครงสร้างราคา R4.0 — ปรับตรงไหน + ราคาต่อบานเข้ายังไง</h1>
+    <p>ตอบ 3 เรื่อง: (1) พี่กรอกราคาตรงไหน · (2) โปรเจคใหม่หรือทำต่อ · (3) ออกแบบราคาต่อบาน</p>
+    <span class="lock">🔒 ดราฟวางแผน · อ่านโค้ดจริงมาประกอบ · ยังไม่แตะ index.html</span>
+  </div>
+
+  <!-- ===== 1 ===== -->
+  <h2 class="sec">1️⃣ พี่กรอก/ปรับราคาตรงไหน?</h2>
+  <div class="card">
+    <p>ราคาทั้งระบบรวมอยู่ที่ <span class="pin">RATES{ }</span> ก้อนเดียว (index.html บรรทัด 576) — <b>จุดแก้เดียว</b> สินค้าทุกตัวชี้มาที่นี่</p>
+    <div class="codebox">
+<span class="c">// ตารางราคากลาง — แก้ตัวเลขที่นี่ที่เดียว ทั้งเว็บเปลี่ยนตาม</span>
+<span class="k">const</span> RATES = {
+  SMS:  [[2.0,2.3,<span class="h">6500</span>],[2.3,3.5,<span class="h">6000</span>], ... [12,9999,<span class="h">4000</span>]],
+  EURO: [[2.0,2.3,<span class="h">7200</span>],[2.3,3.5,<span class="h">6600</span>], ... ],
+  <span class="c">//        └ช่วงล่าง └ช่วงบน └เรต/ตร.ม. (← เลขที่พี่ปรับ)</span>
+}
+    </div>
+    <div class="ill">📖 <b>อ่านยังไง:</b> <code>[2.0, 2.3, 6500]</code> = บานพื้นที่ 2.0–2.3 ตร.ม. คิด <b>6,500 บาท/ตร.ม.</b><br>
+    <b>R4.0 = แค่เปลี่ยนชุดเลขนี้</b> (ทุน/ตร.ม. × 2 ปัดร้อย) โครงเดิมไม่ขยับ → <b>เสี่ยงต่ำสุด งานไม่พัง</b></div>
+  </div>
+
+  <!-- ===== 2 ===== -->
+  <h2 class="sec">2️⃣ เปิดโปรเจคใหม่ หรือทำต่อในนี้?</h2>
+  <div class="card">
+    <table>
+      <tr><th>ประเด็น</th><th>🟢 ทำต่อโปรเจคเดิม (แนะนำ)</th><th>🔴 เปิดโปรเจค/เว็บใหม่</th></tr>
+      <tr><td class="l">ความเร็ว</td><td>เร็ว — แก้แค่ตัวเลข</td><td>ช้า — ทำ engine/ใบ/ฟอร์มใหม่หมด</td></tr>
+      <tr><td class="l">งานพัง</td><td>เสี่ยงต่ำ + มี golden snapshot กัน</td><td>เสี่ยงสูง — ของที่เทสแล้วต้องเทสซ้ำหมด</td></tr>
+      <tr><td class="l">เฟิร์นตรวจ</td><td>เทียบเก่า→ใหม่ในที่เดียว</td><td>ต้องเรียนระบบใหม่</td></tr>
+      <tr><td class="l">อนาคตปรับราคา</td><td>กดเปลี่ยนเลข RATES จบ</td><td>เท่ากัน แต่ลงทุนทำใหม่ก่อน</td></tr>
+    </table>
+    <div class="ans">✅ <b>คำตอบ: ทำต่อในโปรเจคเดิม</b> — engine เดียว เปลี่ยนแค่ "ตัวเลข + เพิ่ม field ต่อบาน" ไม่ต้อง fork เว็บใหม่<br>
+    💡 ส่วน <b>"แชท"</b> ค่อยเปิดใหม่ได้ (แชทนี้ยาว) — แต่ <b>"โค้ด/เว็บ" ใช้ตัวเดิม</b> · R4.0 ทำเป็น "ชุดเลขที่สลับเข้าได้" ปลอดภัยกว่าสร้างใหม่</div>
+  </div>
+
+  <!-- ===== 3 ===== -->
+  <h2 class="sec">3️⃣ ราคาต่อบาน — ออกแบบให้มีผลยังไง</h2>
+  <div class="card">
+    <p><b>สถานะตอนนี้:</b> เครื่องคิดราคา "ต่อบาน" มีอยู่แล้ว<b>บางชนิด</b> (ของจริงในโค้ด):</p>
+    <ul>
+      <li>บานเฟี้ยม → <code>unit_rate</code> คิดต่อบาน + ขั้นต่ำ 15,000/บาน</li>
+      <li>บานเปิดยูโร → <code>ceLinear</code> คิดต่อบาน (Linear)</li>
+      <li>บานเปลือยประตู → <code>per_panel: 8000</code> บวกต่อบาน</li>
+      <li>บานยก → คิดต่อ "ชุด" (บังคับ 2 บาน) + บานเพิ่ม</li>
+    </ul>
+    <p class="con" style="border-radius:8px;padding:8px 12px"><b>ช่องว่าง:</b> บานเลื่อน/ติดตาย/อีกหลายตัว = คิดแค่ <b>พื้นที่อย่างเดียว</b> — บาน 2 ตร.ม. เท่ากันคิดเท่ากันหมด ไม่ว่าจะ 2 บานหรือ 4 บาน (แต่ทุนจริงต่างกัน เพราะบานเยอะ = เฟรม/ล้อ/มือจับเยอะ)</p>
+    <p>📌 <b>ในไฟล์ถอดทุน 4.0 มี "จำนวนบาน" เป็นตัวแปร</b> → R4.0 ควรให้จำนวนบานมีผล มี 3 ทางเลือก:</p>
+
+    <!-- OPT A -->
+    <div class="opt a">
+      <h3>ทาง A — เรตต่อ ตร.ม. (เดิม) + บวก "ต่อบาน" แยก<span class="badge b-rec">แนะนำ ✅</span></h3>
+      <p>เพิ่ม field ใหม่ในแต่ละสินค้า <code>panelAdd</code> = ค่าเพิ่มต่อบาน · ราคาคิดแบบ:</p>
+      <div class="formula">ราคา = (พื้นที่ × เรต/ตร.ม.) <span class="add">+ (จำนวนบาน × panelAdd)</span></div>
+      <div class="ill"><b>ตัวอย่าง</b> บานเลื่อน SMS 4 บาน พื้นที่ 6 ตร.ม. · panelAdd = 800/บาน<br>
+      = (6 × 4,100) + (4 × 800) = 24,600 + 3,200 = <b>27,800</b> · ถ้า 2 บานพื้นที่เท่ากัน = 24,600 + 1,600 = <b>26,200</b> (ถูกกว่าเพราะบานน้อย ✔)</div>
+      <div class="pc">
+        <div class="pro"><b>ข้อดี:</b> โครงเดิมอยู่ครบ · เพิ่มแค่ field เดียว · จำนวนบานมีผลทันที · กดปรับ 2 ตัวเลข (เรต + ต่อบาน) · golden กันพังได้</div>
+        <div class="con"><b>ข้อควรระวัง:</b> ต้องตั้ง panelAdd ต่อชนิด (แต่ดึงจากไฟล์ทุน 4.0 ได้เลย)</div>
+      </div>
+    </div>
+
+    <!-- OPT B -->
+    <div class="opt b">
+      <h3>ทาง B — ตารางเรต 2 มิติ (พื้นที่ × จำนวนบาน)<span class="badge b-mid">กลาง</span></h3>
+      <p>เปลี่ยน RATES ให้มีเรตแยกตามจำนวนบานด้วย เช่น เรต 2 บาน / 3 บาน / 4 บาน คนละชุด</p>
+      <div class="formula">ราคา = พื้นที่ × เรต[ช่วงพื้นที่][จำนวนบาน]</div>
+      <div class="pc">
+        <div class="pro"><b>ข้อดี:</b> แม่นกับทุนจริงสุด (ทุนต่อบานไม่เชิงเส้น)</div>
+        <div class="con"><b>ข้อเสีย:</b> ตารางใหญ่ขึ้น 3–4 เท่า · กรอก/ตรวจเยอะ · engine ต้องแก้ลึก · เสี่ยงพังสูงกว่า</div>
+      </div>
+    </div>
+
+    <!-- OPT C -->
+    <div class="opt c">
+      <h3>ทาง C — คิดทุนจริงต่อบานทั้งหมด (rebuild)<span class="badge b-hard">หนัก</span></h3>
+      <p>เลิกเรตต่อ ตร.ม. ทั้งหมด → คิดจาก น้ำหนักอลู × ราคา/กก. × จำนวนเส้น + กระจก + ค่าแรง ต่อบานจริง (ตามไฟล์ 4.0 ตรงๆ)</p>
+      <div class="pc">
+        <div class="pro"><b>ข้อดี:</b> แม่นที่สุด · กดเปลี่ยนน้ำหนัก/ราคาอลู ราคาขยับเอง (เป้าหมายปลายทาง)</div>
+        <div class="con"><b>ข้อเสีย:</b> รื้อ engine ใหญ่ · เสี่ยงพังสูงสุด · ใช้เวลานาน · เฟิร์นตรวจยาก</div>
+      </div>
+    </div>
+
+    <div class="ans">✅ <b>แนะนำเริ่ม "ทาง A"</b> — ได้ "จำนวนบานมีผล" ทันที โดยโครงเว็บไม่พัง · เป็นบันไดไปทาง C ในอนาคต (ค่อยๆ ขยับ)<br>
+    เพราะมติคือ <b>markup 100% เป็นฐาน</b> อยู่แล้ว → ทาง A = เรต/ตร.ม.(×2) + ต่อบาน(×2) ก็ครบเป้า เร็ว แม่น ไม่พัง</div>
+  </div>
+
+  <!-- next -->
+  <h2 class="sec">⏭️ ถ้าโอเค — ลำดับทำ (ปรับจากแผนเดิม)</h2>
+  <div class="card">
+    <p><span class="step-dot">1</span> ดึงจากไฟล์ 4.0: <b>ทุน/ตร.ม. (×2)</b> + <b>ทุนต่อบาน (×2)</b> ทุกกลุ่ม</p>
+    <p><span class="step-dot">2</span> ดราฟตารางเทียบ R3.9 → R4.0 (มีคอลัมน์ "ต่อบาน" เพิ่ม) → เฟิร์นตรวจ</p>
+    <p><span class="step-dot">3</span> ใบสั่ง dev: เปลี่ยนเลข <code>RATES</code> + เพิ่ม field <code>panelAdd</code> + แก้ engine จุดเดียว (บวกต่อบาน) + golden snapshot</p>
+    <p><span class="step-dot">4</span> ส่วนลดรวม = เลเยอร์ทีหลัง</p>
+  </div>
+
+  <div class="foot">ดราฟวางแผน · 26 มิ.ย. 2569 · อ้างอิง index.html บรรทัด 576 (RATES) + PRODUCTS · 🔒 ยังไม่แก้อะไร</div>
+</div>
+</body>
+</html>

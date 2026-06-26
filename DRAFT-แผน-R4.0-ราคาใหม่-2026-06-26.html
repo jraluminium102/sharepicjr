@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แผนปรับราคา R4.0 (markup 100%)</title>
+<style>
+  :root{ --red:#c0392b; --red2:#e74c3c; --ink:#222; --mut:#777; --line:#e5e5e5;
+    --grn:#1e8449; --grnbg:#e8f6ee; --amb:#b9770e; --ambbg:#fef5e7; --blu:#2471a3; --blubg:#eaf2f8; }
+  *{box-sizing:border-box}
+  body{font-family:"Sarabun","Segoe UI",sans-serif; margin:0; background:#f4f5f7; color:var(--ink); line-height:1.55}
+  .wrap{max-width:920px; margin:0 auto; padding:22px 18px 60px}
+  .top{background:linear-gradient(135deg,var(--red),var(--red2)); color:#fff; border-radius:16px; padding:22px 24px; box-shadow:0 6px 20px rgba(192,57,43,.25)}
+  .top h1{margin:0 0 4px; font-size:23px}
+  .top p{margin:0; opacity:.95; font-size:14px}
+  .lock{display:inline-block; margin-top:10px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.4);
+    padding:5px 12px; border-radius:999px; font-size:12.5px; font-weight:600}
+  .decision{background:#fff; border:2px solid var(--red); border-radius:14px; padding:16px 18px; margin:18px 0}
+  .decision b{color:var(--red)}
+  .decision .row{display:flex; gap:18px; flex-wrap:wrap; margin-top:8px}
+  .decision .row div{flex:1; min-width:200px; background:#fbeeec; border-radius:10px; padding:10px 12px; font-size:13.5px}
+  h2.sec{font-size:15px; color:var(--red); margin:26px 0 6px; letter-spacing:.3px}
+
+  .phase{background:#fff; border:1px solid var(--line); border-radius:14px; padding:0; margin:14px 0; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .ph-head{display:flex; align-items:center; gap:12px; padding:13px 16px; cursor:pointer; user-select:none}
+  .ph-num{flex:none; width:38px; height:38px; border-radius:10px; display:grid; place-items:center; font-weight:800; font-size:16px; color:#fff}
+  .ph-0 .ph-num{background:#8e44ad} .ph-1 .ph-num{background:var(--blu)} .ph-2 .ph-num{background:var(--amb)} .ph-3 .ph-num{background:var(--grn)}
+  .ph-title{flex:1}
+  .ph-title b{font-size:15.5px} .ph-title .sub{display:block; font-size:12.5px; color:var(--mut)}
+  .ph-tag{flex:none; font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:999px}
+  .tag-now{background:var(--grnbg); color:var(--grn)} .tag-wait{background:var(--ambbg); color:var(--amb)} .tag-later{background:#eee; color:#777}
+  .ph-body{padding:2px 18px 16px 66px; font-size:13.8px}
+  .ph-body ol{margin:6px 0; padding-left:18px} .ph-body li{margin:5px 0}
+  .ph-body .note{background:#f7f7f9; border-left:3px solid var(--red2); padding:8px 12px; border-radius:6px; margin-top:8px; font-size:12.8px; color:#555}
+  .arrow{text-align:center; color:#bbb; font-size:20px; margin:-6px 0 -2px}
+
+  table{width:100%; border-collapse:collapse; margin:10px 0; font-size:13px; background:#fff; border-radius:8px; overflow:hidden}
+  th,td{border:1px solid var(--line); padding:6px 9px; text-align:center}
+  th{background:#fafafa; color:#555; font-weight:700}
+  .up{color:var(--red); font-weight:700} .down{color:var(--grn); font-weight:700}
+  .grp{display:inline-block; padding:3px 9px; border-radius:6px; font-size:12px; font-weight:600; margin:2px}
+  .g-done{background:var(--grnbg); color:var(--grn)} .g-todo{background:var(--ambbg); color:var(--amb)}
+
+  .flow{display:flex; align-items:stretch; gap:0; flex-wrap:wrap; margin:8px 0 4px}
+  .flow .step{flex:1; min-width:120px; text-align:center; padding:10px 6px; border-radius:10px; background:#fff; border:1px solid var(--line); font-size:12.5px; font-weight:600; position:relative}
+  .flow .arr{flex:none; display:grid; place-items:center; color:#ccc; font-size:18px; padding:0 4px}
+  .why{background:#fff; border:1px dashed #ccc; border-radius:12px; padding:14px 16px; margin-top:8px; font-size:13.5px}
+  .foot{text-align:center; color:var(--mut); font-size:12px; margin-top:30px}
+  .pill{display:inline-block; background:#eee; border-radius:6px; padding:1px 7px; font-size:12px; font-family:monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <h1>📐 แผนปรับราคาใหม่ R4.0 — markup 100%</h1>
+    <p>เปลี่ยนจากเรต R3.9 (สูตรเดิม) → ราคาฐานจากทุนจริง × 2 · ขั้นตอนก่อน–หลัง</p>
+    <span class="lock">🔒 ดราฟวางแผนเท่านั้น · ยังไม่แตะโค้ด/เว็บ/index.html</span>
+  </div>
+
+  <div class="decision">
+    <b>มติที่เคาะแล้ว (25 มิ.ย.):</b> ราคาขาย = <b>ทุน × 2 (markup 100%)</b> ปัดขึ้นหลักร้อย = ราคาฐานทุกขนาดเท่ากัน
+    <div class="row">
+      <div>✅ <b>ฐานสะอาด</b> — ทุกตัวกำไร 100% เท่ากัน ไม่ต้องเดาเส้นกำไร</div>
+      <div>✅ <b>ส่วนลดแยกทีหลัง</b> — ค่อยทำเลเยอร์ส่วนลดรวมตอนต่อรอง</div>
+      <div>✅ <b>ปรับไว</b> — อนาคตแค่กดเปลี่ยนน้ำหนัก/ราคาอลู เรตขยับเอง</div>
+    </div>
+  </div>
+
+  <h2 class="sec">🗺️ ภาพรวม 4 เฟส (ซ้าย → ขวา)</h2>
+  <div class="flow">
+    <div class="step ph-0" style="border-top:3px solid #8e44ad">0 · เตรียมเรต</div>
+    <div class="arr">→</div>
+    <div class="step ph-1" style="border-top:3px solid var(--blu)">1 · ดราฟเทียบ<br>เฟิร์นตรวจ</div>
+    <div class="arr">→</div>
+    <div class="step ph-2" style="border-top:3px solid var(--amb)">2 · ใบสั่ง dev<br>แก้เลขเรต</div>
+    <div class="arr">→</div>
+    <div class="step ph-3" style="border-top:3px solid var(--grn)">3 · ส่วนลดรวม<br>(ทีหลัง)</div>
+  </div>
+
+  <!-- PHASE 0 -->
+  <div class="phase ph-0">
+    <div class="ph-head" onclick="t(this)">
+      <div class="ph-num">0</div>
+      <div class="ph-title"><b>เตรียมเรตใหม่</b><span class="sub">ดึงทุน/ตร.ม. ทุกกลุ่ม × 2 ปัดขึ้นร้อย</span></div>
+      <div class="ph-tag tag-now">ทำได้เลย</div>
+    </div>
+    <div class="ph-body">
+      <ol>
+        <li>ดึง <b>ทุน/ตร.ม. ทุกช่วงพื้นที่</b> จาก <span class="pill">ถอดทุน 4.0.xlsx</span> (ชีท “เทียบ R3.9” คอลัมน์ G)</li>
+        <li>คำนวณเรตใหม่ = ทุน/ตร.ม. × 2 → ปัดขึ้นหลักร้อย</li>
+      </ol>
+      <div>กลุ่มที่ต้องดึง:
+        <span class="grp g-done">SMS ✅ เสร็จ</span>
+        <span class="grp g-todo">ยูโร ⏳</span>
+        <span class="grp g-todo">E-series ⏳</span>
+        <span class="grp g-todo">เฟี้ยมยูโร ⏳</span>
+      </div>
+      <div class="note">📊 ตัวอย่าง SMS ที่ดึงมาแล้ว (per ตร.ม.) — บานเล็กแพงขึ้น บานใหญ่ถูกลง:</div>
+      <table>
+        <tr><th>ช่วงพื้นที่ (ตร.ม.)</th><th>R3.9 เดิม</th><th>→ R4.0 (×2)</th><th>เปลี่ยน</th></tr>
+        <tr><td>2.0–2.3</td><td>6,500</td><td>9,200</td><td class="up">+42%</td></tr>
+        <tr><td>3.5–4.5</td><td>5,700</td><td>5,200</td><td class="down">−9%</td></tr>
+        <tr><td>7.0–9.0</td><td>4,400</td><td>3,200</td><td class="down">−27%</td></tr>
+        <tr><td>&gt;12</td><td>4,000</td><td>1,900</td><td class="down">−53%</td></tr>
+      </table>
+      <div class="note">⚠️ <b>หมายเหตุ:</b> ทุนต้อง <b>เปิด Excel กด Save ก่อน</b> สูตรถึงเก็บค่า (ไฟล์ READ-ONLY ห้ามแก้)</div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+
+  <!-- PHASE 1 -->
+  <div class="phase ph-1">
+    <div class="ph-head" onclick="t(this)">
+      <div class="ph-num">1</div>
+      <div class="ph-title"><b>ดราฟเทียบราคา → ให้เฟิร์นตรวจ</b><span class="sub">ตาราง R3.9 ↔ R4.0 คู่กัน ทุกกลุ่ม</span></div>
+      <div class="ph-tag tag-now">หลังเฟส 0</div>
+    </div>
+    <div class="ph-body">
+      <ol>
+        <li>ทำหน้า HTML <b>ตารางเทียบเก่า/ใหม่/%เปลี่ยน</b> ทุกกลุ่ม + ไฮไลต์จุดขยับเยอะ</li>
+        <li>ส่งลิงก์ให้ <b>เฟิร์น</b> ที่ชินราคาเก่าตรวจว่ารับได้ไหม</li>
+        <li>พี่นัท approve เรตสุดท้าย</li>
+      </ol>
+      <div class="note">🎯 จุดสำคัญที่เฟิร์นต้องดู: บานเล็กแพงขึ้น (+42%) ลูกค้ารับได้ไหม · บานใหญ่ถูกลงเยอะ (−50%) ขายดีขึ้นแต่กำไร/ชุดยังโอเค</div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+
+  <!-- PHASE 2 -->
+  <div class="phase ph-2">
+    <div class="ph-head" onclick="t(this)">
+      <div class="ph-num">2</div>
+      <div class="ph-title"><b>ใบสั่ง dev — เปลี่ยนแค่ตัวเลขเรต</b><span class="sub">โครงเว็บเดิม (ทาง A) ไม่แตะ logic</span></div>
+      <div class="ph-tag tag-wait">รอ index ว่าง</div>
+    </div>
+    <div class="ph-body">
+      <ol>
+        <li>เขียนใบสั่ง: แก้เฉพาะตัวเลขใน <span class="pill">RATES</span> — โครงเรตต่อช่วงพื้นที่คงเดิม</li>
+        <li><b>golden snapshot</b> ก่อน–หลัง กันราคากลุ่มอื่นเพี้ยน</li>
+        <li>เทสเว็บสด → ส่ง dev แก้ → push</li>
+      </ol>
+      <div class="note">🚦 <b>ทำไมต้องรอ:</b> ตอนนี้มีแชทอื่นแก้ <span class="pill">index.html</span> อยู่ — ต้องรอ “index ว่าง” ก่อน ไม่งั้นชนไฟล์กัน</div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+
+  <!-- PHASE 3 -->
+  <div class="phase ph-3">
+    <div class="ph-head" onclick="t(this)">
+      <div class="ph-num">3</div>
+      <div class="ph-title"><b>เลเยอร์ส่วนลดรวม</b><span class="sub">เฟสแยก ทำหลังฐานราคานิ่งแล้ว</span></div>
+      <div class="ph-tag tag-later">ทีหลัง</div>
+    </div>
+    <div class="ph-body">
+      <ol>
+        <li>ฐานราคา 100% นิ่งก่อน → ค่อยเพิ่มช่องส่วนลดรวมทั้งใบ</li>
+        <li>ส่วนลดเป็นชั้นแยก ไม่ยุ่งกับเรตฐาน (ปรับต่อรองได้อิสระ)</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2 class="sec">🤔 ทำไมเรียงแบบนี้</h2>
+  <div class="why">
+    <b>1) เตรียมเรตก่อน</b> — ทำได้เลยตอนนี้ ไม่ต้องรอใคร ไม่แตะเว็บ · <b>2) เฟิร์นตรวจก่อนแก้จริง</b> — กันราคาพลาดขึ้นเว็บแล้วลูกค้าเห็น · <b>3) แก้เว็บทีหลัง</b> — รอ index ว่างกันชนแชทอื่น แก้แค่ตัวเลขเสี่ยงต่ำ · <b>4) ส่วนลดสุดท้าย</b> — แยกชั้นให้ฐานสะอาด ปรับง่ายในอนาคต
+  </div>
+
+  <h2 class="sec">⏭️ ก้าวถัดไป (เลือกได้)</h2>
+  <div class="why">
+    👉 <b>เริ่มเฟส 0</b> — ดึงเรต ยูโร / E-series / เฟี้ยมยูโร ให้ครบ (เหมือน SMS) แล้วทำตารางเทียบ<br>
+    💡 แนะนำเปิด <b>แชทใหม่ “R4.0 เรตใหม่”</b> ทำต่อ — แชทนี้ยาวมาก จะรันไวกว่า · memory จดไว้ครบแล้ว ไม่ต้องเล่าซ้ำ
+  </div>
+
+  <div class="foot">ดราฟวางแผน · 26 มิ.ย. 2569 · 🔒 ยังไม่แก้อะไรทั้งสิ้น — รอพี่นัทเคาะ</div>
+</div>
+
+<script>
+function t(h){ var b=h.nextElementSibling; b.style.display = (b.style.display==='none')?'block':'none'; }
+</script>
+</body>
+</html>
