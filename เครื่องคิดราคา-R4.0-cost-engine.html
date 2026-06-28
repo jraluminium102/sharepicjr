@@ -9173,14 +9173,15 @@ const PRODUCTS_TODO = [
     const pp = { profitPct: PB.settings.profitPct, installProfitPct: PB.settings.installProfitPct };
     const lines = []; let sell = 0, cost = 0;
     const wallW = [W, D, D, W];  // ด้านกระจก: หน้า(กว้าง) → ข้าง(ลึก) → ข้าง → หลัง
+    const sideLbl = ['หน้า', 'ข้างซ้าย', 'ข้างขวา', 'หลัง'];
     const nWall = Math.max(1, Math.min(4, c.nwall || 3));
-    const wt = PRODUCTS[c.walltype] || PRODUCTS.fixed;
     for (let i = 0; i < nWall; i++) {
+      const wt = PRODUCTS[(c.sideTypes && c.sideTypes[i]) || c.walltype] || PRODUCTS.fixed;  // เลือกชนิดผนังต่อด้าน
       const ww = wallW[i] || W;
       const np = Math.max(1, Math.round(ww / 1.0));
       const r = computeCost(PB, wt, { w: ww * 100, h: RH * 100, p: Math.min(np, wt.maxP || 6), form: wt.defForm, glassType: wt.defGlass || 'เขียว 6มม.', color: 'white', material: wt.defMaterial, ...pp });
       sell += r.sell.withInstall; cost += r.cost.total;
-      lines.push({ cat: 'consum', name: 'ผนัง #' + (i + 1) + ' · ' + wt.name + ' (' + (Math.round(ww * 100) / 100) + '×' + RH + 'ม.)', qty: 1, unit: 'ด้าน', unitPrice: r.sell.withInstall, amount: r.sell.withInstall });
+      lines.push({ cat: 'consum', name: 'ผนัง' + sideLbl[i] + ' · ' + wt.name + ' (' + (Math.round(ww * 100) / 100) + '×' + RH + 'ม.)', qty: 1, unit: 'ด้าน', unitPrice: r.sell.withInstall, amount: r.sell.withInstall });
     }
     if (c.roofOn !== false) {
       const rr = computeCost(PB, PRODUCTS.roof, { w: W * 100, h: D * 100, p: 1, form: PRODUCTS.roof.defForm, material: c.roofmat || 'ไวนิล', ...pp });
@@ -9218,9 +9219,16 @@ const PRODUCTS_TODO = [
     const f1 = el('label', 'fld'); f1.innerHTML = `<span class="lbl">จำนวนด้านกระจก</span>`;
     f1.appendChild(chipRow([1, 2, 3, 4].map(n => ({ val: n, label: n + ' ด้าน' })), c.nwall, v => { c.nwall = v; upd(); }));
     body.appendChild(f1);
-    const f2 = el('label', 'fld'); f2.innerHTML = `<span class="lbl">ชนิดผนัง (บาน)</span>`;
-    f2.appendChild(chipRow((p.wallTypes || ['fixed']).map(id => ({ val: id, label: PRODUCTS[id] ? PRODUCTS[id].name : id })), c.walltype, v => { c.walltype = v; upd(); }));
-    body.appendChild(f2);
+    // เลือกชนิดผนังต่อด้าน (หน้า/ข้างซ้าย/ข้างขวา/หลัง)
+    const sideLbl = ['หน้า', 'ข้างซ้าย', 'ข้างขวา', 'หลัง'];
+    const nW = Math.max(1, Math.min(4, c.nwall || 3));
+    if (!c.sideTypes) c.sideTypes = [];
+    for (let i = 0; i < nW; i++) {
+      const f2 = el('label', 'fld'); f2.innerHTML = `<span class="lbl">ผนัง${sideLbl[i]} (ชนิดบาน)</span>`;
+      const cur = c.sideTypes[i] || c.walltype;
+      f2.appendChild(chipRow((p.wallTypes || ['fixed']).map(id => ({ val: id, label: PRODUCTS[id] ? PRODUCTS[id].name : id })), cur, v => { c.sideTypes[i] = v; upd(); }));
+      body.appendChild(f2);
+    }
     const f3 = el('label', 'fld'); f3.innerHTML = `<span class="lbl">หลังคา</span>`;
     f3.appendChild(chipRow([{ val: true, label: 'มีหลังคา' }, { val: false, label: 'ไม่มี' }], c.roofOn !== false, v => { c.roofOn = v; upd(); }));
     body.appendChild(f3);
