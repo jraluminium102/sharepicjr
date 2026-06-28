@@ -7995,6 +7995,18 @@ function computeCost(PB, prod, opt) {
     sellWithInstall = sellMfgOnly + ceil100(laborInstall * (1 + installProfitPct / 100));
   }
 
+  // (6) ออปชั่นเสริม (add-on) — แต่ละตัวเป็นบรรทัดราคาแยก บวกเข้ายอดขาย (ราคา R3.9 ยังไม่ถอดทุน · flag)
+  const selAddons = opt.addons || {};
+  let addonTotal = 0;
+  for (const ad of (prod.addons || [])) {
+    const r = computeAddon(ad, selAddons[ad], { W, H, P, area });
+    if (r && r.amount > 0) {
+      addonTotal += r.amount;
+      lines.push({ cat: 'addon', name: r.label, qty: r.qty || 1, unit: r.unit || '', unitPrice: r.unitPrice || r.amount, amount: round2(r.amount) });
+    }
+  }
+  if (addonTotal > 0) { sellBeforeLabor += addonTotal; sellMfgOnly += addonTotal; sellWithInstall += addonTotal; }
+
   const costTotalOut = sellCostOverride != null ? round2(sellCostOverride) : round2(costTotal);
   return {
     input: { W, H, P, form, area: round2(area), color, material, glassType, brand, mult: round3(mult), profitPct, installProfitPct },
@@ -8015,6 +8027,36 @@ function round2(x) { return Math.round((x + Number.EPSILON) * 100) / 100; }
 function round3(x) { return Math.round((x + Number.EPSILON) * 1000) / 1000; }
 function colorLabel(c) {
   return ({ white: 'อบขาว/ดำ', sahara: 'เทาซาฮาร่า', special: 'สีอบพิเศษ', woodSpecial: 'ลายไม้อบพิเศษ', woodStock: 'ลายไม้สต็อค' })[c] || c;
+}
+
+// ── ออปชั่นเสริม (add-on) — คืน {label,qty,unit,unitPrice,amount} หรือ null ถ้าไม่เลือก ──
+// ราคาอ้างอิง R3.9 (ยังไม่ถอดทุน R4.0 · ติดป้าย "(R3.9)") — W,H เป็นเมตร
+function computeAddon(id, sel, ctx) {
+  if (sel == null || sel === 'none' || sel === false || sel === '') return null;
+  const W = ctx.W, H = ctx.H;
+  if (id === 'frame_wrap') {            // ครอบวงกบอลู (รอบวงกบ × เรตตามสี)
+    const sides = (sel === '4') ? 4 : 3;
+    const perim = sides === 4 ? 2 * (W + H) : (2 * H + W);   // 3 ด้าน = บน+ข้าง 2 · 4 ด้าน = รอบ
+    const rate = 700;
+    return { label: 'ครอบวงกบอลู ' + sides + ' ด้าน (R3.9)', qty: round2(perim), unit: 'ม.', unitPrice: rate, amount: perim * rate };
+  }
+  if (id === 'closer') {                // โช้คอัพประตู
+    return { label: 'โช้คอัพประตู (R3.9)', qty: 1, unit: 'ชุด', unitPrice: 5000, amount: 5000 };
+  }
+  if (id === 'thresh') {                // ธรณีหลังเต่า
+    return sel === 'turtle' ? { label: 'ธรณีหลังเต่า + DropSeal (R3.9)', qty: 1, unit: 'ชุด', unitPrice: 1000, amount: 1000 } : null;
+  }
+  if (id === 'grid') {                  // คาดตาราง (เส้นนอน/ตั้ง × ความยาว × เรตสี)
+    const nh = (sel.nh | 0), nv = (sel.nv | 0), rate = sel.rate || 200;
+    const len = nh * W + nv * H;
+    if (len <= 0) return null;
+    return { label: 'คาดตาราง ' + nh + 'นอน+' + nv + 'ตั้ง (R3.9)', qty: round2(len), unit: 'ม.', unitPrice: rate, amount: len * rate };
+  }
+  if (id === 'digihandle') {            // มือจับดิจิตอล (sel = ราคา จาก DIGI)
+    const pr = +sel || 0;
+    return pr > 0 ? { label: 'มือจับดิจิตอล (R3.9)', qty: 1, unit: 'ชุด', unitPrice: pr, amount: pr } : null;
+  }
+  return null;
 }
 
 </script>
@@ -8044,7 +8086,7 @@ const PRODUCTS = {
 
   // ═══════════════════════ G1 บาน ═══════════════════════
   sms_slide: {
-    id: 'sms_slide', group: 1, name: 'บานเลื่อน SMS', brand: 'SMS', laborKey: 'บานเลื่อน SMS',
+    id: 'sms_slide', group: 1, name: 'บานเลื่อน SMS', brand: 'SMS', laborKey: 'บานเลื่อน SMS', addons: ['frame_wrap', 'grid'],
     icon: '🪟', defForm: 'อิสระ', forms: ['อิสระ', 'ลากจูง', 'เปิดคู่กลาง'],
     defaults: { w: 600, h: 300, p: 3 }, defGlass: 'เขียว 6มม.', minP: 2, maxP: 6,
     vars: SLIDE_VARS,
@@ -8146,7 +8188,7 @@ const PRODUCTS = {
   },
 
   open_door: {
-    id: 'open_door', group: 1, name: 'บานเปิด', brand: 'EURO', laborKey: 'บานเปิด (ยูโร)',
+    id: 'open_door', group: 1, name: 'บานเปิด', brand: 'EURO', laborKey: 'บานเปิด (ยูโร)', addons: ['frame_wrap', 'closer', 'thresh', 'grid'],
     icon: '🚪', defForm: 'มีธรณี', forms: ['มีธรณี', 'ไม่มีธรณี'],
     defaults: { w: 150, h: 200, p: 1 }, defGlass: 'เขียว 6มม.', minP: 1, maxP: 4,
     vars: {
@@ -8239,7 +8281,7 @@ const PRODUCTS = {
   },
 
   fixed: {
-    id: 'fixed', group: 1, name: 'บานติดตาย', brand: 'MTONG', laborKey: 'บานติดตาย',
+    id: 'fixed', group: 1, name: 'บานติดตาย', brand: 'MTONG', laborKey: 'บานติดตาย', addons: ['frame_wrap', 'grid'],
     icon: '🟦', defForm: 'กระจกล้วน', forms: ['กระจกล้วน'], stockLen: 6.0,
     defaults: { w: 150, h: 200, p: 1 }, defGlass: 'เขียว 6มม.', minP: 1, maxP: 6,
     alu: [
@@ -9080,7 +9122,7 @@ const PRODUCTS_TODO = [
   let quote = [];
 
   function defCfg(p) {
-    const c = { w: p.defaults.w, h: p.defaults.h, p: p.defaults.p, form: p.defForm || 'std', color: p.defColor || 'white', glassType: p.defGlass || 'เขียว 6มม.', material: p.defMaterial || null };
+    const c = { w: p.defaults.w, h: p.defaults.h, p: p.defaults.p, form: p.defForm || 'std', color: p.defColor || 'white', glassType: p.defGlass || 'เขียว 6มม.', material: p.defMaterial || null, addons: {} };
     if (p.composite && p.room) Object.assign(c, p.room);  // ห้องกระจก: roomH/nwall/walltype/roofOn/roofmat/floorOn
     return c;
   }
@@ -9090,7 +9132,7 @@ const PRODUCTS_TODO = [
     const p = PRODUCTS[id], c = getCfg(id);
     if (p.composite) return composeRoom(p, c);
     return computeCost(PB, p, {
-      w: c.w, h: c.h, p: c.p, form: c.form, color: c.color, glassType: c.glassType, material: c.material,
+      w: c.w, h: c.h, p: c.p, form: c.form, color: c.color, glassType: c.glassType, material: c.material, addons: c.addons || {},
       profitPct: PB.settings.profitPct, installProfitPct: PB.settings.installProfitPct,
     });
   }
@@ -9309,7 +9351,45 @@ const PRODUCTS_TODO = [
       f.appendChild(more); body.appendChild(f);
     }
 
+    // ── ออปชั่นเสริม (add-on แยกราคา) ──
+    if (p.addons && p.addons.length) renderAddons(p, c, body);
+
     if (p.note) body.appendChild(el('div', 'todo-note', 'ℹ️ ' + p.note));
+  }
+
+  // render ออปชั่นเสริมต่อรุ่น (เก็บใน c.addons{}) — แต่ละตัวบวกเป็นบรรทัดราคาในใบ
+  function renderAddons(p, c, body) {
+    if (!c.addons) c.addons = {};
+    const hd = el('div', 'todo-note'); hd.style.cssText = 'background:#fef3f2;border-color:#fecaca;color:#b3151d;font-weight:600';
+    hd.textContent = '➕ ออปชั่นเสริม (บวกแยกบรรทัดในใบ)'; body.appendChild(hd);
+    const A = c.addons;
+    const setA = (k, v) => { A[k] = v; renderConfig(); renderRight(); };
+    for (const ad of p.addons) {
+      if (ad === 'frame_wrap') {
+        const f = el('label', 'fld'); f.innerHTML = `<span class="lbl">ครอบวงกบอลู</span>`;
+        f.appendChild(chipRow([{ val: 'none', label: 'ไม่มี' }, { val: '3', label: '3 ด้าน' }, { val: '4', label: '4 ด้าน' }], A.frame_wrap || 'none', v => setA('frame_wrap', v)));
+        body.appendChild(f);
+      } else if (ad === 'closer') {
+        const f = el('label', 'fld'); f.innerHTML = `<span class="lbl">โช้คอัพประตู</span>`;
+        f.appendChild(chipRow([{ val: 'none', label: 'ไม่มี' }, { val: 'yes', label: 'มี (+5,000)' }], A.closer || 'none', v => setA('closer', v)));
+        body.appendChild(f);
+      } else if (ad === 'thresh') {
+        const f = el('label', 'fld'); f.innerHTML = `<span class="lbl">ธรณีประตู</span>`;
+        f.appendChild(chipRow([{ val: 'none', label: 'มาตรฐาน' }, { val: 'turtle', label: 'หลังเต่า (+1,000)' }], A.thresh || 'none', v => setA('thresh', v)));
+        body.appendChild(f);
+      } else if (ad === 'grid') {
+        const g = A.grid || { nh: 0, nv: 0, rate: 200 };
+        const f = el('label', 'fld'); f.innerHTML = `<span class="lbl">คาดตาราง (เส้น)</span>`;
+        const row = el('div', 'row2');
+        [['nh', 'แนวนอน'], ['nv', 'แนวตั้ง']].forEach(([k, lb]) => {
+          const ff = el('label', 'fld'); ff.innerHTML = `<span class="lbl" style="font-size:11px">${lb}</span>`;
+          const inp = el('input'); inp.type = 'number'; inp.value = g[k] || 0; inp.min = 0;
+          inp.oninput = () => { g[k] = +inp.value || 0; A.grid = g; renderRight(); };
+          ff.appendChild(inp); row.appendChild(ff);
+        });
+        f.appendChild(row); body.appendChild(f);
+      }
+    }
   }
 
   function renderRight() {
@@ -9340,8 +9420,8 @@ const PRODUCTS_TODO = [
 
   function renderBreakdown(r) {
     const box = $('#breakdown');
-    const catName = { alu: 'อลูมิเนียม (×ราคา/กก.)', bake: 'สี/ผิว', glass: 'กระจก', hardware: 'อุปกรณ์', consum: 'วัสดุสิ้นเปลือง' };
-    const cats = ['alu', 'bake', 'glass', 'hardware', 'consum'];
+    const catName = { alu: 'อลูมิเนียม (×ราคา/กก.)', bake: 'สี/ผิว', glass: 'กระจก', hardware: 'อุปกรณ์', consum: 'วัสดุสิ้นเปลือง', addon: 'ออปชั่นเสริม' };
+    const cats = ['alu', 'bake', 'glass', 'hardware', 'consum', 'addon'];
     let rows = '';
     cats.forEach(cat => {
       const lines = r.lines.filter(l => l.cat === cat);
