@@ -7919,7 +7919,12 @@ function computeCost(PB, prod, opt) {
     const tiers = (PB.R39RATES && prod.r39key) ? PB.R39RATES[prod.r39key] : null;
     const lenOrArea = prod.r39method === 'per_length_tier' ? W : area;  // ราวบันได = ความยาว(กว้าง)
     let raw;
-    if (prod.r39method === 'per_sqm') raw = area * ((prod.r39rate || 0) + (prod.r39fin || 0));
+    if (prod.r39method === 'per_sqm') {
+      // cascade (ระแนง) → ดึงเรต/ค่าสีจาก ROW (lut ต่อลาย) · ไม่งั้นใช้ r39rate คงที่
+      const rr = (prod.cascade && scope.ROW && scope.ROW.rate) ? scope.ROW.rate : (prod.r39rate || 0);
+      const rf = (prod.cascade && scope.ROW && scope.ROW.fin) ? scope.ROW.fin : (prod.r39fin || 0);
+      raw = area * (rr + rf);
+    }
     else if (prod.r39method === 'per_length_tier') raw = lenOrArea * rateOf(lenOrArea, tiers);
     else raw = area * rateOf(area, tiers);  // bucket / area_rate
     const goods = roundUp1000(Math.max(prod.r39min || 0, raw));
@@ -8890,10 +8895,10 @@ const PRODUCTS_TODO = [
   const CAT2G={'บานเลื่อน':1,'บานเปิด':1,'ติดตาย':1,'บานกระทุ้ง':1,'บานหมุน':1,'บานเฟี้ยม':1,'เลื่อนภายใน':1,'บานยก':1,'shower':1,'บานเปลือย':1,'ดัดโค้ง':1,'PC Door':1,'YKK':1,'ระแนง':2,'ประตูรั้ว':2,'เส้นคาด':2,'ราวบันได':2,'ระแนง-บังตา':2,'ระแนง-ผนัง':2,'ระแนง-เกล็ด':2,'หลังคา':3,'ฝ้า-ผนัง':3,'ตู้อลู':4,'ฝาตู้':4,'มุ้ง':5,'ม่านซิป':7};
   // ข้ามรุ่นที่ R4.0 มี cost-engine แล้ว
   const SKIP=new Set(['sliding_sms','sliding_euro','sliding_eseries','fixed_glass','awning_euro','awning_aluinch','casement_euro','casement_velora','folding','folding_euro','folding_xseries','lift_sms','lift_aluinch','pc_door_2','pc_door_4','curved_fixed','roof_vinyl','roof_delight','roof_polyton','roof_laminate','ceiling_smooth','isowall','wall_ext','wall_int','ceil_cshape','ceil_bsc','steel_mesh']);
-  // ข้ามหมวดที่ทำแยก (cascade ระแนง · หลังคา/มุ้ง cost-engine · เสริม=ออปชั่น)
-  const SKIPCAT=new Set(['เสริม','ลูกฟูก+คอมโพสิททึบ','ระแนง-บังตา','ระแนง-ผนัง','ระแนง-เกล็ด','หลังคา','มุ้ง']);
+  // ข้ามหมวดที่ทำแยก (ระแนงมีโครง=cascade ด้านล่าง · เสริม=ออปชั่น)
+  const SKIPCAT=new Set(['เสริม','ลูกฟูก+คอมโพสิททึบ','ระแนง-บังตา','ระแนง-ผนัง','ระแนง-เกล็ด']);
   const OKM=new Set(['bucket','area_rate','per_sqm','per_length_tier']);
-  const BESPOKE=['cabinet','future_tech','zipscreen','gate','bar_grid','bar_slide','bar_openclose','grid','frame_wrap','custom_item','glass_replace','gutter_cover','pvc_cover','truss_cover','ranae'];
+  const BESPOKE=['cabinet','future_tech','zipscreen','gate','bar_grid','bar_slide','bar_openclose','grid','frame_wrap','custom_item','glass_replace','gutter_cover','pvc_cover','truss_cover','ranae','screen_addon'];
   let n=0;
   R39DATA.products.forEach(function(p){
     if(SKIP.has(p.id)||SKIPCAT.has(p.cat)) return;
@@ -8911,6 +8916,25 @@ const PRODUCTS_TODO = [
       note:'ราคาอ้างอิง R3.9 ('+(isLen?'ตามความยาว':(p.method==='per_sqm'?'ตร.ม.×เรต':'ตามขนาด'))+' · รวมติดตั้ง · ยังไม่ถอดต้นทุน/ออปชั่น)' };
     n++;
   });
+  // ── ระแนงมีโครง (บังตา/ผนัง/เกล็ด) → cascade เดียว (สไตล์ R4.0 · ไม่ใช่ 88 ปุ่ม) · ราคา per_sqm × ลาย ──
+  const RNCATS=['ระแนง-บังตา','ระแนง-ผนัง','ระแนง-เกล็ด'];
+  const ranaeLut={}, ranaeMats=[];
+  R39DATA.products.forEach(function(p){
+    if(RNCATS.indexOf(p.cat)<0) return;
+    if(p.method!=='per_sqm'||!p.rate) return;
+    if(/ยกเลิกขาย/.test(p.name||'')) return;
+    const key=p.cat+'|'+p.id;
+    ranaeLut[key]={ rate:p.rate, fin:0, name:(p.name||'').replace(/^บังตาผนังระแนง\s*/,'').trim()||p.id };
+    ranaeMats.push(key);
+  });
+  if(ranaeMats.length && !PRODUCTS['r39_ranae']){
+    PRODUCTS['r39_ranae']={ id:'r39_ranae', group:2, name:'ระแนง (บังตา/ผนัง/เกล็ด)', brand:'MTONG',
+      sellR39:true, r39method:'per_sqm', r39min:0, cascade:true, lut:ranaeLut, materials:ranaeMats, defMaterial:ranaeMats[0], materialLabel:'ลายระแนง',
+      icon:'▦', defForm:'มาตรฐาน', forms:['มาตรฐาน'], defaults:{w:200,h:240,p:1}, defGlass:null, minP:1, maxP:1,
+      alu:[], glass:null, hardware:[], consum:[],
+      note:'ราคาอ้างอิง R3.9 (per_sqm × ลาย · รวมติดตั้ง) — สี/วิธีตัด/มุ้งติดตาย ทำทีหลัง' };
+    if(typeof console!=='undefined') console.log('[R39] ระแนง cascade:',ranaeMats.length,'ลาย');
+  }
   if(typeof console!=='undefined') console.log('[R39] auto-register fallback:',n,'รุ่น');
 })();
 </script>
@@ -9078,7 +9102,8 @@ const PRODUCTS_TODO = [
         const f2 = el('label', 'fld'); f2.innerHTML = `<span class="lbl">รุ่น / แบบ</span>`;
         const sel = el('select');
         p.materials.filter(m => m.split('|')[0] === curShop).forEach(m => {
-          const o = el('option', null, m.split('|')[1]); o.value = m; if (m === c.material) o.selected = true; sel.appendChild(o);
+          const lbl = (p.lut && p.lut[m] && p.lut[m].name) ? p.lut[m].name : m.split('|')[1];
+          const o = el('option', null, lbl); o.value = m; if (m === c.material) o.selected = true; sel.appendChild(o);
         });
         sel.onchange = () => { c.material = sel.value; renderConfig(); renderRight(); };
         f2.appendChild(sel); body.appendChild(f2);
