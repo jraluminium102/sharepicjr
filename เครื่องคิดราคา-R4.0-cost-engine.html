@@ -8056,6 +8056,12 @@ function computeAddon(id, sel, ctx) {
     const pr = +sel || 0;
     return pr > 0 ? { label: 'มือจับดิจิตอล (R3.9)', qty: 1, unit: 'ชุด', unitPrice: pr, amount: pr } : null;
   }
+  if (id === 'mosquito') {              // มุ้งบวกบาน (เฟรมเล็ก/ใหญ่/นิรภัย) — ราคา R3.9 ประมาณ (พื้นที่×เรต ขั้นต่ำ)
+    const M = { small: { rate: 1700, min: 2400, label: 'มุ้งเฟรมเล็ก' }, big: { rate: 1500, min: 7200, label: 'มุ้งเฟรมใหญ่' }, safety: { rate: 5000, min: 5000, label: 'มุ้งนิรภัย' } };
+    const m = M[sel]; if (!m) return null;
+    const amt = Math.max(m.min, ctx.area * m.rate);
+    return { label: m.label + ' (R3.9)', qty: round2(ctx.area), unit: 'ตร.ม.', unitPrice: m.rate, amount: amt };
+  }
   // ── ออปชั่น R4.0 (ทุนจีน×2 · ไม่ติดป้าย R3.9) ──
   if (id === 'zip_smart') {             // ม่านซิป Smart Module (Wi-Fi/Voice/App) — ทุนจีน ¥80×5×2
     return { label: 'Smart Module (Wi-Fi/Voice/App)', qty: 1, unit: 'ชิ้น', unitPrice: 800, amount: 800 };
@@ -8094,7 +8100,7 @@ const PRODUCTS = {
 
   // ═══════════════════════ G1 บาน ═══════════════════════
   sms_slide: {
-    id: 'sms_slide', group: 1, name: 'บานเลื่อน SMS', brand: 'SMS', laborKey: 'บานเลื่อน SMS', addons: ['frame_wrap', 'grid'],
+    id: 'sms_slide', group: 1, name: 'บานเลื่อน SMS', brand: 'SMS', laborKey: 'บานเลื่อน SMS',
     icon: '🪟', defForm: 'อิสระ', forms: ['อิสระ', 'ลากจูง', 'เปิดคู่กลาง'],
     defaults: { w: 600, h: 300, p: 3 }, defGlass: 'เขียว 6มม.', minP: 2, maxP: 6,
     vars: SLIDE_VARS,
@@ -8196,7 +8202,7 @@ const PRODUCTS = {
   },
 
   open_door: {
-    id: 'open_door', group: 1, name: 'บานเปิด', brand: 'EURO', laborKey: 'บานเปิด (ยูโร)', addons: ['frame_wrap', 'closer', 'thresh', 'grid'],
+    id: 'open_door', group: 1, name: 'บานเปิด', brand: 'EURO', laborKey: 'บานเปิด (ยูโร)',
     icon: '🚪', defForm: 'มีธรณี', forms: ['มีธรณี', 'ไม่มีธรณี'],
     defaults: { w: 150, h: 200, p: 1 }, defGlass: 'เขียว 6มม.', minP: 1, maxP: 4,
     vars: {
@@ -8289,7 +8295,7 @@ const PRODUCTS = {
   },
 
   fixed: {
-    id: 'fixed', group: 1, name: 'บานติดตาย', brand: 'MTONG', laborKey: 'บานติดตาย', addons: ['frame_wrap', 'grid'],
+    id: 'fixed', group: 1, name: 'บานติดตาย', brand: 'MTONG', laborKey: 'บานติดตาย',
     icon: '🟦', defForm: 'กระจกล้วน', forms: ['กระจกล้วน'], stockLen: 6.0,
     defaults: { w: 150, h: 200, p: 1 }, defGlass: 'เขียว 6มม.', minP: 1, maxP: 6,
     alu: [
@@ -9102,6 +9108,8 @@ const PRODUCTS_TODO = [
     if(p.group===1){
       const ads=['frame_wrap','grid'];
       if(/เปิด|ประตู|door|casement|ดัดโค้ง|YKK|เฟี้ยม/i.test(nm)){ ads.push('closer'); if(/เปิด|เฟี้ยม|ประตู/.test(nm)) ads.push('thresh'); }
+      if(!/ติดตาย/.test(nm)) ads.push('mosquito');           // มุ้งบวกบาน (เว้นติดตาย)
+      if(/เลื่อน|เปิด|ประตู|หมุน|ดัดโค้ง|PC|เฟี้ยม/i.test(nm)) ads.push('digihandle'); // มือจับดิจิตอล
       p.addons=ads; na++;
     } else if(p.group===2 && /ระแนง|รั้ว|บังตา/.test(nm)){
       p.addons=['frame_wrap']; na++;
@@ -9419,6 +9427,18 @@ const PRODUCTS_TODO = [
         const inp = el('input'); inp.type = 'number'; inp.value = A.zip_remote || 0; inp.min = 0;
         inp.oninput = () => { A.zip_remote = +inp.value || 0; renderRight(); };
         f.appendChild(inp); body.appendChild(f);
+      } else if (ad === 'mosquito') {
+        const f = el('label', 'fld'); f.innerHTML = `<span class="lbl">มุ้งบวกบาน</span>`;
+        f.appendChild(chipRow([{ val: 'none', label: 'ไม่มี' }, { val: 'small', label: 'เฟรมเล็ก' }, { val: 'big', label: 'เฟรมใหญ่' }, { val: 'safety', label: 'นิรภัย' }], A.mosquito || 'none', v => setA('mosquito', v)));
+        body.appendChild(f);
+      } else if (ad === 'digihandle') {
+        const f = el('label', 'fld'); f.innerHTML = `<span class="lbl">มือจับดิจิตอล</span>`;
+        const sel = el('select');
+        sel.appendChild(el('option', null, '— ไม่ใส่ —'));
+        const digi = (typeof R39DATA !== 'undefined' && R39DATA.DIGI) ? R39DATA.DIGI : [];
+        digi.forEach(d => { const o = el('option', null, d.n + ' · ' + fmt(d.p) + ' บ.'); o.value = d.p; if (String(d.p) === String(A.digihandle)) o.selected = true; sel.appendChild(o); });
+        sel.onchange = () => { A.digihandle = sel.value || ''; renderRight(); };
+        f.appendChild(sel); body.appendChild(f);
       }
     }
   }
