@@ -8947,6 +8947,17 @@ const PRODUCTS = {
     note: 'ฝาตู้ — เฉพาะบานหน้า Future Tech (max 3 บาน/ชุด · ราคาตามพื้นที่/บาน + 5,500/บานเพิ่ม) · ราคาตรง R3.9',
   },
 
+  // ═══════════════════════ G6 ห้องกระจก ═══════════════════════
+  room: {
+    id: 'room', group: 6, name: 'ห้องกระจก (ประกอบ)', brand: '-', composite: true,
+    icon: '🔲', defForm: 'มาตรฐาน', forms: ['มาตรฐาน'],
+    defaults: { w: 300, h: 300, p: 1 }, defGlass: null, minP: 1, maxP: 1,
+    room: { roomH: 250, nwall: 3, walltype: 'fixed', roofOn: true, roofmat: 'ไวนิล', floorOn: false, floorRate: 5000 },
+    wallTypes: ['fixed', 'sms_slide', 'open_door'],  // ชนิดผนัง (รุ่นจริงที่ประกอบ)
+    alu: [], glass: null, hardware: [], consum: [],
+    note: 'ห้องกระจก R4.0 — ประกอบจากรุ่นจริง: ผนังกระจก(เลือกชนิดบาน) + หลังคา(เลือกวัสดุ) + พื้น(ออปชั่น) · คิดด้วย cost-engine ของแต่ละชิ้น (ราคา R4.0 จริง · แยกราคาทุกด้าน) · room builder หลายช่อง/ต่อด้าน ทำต่อ',
+  },
+
   // ═══════════════════════ G7 ม่านซิป ═══════════════════════
   // R4.0 ของแท้: ซื้อสำเร็จจากจีน (¥×5 = ทุน) → ×2 (กำไร 100%) = ขาย · ข้อมูลจริงจากโฟลเดอร์ "ทำแคตตาล็อกสินค้าจีน" (Hunan)
   zipscreen: {
@@ -9069,16 +9080,87 @@ const PRODUCTS_TODO = [
   let quote = [];
 
   function defCfg(p) {
-    return { w: p.defaults.w, h: p.defaults.h, p: p.defaults.p, form: p.defForm || 'std', color: p.defColor || 'white', glassType: p.defGlass || 'เขียว 6มม.', material: p.defMaterial || null };
+    const c = { w: p.defaults.w, h: p.defaults.h, p: p.defaults.p, form: p.defForm || 'std', color: p.defColor || 'white', glassType: p.defGlass || 'เขียว 6มม.', material: p.defMaterial || null };
+    if (p.composite && p.room) Object.assign(c, p.room);  // ห้องกระจก: roomH/nwall/walltype/roofOn/roofmat/floorOn
+    return c;
   }
   function getCfg(id) { if (!cfgStore[id]) cfgStore[id] = defCfg(PRODUCTS[id]); return cfgStore[id]; }
 
   function calc(id) {
     const p = PRODUCTS[id], c = getCfg(id);
+    if (p.composite) return composeRoom(p, c);
     return computeCost(PB, p, {
       w: c.w, h: c.h, p: c.p, form: c.form, color: c.color, glassType: c.glassType, material: c.material,
       profitPct: PB.settings.profitPct, installProfitPct: PB.settings.installProfitPct,
     });
+  }
+
+  // ห้องกระจก (composite) — ประกอบราคาจากรุ่นจริง: ผนัง(เลือกชนิดบาน) + หลังคา + พื้น · คิดด้วย computeCost ของแต่ละชิ้น
+  function composeRoom(p, c) {
+    const W = (c.w || 300) / 100, D = (c.h || 300) / 100, RH = (c.roomH || 250) / 100;
+    const pp = { profitPct: PB.settings.profitPct, installProfitPct: PB.settings.installProfitPct };
+    const lines = []; let sell = 0, cost = 0;
+    const wallW = [W, D, D, W];  // ด้านกระจก: หน้า(กว้าง) → ข้าง(ลึก) → ข้าง → หลัง
+    const nWall = Math.max(1, Math.min(4, c.nwall || 3));
+    const wt = PRODUCTS[c.walltype] || PRODUCTS.fixed;
+    for (let i = 0; i < nWall; i++) {
+      const ww = wallW[i] || W;
+      const np = Math.max(1, Math.round(ww / 1.0));
+      const r = computeCost(PB, wt, { w: ww * 100, h: RH * 100, p: Math.min(np, wt.maxP || 6), form: wt.defForm, glassType: wt.defGlass || 'เขียว 6มม.', color: 'white', material: wt.defMaterial, ...pp });
+      sell += r.sell.withInstall; cost += r.cost.total;
+      lines.push({ cat: 'consum', name: 'ผนัง #' + (i + 1) + ' · ' + wt.name + ' (' + (Math.round(ww * 100) / 100) + '×' + RH + 'ม.)', qty: 1, unit: 'ด้าน', unitPrice: r.sell.withInstall, amount: r.sell.withInstall });
+    }
+    if (c.roofOn !== false) {
+      const rr = computeCost(PB, PRODUCTS.roof, { w: W * 100, h: D * 100, p: 1, form: PRODUCTS.roof.defForm, material: c.roofmat || 'ไวนิล', ...pp });
+      sell += rr.sell.withInstall; cost += rr.cost.total;
+      lines.push({ cat: 'consum', name: 'หลังคา · ' + (c.roofmat || 'ไวนิล') + ' (' + W + '×' + D + 'ม.)', qty: 1, unit: 'หลัง', unitPrice: rr.sell.withInstall, amount: rr.sell.withInstall });
+    }
+    if (c.floorOn) {
+      const fa = W * D, fp = Math.ceil(fa * (c.floorRate || 5000) / 100) * 100;
+      sell += fp; cost += fp / 2;
+      lines.push({ cat: 'consum', name: 'พื้น (' + (Math.round(fa * 100) / 100) + 'ตร.ม. × ' + (c.floorRate || 5000) + ')', qty: Math.round(fa * 100) / 100, unit: 'ตร.ม.', unitPrice: c.floorRate || 5000, amount: fp });
+    }
+    return {
+      input: { area: Math.round(W * D * 100) / 100, W, H: D }, glassArea: 0, aluKg: 0,
+      cost: { total: Math.round(cost), alu: 0, bake: 0, openOven: 0, glass: 0, hardware: 0, consum: Math.round(cost) },
+      labor: { prod: 0, install: 0 }, profit: Math.round(sell - cost),
+      sell: { beforeLabor: sell, mfgOnly: sell, withInstall: sell }, lines,
+    };
+  }
+
+  // UI ห้องกระจก (composite)
+  function renderRoomConfig(p, c, body) {
+    const upd = () => { renderConfig(); renderRight(); };
+    const row = el('div', 'row2');
+    [['w', 'กว้างห้อง (ซม.)'], ['h', 'ลึกห้อง (ซม.)']].forEach(([k, lb]) => {
+      const f = el('label', 'fld'); f.innerHTML = `<span class="lbl">${lb}</span>`;
+      const inp = el('input'); inp.type = 'number'; inp.value = c[k]; inp.min = 50; inp.step = 10;
+      inp.oninput = () => { c[k] = +inp.value || 0; renderRight(); };
+      f.appendChild(inp); row.appendChild(f);
+    });
+    body.appendChild(row);
+    const fh = el('label', 'fld'); fh.innerHTML = `<span class="lbl">สูงห้อง (ซม.)</span>`;
+    const ih = el('input'); ih.type = 'number'; ih.value = c.roomH; ih.min = 100; ih.step = 10;
+    ih.oninput = () => { c.roomH = +ih.value || 0; renderRight(); };
+    fh.appendChild(ih); body.appendChild(fh);
+    const f1 = el('label', 'fld'); f1.innerHTML = `<span class="lbl">จำนวนด้านกระจก</span>`;
+    f1.appendChild(chipRow([1, 2, 3, 4].map(n => ({ val: n, label: n + ' ด้าน' })), c.nwall, v => { c.nwall = v; upd(); }));
+    body.appendChild(f1);
+    const f2 = el('label', 'fld'); f2.innerHTML = `<span class="lbl">ชนิดผนัง (บาน)</span>`;
+    f2.appendChild(chipRow((p.wallTypes || ['fixed']).map(id => ({ val: id, label: PRODUCTS[id] ? PRODUCTS[id].name : id })), c.walltype, v => { c.walltype = v; upd(); }));
+    body.appendChild(f2);
+    const f3 = el('label', 'fld'); f3.innerHTML = `<span class="lbl">หลังคา</span>`;
+    f3.appendChild(chipRow([{ val: true, label: 'มีหลังคา' }, { val: false, label: 'ไม่มี' }], c.roofOn !== false, v => { c.roofOn = v; upd(); }));
+    body.appendChild(f3);
+    if (c.roofOn !== false) {
+      const f3b = el('label', 'fld'); f3b.innerHTML = `<span class="lbl">วัสดุมุง</span>`;
+      f3b.appendChild(chipRow((PRODUCTS.roof.materials || ['ไวนิล']).map(m => ({ val: m, label: m })), c.roofmat, v => { c.roofmat = v; renderRight(); }));
+      body.appendChild(f3b);
+    }
+    const f4 = el('label', 'fld'); f4.innerHTML = `<span class="lbl">พื้น</span>`;
+    f4.appendChild(chipRow([{ val: false, label: 'ไม่มี' }, { val: true, label: 'มีพื้น (5,000/ตร.ม.)' }], !!c.floorOn, v => { c.floorOn = v; renderRight(); }));
+    body.appendChild(f4);
+    if (p.note) body.appendChild(el('div', 'todo-note', 'ℹ️ ' + p.note));
   }
   function mfgPrice(r) {
     const d = PB.settings.mfgOnlyDiscountPct || 0;
@@ -9136,6 +9218,9 @@ const PRODUCTS_TODO = [
   function renderConfig() {
     const p = PRODUCTS[state.productId], c = getCfg(state.productId), body = $('#configBody');
     body.innerHTML = '';
+
+    // ── ห้องกระจก (composite) — UI เฉพาะ ──
+    if (p.composite) { renderRoomConfig(p, c, body); return; }
 
     // ขนาด
     const dims = el('div');
