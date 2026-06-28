@@ -8056,6 +8056,14 @@ function computeAddon(id, sel, ctx) {
     const pr = +sel || 0;
     return pr > 0 ? { label: 'มือจับดิจิตอล (R3.9)', qty: 1, unit: 'ชุด', unitPrice: pr, amount: pr } : null;
   }
+  // ── ออปชั่น R4.0 (ทุนจีน×2 · ไม่ติดป้าย R3.9) ──
+  if (id === 'zip_smart') {             // ม่านซิป Smart Module (Wi-Fi/Voice/App) — ทุนจีน ¥80×5×2
+    return { label: 'Smart Module (Wi-Fi/Voice/App)', qty: 1, unit: 'ชิ้น', unitPrice: 800, amount: 800 };
+  }
+  if (id === 'zip_remote') {            // ม่านซิป รีโมทเพิ่ม (Multi Frequency)
+    const n = +sel || 0;
+    return n > 0 ? { label: 'รีโมทเพิ่ม ' + n + ' ตัว (Multi)', qty: n, unit: 'ตัว', unitPrice: 400, amount: n * 400 } : null;
+  }
   return null;
 }
 
@@ -9003,7 +9011,7 @@ const PRODUCTS = {
   // ═══════════════════════ G7 ม่านซิป ═══════════════════════
   // R4.0 ของแท้: ซื้อสำเร็จจากจีน (¥×5 = ทุน) → ×2 (กำไร 100%) = ขาย · ข้อมูลจริงจากโฟลเดอร์ "ทำแคตตาล็อกสินค้าจีน" (Hunan)
   zipscreen: {
-    id: 'zipscreen', group: 7, name: 'ม่านซิป (Zip Screen กันลม)', brand: '-', sellZip: true,
+    id: 'zipscreen', group: 7, name: 'ม่านซิป (Zip Screen กันลม)', brand: '-', sellZip: true, addons: ['zip_smart', 'zip_remote'],
     icon: '🎐', materialLabel: 'ผ้า (ความโปร่ง)',
     materials: ['0', '1', '2', '3', '5', '10', '30', 'PET'],
     materialLabels: { '0': 'F00 ทึบ 99%', '1': 'F01 1%', '2': 'F02 2%', '3': 'F03 ไฟเบอร์', '5': 'F05 5% (ขายดี)', '10': 'F10 10%', '30': 'F30 30%', 'PET': 'PET ใส' },
@@ -9085,7 +9093,21 @@ const PRODUCTS_TODO = [
       note:'ราคาอ้างอิง R3.9 (per_sqm × ลาย · รวมติดตั้ง) — สี/วิธีตัด/มุ้งติดตาย ทำทีหลัง' };
     if(typeof console!=='undefined') console.log('[R39] ระแนง cascade:',ranaeMats.length,'ลาย');
   }
-  if(typeof console!=='undefined') console.log('[R39] auto-register fallback:',n,'รุ่น');
+  // ── ใส่ออปชั่นเสริม default ให้รุ่นที่ควรมี (ทับเฉพาะที่ยังไม่ระบุเอง) ──
+  // G1 บาน: ครอบวงกบ+คาดตาราง ทุกบาน · บานเปิด/ประตู +โช้ค+ธรณี · G2 ระแนง/รั้ว: ครอบวงกบ
+  let na=0;
+  Object.values(PRODUCTS).forEach(function(p){
+    if(p.composite || p.sellZip || p.addons) return;
+    const nm=p.name||'';
+    if(p.group===1){
+      const ads=['frame_wrap','grid'];
+      if(/เปิด|ประตู|door|casement|ดัดโค้ง|YKK|เฟี้ยม/i.test(nm)){ ads.push('closer'); if(/เปิด|เฟี้ยม|ประตู/.test(nm)) ads.push('thresh'); }
+      p.addons=ads; na++;
+    } else if(p.group===2 && /ระแนง|รั้ว|บังตา/.test(nm)){
+      p.addons=['frame_wrap']; na++;
+    }
+  });
+  if(typeof console!=='undefined') console.log('[R39] auto-register fallback:',n,'รุ่น · auto-addon:',na,'รุ่น');
 })();
 </script>
 <script>/* APP UI */
@@ -9388,6 +9410,15 @@ const PRODUCTS_TODO = [
           ff.appendChild(inp); row.appendChild(ff);
         });
         f.appendChild(row); body.appendChild(f);
+      } else if (ad === 'zip_smart') {
+        const f = el('label', 'fld'); f.innerHTML = `<span class="lbl">Smart Module (Wi-Fi/เสียง)</span>`;
+        f.appendChild(chipRow([{ val: 'none', label: 'ไม่มี' }, { val: 'yes', label: 'มี (+800)' }], A.zip_smart || 'none', v => setA('zip_smart', v)));
+        body.appendChild(f);
+      } else if (ad === 'zip_remote') {
+        const f = el('label', 'fld'); f.innerHTML = `<span class="lbl">รีโมทเพิ่ม (ตัว)</span>`;
+        const inp = el('input'); inp.type = 'number'; inp.value = A.zip_remote || 0; inp.min = 0;
+        inp.oninput = () => { A.zip_remote = +inp.value || 0; renderRight(); };
+        f.appendChild(inp); body.appendChild(f);
       }
     }
   }
