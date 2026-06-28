@@ -7999,7 +7999,7 @@ function computeCost(PB, prod, opt) {
   const selAddons = opt.addons || {};
   let addonTotal = 0;
   for (const ad of (prod.addons || [])) {
-    const r = computeAddon(ad, selAddons[ad], { W, H, P, area });
+    const r = computeAddon(ad, selAddons[ad], { W, H, P, area, opt });
     if (r && r.amount > 0) {
       addonTotal += r.amount;
       lines.push({ cat: 'addon', name: r.label, qty: r.qty || 1, unit: r.unit || '', unitPrice: r.unitPrice || r.amount, amount: round2(r.amount) });
@@ -8056,11 +8056,13 @@ function computeAddon(id, sel, ctx) {
     const pr = +sel || 0;
     return pr > 0 ? { label: 'มือจับดิจิตอล (R3.9)', qty: 1, unit: 'ชุด', unitPrice: pr, amount: pr } : null;
   }
-  if (id === 'mosquito') {              // มุ้งบวกบาน (เฟรมเล็ก/ใหญ่/นิรภัย) — ราคา R3.9 ประมาณ (พื้นที่×เรต ขั้นต่ำ)
+  if (id === 'mosquito') {              // มุ้งบวกบาน — ใช้ราคา R4.0 จาก cost-engine มุ้ง (app คำนวณส่งมาทาง opt.mosquitoR4)
+    const r4 = ctx.opt && ctx.opt.mosquitoR4;
+    if (r4 && r4.amount > 0) return { label: r4.label + ' (R4.0)', qty: round2(ctx.area), unit: 'ตร.ม.', unitPrice: round2(r4.amount / (ctx.area || 1)), amount: r4.amount };
+    // fallback (ถ้า app ไม่ส่ง R4.0 มา) — ราคา R3.9 ประมาณ
     const M = { small: { rate: 1700, min: 2400, label: 'มุ้งเฟรมเล็ก' }, big: { rate: 1500, min: 7200, label: 'มุ้งเฟรมใหญ่' }, safety: { rate: 5000, min: 5000, label: 'มุ้งนิรภัย' } };
     const m = M[sel]; if (!m) return null;
-    const amt = Math.max(m.min, ctx.area * m.rate);
-    return { label: m.label + ' (R3.9)', qty: round2(ctx.area), unit: 'ตร.ม.', unitPrice: m.rate, amount: amt };
+    return { label: m.label + ' (R3.9)', qty: round2(ctx.area), unit: 'ตร.ม.', unitPrice: m.rate, amount: Math.max(m.min, ctx.area * m.rate) };
   }
   // ── ออปชั่น R4.0 (ทุนจีน×2 · ไม่ติดป้าย R3.9) ──
   if (id === 'zip_smart') {             // ม่านซิป Smart Module (Wi-Fi/Voice/App) — ทุนจีน ¥80×5×2
@@ -9161,10 +9163,21 @@ const PRODUCTS_TODO = [
   function calc(id) {
     const p = PRODUCTS[id], c = getCfg(id);
     if (p.composite) return composeRoom(p, c);
-    return computeCost(PB, p, {
+    const opt = {
       w: c.w, h: c.h, p: c.p, form: c.form, color: c.color, glassType: c.glassType, material: c.material, addons: c.addons || {},
       profitPct: PB.settings.profitPct, installProfitPct: PB.settings.installProfitPct,
-    });
+    };
+    // มุ้งบวกบาน — คิดราคา R4.0 จาก cost-engine มุ้ง (เฟรมเล็ก/ใหญ่/นิรภัย) ที่ขนาดบาน
+    const mq = c.addons && c.addons.mosquito;
+    if (mq && mq !== 'none') {
+      const mId = { small: 'screen', big: 'screen_big', safety: 'screen_safety' }[mq];
+      const mp = mId && PRODUCTS[mId];
+      if (mp) {
+        const mr = computeCost(PB, mp, { w: c.w, h: c.h, p: 1, form: mp.defForm, material: mp.defMaterial, profitPct: opt.profitPct, installProfitPct: opt.installProfitPct });
+        opt.mosquitoR4 = { amount: mr.sell.withInstall, label: mp.name };
+      }
+    }
+    return computeCost(PB, p, opt);
   }
 
   // ห้องกระจก (composite) — ประกอบราคาจากรุ่นจริง: ผนัง(เลือกชนิดบาน) + หลังคา + พื้น · คิดด้วย computeCost ของแต่ละชิ้น
